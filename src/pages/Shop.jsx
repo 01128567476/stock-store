@@ -16,18 +16,20 @@ const SORTS = [
 export default function Shop() {
   const [params, setParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
-  const pushedRef = useRef(false);
+  const sidebarPushedRef = useRef(false);
 
   useEffect(() => {
     if (!showFilters) return undefined;
+
     const previousBodyOverflow = document.body.style.overflow;
     const previousHtmlOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
 
-    // Add a history entry so the hardware back button closes the drawer first
-    history.pushState({ filters: true }, '');
-    pushedRef.current = true;
+    // Push ONE history entry so hardware Back closes the drawer first,
+    // without changing the route/hash (stays on the Search page).
+    history.pushState({ sidebar: true }, '');
+    sidebarPushedRef.current = true;
 
     const closeOnEscape = (event) => {
       if (event.key === 'Escape') setShowFilters(false);
@@ -48,7 +50,12 @@ export default function Shop() {
     };
 
     const handlePopState = () => {
-      if (showFilters) setShowFilters(false);
+      // Hardware Back while drawer is open: close it only.
+      // Do not call history.back() again — the browser already navigated back.
+      if (showFilters && sidebarPushedRef.current) {
+        sidebarPushedRef.current = false;
+        setShowFilters(false);
+      }
     };
 
     window.addEventListener('keydown', closeOnEscape);
@@ -58,9 +65,11 @@ export default function Shop() {
     return () => {
       document.body.style.overflow = previousBodyOverflow;
       document.documentElement.style.overflow = previousHtmlOverflow;
-      if (pushedRef.current) {
+      // Pop the sidebar entry only if we pushed it and state matches,
+      // so no leftover history entries remain when closing via UI.
+      if (sidebarPushedRef.current && history.state?.sidebar === true) {
+        sidebarPushedRef.current = false;
         history.back();
-        pushedRef.current = false;
       }
       window.removeEventListener('keydown', closeOnEscape);
       window.removeEventListener('popstate', handlePopState);
