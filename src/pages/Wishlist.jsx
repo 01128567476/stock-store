@@ -1,14 +1,15 @@
 import { Link } from 'react-router-dom';
 import { ArrowIcon } from '../components/Icons';
-import { PRODUCTS } from '../data/products';
 import { useWishlist } from '../context/WishlistContext';
+import { useAdmin } from '../context/AdminContext';
 import { useSEO } from '../hooks/useSEO';
 import ProductCard from '../components/ProductCard';
 
 export default function Wishlist() {
   useSEO('Wishlist');
   const { ids } = useWishlist();
-  const items = PRODUCTS.filter((p) => ids.includes(p.id));
+  const { products } = useAdmin();
+  const items = products.filter((p) => ids.includes(p.id) && p.active !== false);
 
   return (
     <div className="container page-pad">

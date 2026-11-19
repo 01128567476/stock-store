@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { CATEGORIES, IMAGES, PRODUCTS, discountPercent } from '../data/products';
+import { CATEGORIES, IMAGES, discountPercent } from '../data/products';
 import { STORE } from '../config';
+import { useAdmin } from '../context/AdminContext';
 import { useSEO } from '../hooks/useSEO';
 import ProductSection from '../components/ProductSection';
 import Reveal from '../components/Reveal';
@@ -23,11 +24,13 @@ const FEATURES = [
 
 export default function Home() {
   useSEO(null);
-  const featured = PRODUCTS.filter((p) => p.featured).slice(0, 4);
-  const newArrivals = PRODUCTS.filter((p) => p.isNew).slice(0, 4);
-  const best = PRODUCTS.filter((p) => p.bestSeller).slice(0, 4);
-  const onSale = PRODUCTS.filter((p) => p.salePrice != null);
-  const maxOff = Math.max(...onSale.map(discountPercent));
+  const { products } = useAdmin();
+  const visible = products.filter((p) => p.active !== false);
+  const featured = visible.filter((p) => p.featured).slice(0, 4);
+  const newArrivals = visible.filter((p) => p.isNew).slice(0, 4);
+  const best = visible.filter((p) => p.bestSeller).slice(0, 4);
+  const onSale = visible.filter((p) => p.salePrice != null);
+  const maxOff = onSale.length ? Math.max(...onSale.map(discountPercent)) : 0;
 
   return (
     <>

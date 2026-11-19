@@ -1,9 +1,9 @@
-import { useState, useCallback, useEffect } from 'react';
+﻿import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
-import { CATEGORIES, getProduct } from '../data/products';
+import { CATEGORIES } from '../data/products';
 import { money } from '../config';
-import { CloseIcon } from '../components/Icons';
+import { CloseIcon, ArrowIcon } from '../components/Icons';
 
 const DEFAULT_SIZES = {
   men: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -12,355 +12,273 @@ const DEFAULT_SIZES = {
 };
 
 export default function AdminProductForm() {
-  const { addProduct, updateProduct } = useAdmin();
+  const { products, addProduct, updateProduct } = useAdmin();
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
-  const existing = isEdit ? getProduct(id) : null;
+
+  const existing = isEdit ? products.find((p) => p.id === id) : null;
+  const imageInput = useRef(null);
 
   const [form, setForm] = useState({
-    name: existing?.name || '',
-    description: existing?.description || '',
-    category: existing?.category || 'men',
-    price: existing?.price ?? '',
-    discount: existing?.salePrice != null
-      ? Math.round(((existing.price - existing.salePrice) / existing.price) * 100)
-      : '',
-    colors: existing?.colors?.map((c) => ({ name: c.name, hex: c.hex })) || [
-      { name: 'Black', hex: '#141414' },
-    ],
-    sizes: existing?.sizes || DEFAULT_SIZES.men,
-    images: existing?.images || [],
+    name: '', description: '', category: 'men', price: '', discount: '',
+    colors: [{ name: 'Black', hex: '#141414' }],
+    sizes: DEFAULT_SIZES.men,
+    images: [],
+    active: true,
   });
 
+  const [ready, setReady] = useState(!isEdit);
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-
-  const salePrice = useCallback(() => {
-    const p = parseFloat(form.price);
-    const d = parseFloat(form.discount) || 0;
-    if (!p || d < 0 || d > 100) return null;
-    return Math.round(p * (1 - d / 100) * 100) / 100;
-  }, [form.price, form.discount]);
-
-  const sp = salePrice();
-  const onSale = sp != null && sp < parseFloat(form.price || 0);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    if (existing) {
-      setForm((prev) => ({
-        ...prev,
-        name: existing.name,
-        description: existing.description,
-        category: existing.category,
-        price: String(existing.price),
-        discount: existing.salePrice != null
-          ? Math.round(((existing.price - existing.salePrice) / existing.price) * 100)
-          : '',
-        colors: existing.colors.map((c) => ({ name: c.name, hex: c.hex })),
-        sizes: existing.sizes,
-        images: existing.images,
-      }));
-    }
-  }, [existing]);
-
-  const handleChange = (key, value) =>
-    setForm((prev) => ({ ...prev, [key]: value }));
-
-  const addColor = () => {
-    setForm((prev) => ({
-      ...prev,
-      colors: [...prev.colors, { name: 'New Color', hex: '#d9c9ae' }],
-    }));
-  };
-
-  const removeColor = (index) => {
-    if (form.colors.length <= 1) return;
-    setForm((prev) => {
-      const colors = [...prev.colors];
-      colors.splice(index, 1);
-      return { ...prev, colors };
+    if (!isEdit) return;
+    if (!existing) { setReady(true); return; }
+    setForm({
+      name: existing.name || '',
+      description: existing.description || '',
+      category: existing.category || 'men',
+      price: String(existing.price ?? ''),
+      discount: existing.salePrice != null
+        ? String(Math.round(((existing.price - existing.salePrice) / existing.price) * 100))
+        : '',
+      colors: (existing.colors || []).map((c) => ({ name: c.name, hex: c.hex })),
+      sizes: existing.sizes || [],
+      images: existing.images || [],
+      active: existing.active !== false,
     });
+    setReady(true);
+  }, [isEdit, existing]);
+
+  const finalPrice = useMemo(() => {
+    const price = parseFloat(form.price);
+    const discount = parseFloat(form.discount) || 0;
+    if (!price || price <= 0 || discount < 0 || discount > 100) return null;
+    return Math.round(price * (1 - discount / 100) * 100) / 100;
+  }, [form.price, form.discount]);
+
+  const onSale = finalPrice != null && finalPrice < parseFloat(form.price || 0);
+
+  const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
+
+  const validate = () => {
+    const e = {};
+    if (!form.name.trim()) e.name = 'Name is required';
+    if (!form.description.trim()) e.description = 'Description is required';
+    if (!form.price || parseFloat(form.price) <= 0) e.price = 'Enter a valid original price';
+    if (form.discount !== '' && (parseFloat(form.discount) < 0 || parseFloat(form.discount) > 100)) e.discount = 'Discount must be between 0 and 100';
+    if (!form.colors.length) e.colors = 'Add at least one color';
+    if (!form.sizes.length) e.sizes = 'Select at least one size';
+    if (!form.images.length) e.images = 'Add at least one image';
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
-  const updateColor = (index, field, value) => {
-    setForm((prev) => {
-      const colors = [...prev.colors];
-      colors[index] = { ...colors[index], [field]: value };
-      return { ...prev, colors };
-    });
-  };
-
-  const toggleSize = (size) => {
-    setForm((prev) => {
-      const sizes = [...prev.sizes];
-      const idx = sizes.indexOf(size);
-      if (idx >= 0) sizes.splice(idx, 1);
-      else sizes.push(size);
-      return { ...prev, sizes };
-    });
-  };
-
-  const addImage = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image file.');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setForm((prev) => ({
-        ...prev,
-        images: [...prev.images, ev.target.result],
-      }));
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
-  };
-
-  const removeImage = (index) => {
-    setForm((prev) => {
-      const images = [...prev.images];
-      images.splice(index, 1);
-      return { ...prev, images };
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!form.name.trim()) {
-      alert('Product name is required.');
-      return;
-    }
-    const p = parseFloat(form.price);
-    if (!p || p <= 0) {
-      alert('A valid price is required.');
-      return;
-    }
-    const d = parseFloat(form.discount) || 0;
-    const salePrice = d > 0 && d <= 100 ? Math.round(p * (1 - d / 100) * 100) / 100 : null;
-    if (d < 0 || d > 100) {
-      alert('Discount must be between 0 and 100.');
-      return;
-    }
-    if (form.images.length === 0) {
-      alert('At least one image is required.');
-      return;
-    }
-
+  const handleSubmit = (ev) => {
+    ev.preventDefault();
+    if (!validate()) return;
     setLoading(true);
-    const product = {
-      id: isEdit
-        ? form.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-        : Date.now().toString(),
+    const slug = form.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36);
+    const payload = {
+      id: isEdit ? existing.id : slug,
       name: form.name.trim(),
+      description: form.description.trim(),
       category: form.category,
-      price: p,
-      salePrice,
+      price: parseFloat(form.price),
+      salePrice: onSale ? finalPrice : null,
       colors: form.colors,
       sizes: form.sizes,
       images: form.images,
-      description: form.description.trim(),
-      details: ['Premium quality', 'Designed for comfort', 'Made to last'],
-      featured: false,
-      isNew: false,
-      bestSeller: false,
-      rating: 5,
-      reviews: 0,
+      active: form.active,
+      details: existing?.details || ['Premium quality', 'Designed to last'],
+      featured: existing?.featured || false,
+      isNew: existing?.isNew || false,
+      bestSeller: existing?.bestSeller || false,
+      rating: existing?.rating || 4.5,
+      reviews: existing?.reviews || 0,
     };
-
-    if (isEdit) {
-      updateProduct(product.id, product);
-    } else {
-      addProduct(product);
-    }
+    if (isEdit) updateProduct(existing.id, payload);
+    else addProduct(payload);
+    setSaved(true);
     setLoading(false);
-    navigate('/admin/products');
+    setTimeout(() => navigate('/admin/products'), 900);
   };
+
+  const addColor = () => setForm((p) => ({ ...p, colors: [...p.colors, { name: 'New Color', hex: '#d9c9ae' }] }));
+  const removeColor = (i) => setForm((p) => ({ ...p, colors: p.colors.filter((_, idx) => idx !== i) }));
+  const updateColor = (i, field, value) => setForm((p) => ({ ...p, colors: p.colors.map((c, idx) => idx === i ? { ...c, [field]: value } : c) }));
+  const toggleSize = (s) => setForm((p) => ({ ...p, sizes: p.sizes.includes(s) ? p.sizes.filter((x) => x !== s) : [...p.sizes, s] }));
+
+  const handleImages = (ev) => {
+    const files = Array.from(ev.target.files || []);
+    files.forEach((file) => {
+      if (!file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = () => setForm((p) => ({ ...p, images: [...p.images, String(reader.result)] }));
+      reader.readAsDataURL(file);
+    });
+    ev.target.value = '';
+  };
+
+  const moveImage = (i, dir) => {
+    setForm((p) => {
+      const imgs = [...p.images];
+      const j = i + dir;
+      if (j < 0 || j >= imgs.length) return p;
+      [imgs[i], imgs[j]] = [imgs[j], imgs[i]];
+      return { ...p, images: imgs };
+    });
+  };
+
+  if (!ready) return <div className="admin-loading">Loading product…</div>;
+  if (isEdit && !existing) {
+    return (
+      <div className="admin-page">
+        <div className="admin-card admin-empty"><p>Product not found.</p>
+          <button className="btn" onClick={() => navigate('/admin/products')}>Back to Products</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-page">
+      {saved && <div className="admin-toast admin-toast--success">Product saved! Redirecting…</div>}
+
       <div className="admin-page-head">
-        <a href="/admin/products" className="btn btn-outline btn-sm" style={{ marginRight: '0.5rem' }}>
-          ← Back
-        </a>
-        <h2>{isEdit ? 'Edit Product' : 'Add Product'}</h2>
+        <div>
+          <h2>{isEdit ? 'Edit Product' : 'Add Product'}</h2>
+          <p className="muted small">{isEdit ? 'Update product details' : 'Create a new catalog item'}</p>
+        </div>
+        <button className="btn btn-outline" onClick={() => navigate('/admin/products')}>← Back</button>
       </div>
 
-      <div className="admin-card">
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="admin-form-grid">
-            <div className="admin-field full">
-              <label>Product Name</label>
-              <input
-                type="text"
-                value={form.name}
-                onChange={(e) => handleChange('name', e.target.value)}
-                placeholder="e.g. Minimal Leather Sneakers"
-                required
-              />
-            </div>
+      <form className="admin-card admin-form" onSubmit={handleSubmit} noValidate>
+        <div className="admin-form-grid">
+          <div className="admin-field full">
+            <label>Product Name *</label>
+            <input type="text" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="e.g. Essential Oversized Tee" />
+            {errors.name && <span className="admin-field-error">{errors.name}</span>}
+          </div>
 
-            <div className="admin-field">
-              <label>Category</label>
-              <select
-                value={form.category}
-                onChange={(e) => handleChange('category', e.target.value)}
-              >
-                {CATEGORIES.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div className="admin-field full">
+            <label>Description *</label>
+            <textarea rows={4} value={form.description} onChange={(e) => set('description', e.target.value)} placeholder="Describe the product…" />
+            {errors.description && <span className="admin-field-error">{errors.description}</span>}
+          </div>
 
-            <div className="admin-field">
-              <label>Original Price (EGP)</label>
-              <div className="price-input">
-                <span>EGP</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={form.price}
-                  onChange={(e) => handleChange('price', e.target.value)}
-                  placeholder="0.00"
-                  required
-                />
-              </div>
-            </div>
+          <div className="admin-field">
+            <label>Category *</label>
+            <select value={form.category} onChange={(e) => {
+              const cat = e.target.value;
+              setForm((p) => ({ ...p, category: cat, sizes: DEFAULT_SIZES[cat] }));
+            }}>
+              {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+            </select>
+          </div>
 
-            <div className="admin-field">
-              <label>Discount %</label>
-              <div className="price-input">
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="1"
-                  value={form.discount}
-                  onChange={(e) => handleChange('discount', e.target.value)}
-                  placeholder="0"
-                />
-                <span>%</span>
+          <div className="admin-field">
+            <label>Status</label>
+            <label className="admin-check">
+              <input type="checkbox" checked={form.active} onChange={(e) => set('active', e.target.checked)} />
+              Active (visible in store)
+            </label>
+          </div>
+
+          <div className="admin-field">
+            <label>Original Price (EGP) *</label>
+            <input type="number" min="1" step="0.01" value={form.price} onChange={(e) => set('price', e.target.value)} placeholder="690" />
+            {errors.price && <span className="admin-field-error">{errors.price}</span>}
+          </div>
+
+          <div className="admin-field">
+            <label>Discount %</label>
+            <input type="number" min="0" max="100" step="1" value={form.discount} onChange={(e) => set('discount', e.target.value)} placeholder="0" />
+            {errors.discount && <span className="admin-field-error">{errors.discount}</span>}
+          </div>
+
+          <div className="admin-field full">
+            <div className="admin-price-preview">
+              <div>
+                <span className="muted small">Final price (auto-calculated)</span>
+                <div className="admin-preview-price">{finalPrice != null ? money(finalPrice) : '—'}</div>
               </div>
               {onSale && (
-                <div className="admin-discount-preview">
-                  <span className="was">{money(parseFloat(form.price))}</span>
-                  <span className="now sale">{money(sp)}</span>
-                  <span className="badge badge-sale">-{Math.round(((parseFloat(form.price) - sp) / parseFloat(form.price)) * 100)}%</span>
+                <div className="admin-preview-details">
+                  <s>{money(parseFloat(form.price))}</s>
+                  <span className="admin-pill admin-pill-sale">-{form.discount}%</span>
                 </div>
               )}
             </div>
+          </div>
 
-            <div className="admin-field full">
-              <label>Description</label>
-              <textarea
-                value={form.description}
-                onChange={(e) => handleChange('description', e.target.value)}
-                rows={4}
-                placeholder="Describe the product…"
-              />
+          <div className="admin-field full">
+            <label>Colors</label>
+            {errors.colors && <span className="admin-field-error">{errors.colors}</span>}
+            <div className="admin-color-list">
+              {form.colors.map((c, i) => (
+                <div key={i} className="admin-color-row">
+                  <span className="admin-color-dot" style={{ background: c.hex }} />
+                  <input type="text" value={c.name} onChange={(e) => updateColor(i, 'name', e.target.value)} placeholder="Color name" />
+                  <input type="color" value={c.hex} onChange={(e) => updateColor(i, 'hex', e.target.value)} />
+                  <button type="button" className="admin-icon-btn" onClick={() => removeColor(i)} aria-label="Remove color"><CloseIcon size={14} /></button>
+                </div>
+              ))}
             </div>
+            <button type="button" className="btn btn-outline btn-sm" onClick={addColor}>+ Add Color</button>
+          </div>
 
-            <div className="admin-field full">
-              <label>Colors</label>
-              <div className="color-list">
-                {form.colors.map((c, i) => (
-                  <div key={i} className="color-item">
-                    <div className="color-swatch" style={{ backgroundColor: c.hex }} />
-                    <input
-                      type="text"
-                      value={c.name}
-                      onChange={(e) => updateColor(i, 'name', e.target.value)}
-                      placeholder="Color name"
-                    />
-                    <input
-                      type="color"
-                      value={c.hex}
-                      onChange={(e) => updateColor(i, 'hex', e.target.value)}
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-sm admin-icon-btn"
-                      onClick={() => removeColor(i)}
-                      aria-label="Remove color"
-                    >
-                      <CloseIcon size={14} />
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  className="btn btn-outline btn-sm"
-                  onClick={addColor}
-                >
-                  + Add Color
-                </button>
-              </div>
+          <div className="admin-field full">
+            <label>Sizes</label>
+            {errors.sizes && <span className="admin-field-error">{errors.sizes}</span>}
+            <div className="admin-size-list">
+              {Array.from(new Set([...DEFAULT_SIZES[form.category], ...form.sizes])).map((s) => (
+                <button key={s} type="button" className={`size-chip ${form.sizes.includes(s) ? 'active' : ''}`} onClick={() => toggleSize(s)}>{s}</button>
+              ))}
             </div>
-
-            <div className="admin-field full">
-              <label>Sizes</label>
-              <div className="size-list">
-                {DEFAULT_SIZES[form.category].map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    className={`size-chip ${form.sizes.includes(s) ? 'active' : ''}`}
-                    onClick={() => toggleSize(s)}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="admin-field full">
-              <label>Product Images</label>
-              <div className="image-list">
-                {form.images.map((src, i) => (
-                  <div key={i} className="image-item">
-                    <img src={src} alt={`Image ${i + 1}`} className="admin-form-img" />
-                    <button
-                      type="button"
-                      className="btn btn-sm admin-icon-btn admin-icon-btn-danger"
-                      onClick={() => removeImage(i)}
-                      aria-label="Remove image"
-                    >
-                      <CloseIcon size={14} />
-                    </button>
-                  </div>
-                ))}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={addImage}
-                  className="admin-file-input"
-                />
-                <button type="button" className="btn btn-outline btn-sm" onClick={() => document.querySelector('.admin-file-input')?.click()}>
-                  + Add Image
-                </button>
-              </div>
-              <p className="muted small">Upload multiple images. First image is the cover.</p>
+            <div className="admin-custom-size">
+              <input type="text" id="customSize" placeholder="Custom size" onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  const v = e.target.value.trim();
+                  if (v && !form.sizes.includes(v)) set('sizes', [...form.sizes, v]);
+                  e.target.value = '';
+                }
+              }} />
+              <span className="muted small">Press Enter to add</span>
             </div>
           </div>
 
-          <div className="admin-form-actions">
-            <button
-              type="button"
-              className="btn btn-outline btn-lg"
-              onClick={() => navigate('/admin/products')}
-            >
-              Cancel
-            </button>
-            <button type="submit" className="btn btn-lg btn-full" disabled={loading}>
-              {loading ? 'Saving…' : isEdit ? 'Update Product' : 'Create Product'}
-            </button>
+          <div className="admin-field full">
+            <label>Images</label>
+            {errors.images && <span className="admin-field-error">{errors.images}</span>}
+            <div className="admin-image-grid">
+              {form.images.map((src, i) => (
+                <div key={i} className="admin-image-item">
+                  <img src={src} alt={`Image ${i + 1}`} />
+                  <div className="admin-image-tools">
+                    <button type="button" onClick={() => moveImage(i, -1)} disabled={i === 0} aria-label="Move left"><ArrowIcon size={14} style={{ transform: 'rotate(180deg)' }} /></button>
+                    <span>{i + 1}</span>
+                    <button type="button" onClick={() => moveImage(i, 1)} disabled={i === form.images.length - 1} aria-label="Move right"><ArrowIcon size={14} /></button>
+                    <button type="button" className="danger" onClick={() => set('images', form.images.filter((_, idx) => idx !== i))} aria-label="Remove image"><CloseIcon size={14} /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <input ref={imageInput} type="file" accept="image/*" multiple onChange={handleImages} style={{ display: 'none' }} />
+            <button type="button" className="btn btn-outline btn-sm" onClick={() => imageInput.current?.click()}>+ Add Images</button>
           </div>
-        </form>
-      </div>
+        </div>
+
+        <div className="admin-form-actions">
+          <button type="button" className="btn btn-outline btn-lg" onClick={() => navigate('/admin/products')}>Cancel</button>
+          <button type="submit" className="btn btn-lg" disabled={loading}>
+            {loading ? 'Saving…' : isEdit ? 'Save Changes' : 'Create Product'}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

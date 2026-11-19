@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+﻿import { lazy, Suspense, useEffect, useState } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -31,55 +31,41 @@ function AdminGuard({ children }) {
 }
 
 function AdminRoute({ children }) {
-  return (
-    <AdminLayout>
-      <AdminGuard>{children}</AdminGuard>
-    </AdminLayout>
-  );
+  return <AdminLayout><AdminGuard>{children}</AdminGuard></AdminLayout>;
 }
 
 function ScrollToTop() {
   const { pathname } = useLocation();
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return null;
 }
 
 const alreadyBooted = () => {
-  try {
-    return sessionStorage.getItem('mv-booted') === '1';
-  } catch {
-    return false;
-  }
+  try { return sessionStorage.getItem('mv-booted') === '1'; } catch { return false; }
 };
 
-export default function App() {
+function AppShell() {
   const location = useLocation();
   const [booting, setBooting] = useState(() => !alreadyBooted());
+  const isAdmin = location.pathname.startsWith('/admin');
 
   useEffect(() => {
     if (!booting) return undefined;
     const t = setTimeout(() => {
-      try {
-        sessionStorage.setItem('mv-booted', '1');
-      } catch {
-        /* ignore */
-      }
+      try { sessionStorage.setItem('mv-booted', '1'); } catch { /* ignore */ }
       setBooting(false);
     }, 1200);
     return () => clearTimeout(t);
   }, [booting]);
 
   return (
-    <AdminProvider>
-      <>
-        {booting && <SplashLoader />}
+    <>
+      {booting && <SplashLoader />}
       <ScrollToTop />
-      <Navbar />
+      {!isAdmin && <Navbar />}
       <main>
         <Suspense fallback={<PageLoader />}>
-          <div key={location.pathname} className="page">
+          <div key={location.pathname} className={`page ${isAdmin ? 'page-admin' : ''}`}>
             <Routes location={location}>
               <Route path="/" element={<Home />} />
               <Route path="/shop" element={<Shop />} />
@@ -100,9 +86,12 @@ export default function App() {
           </div>
         </Suspense>
       </main>
-      <Footer />
-      <WhatsAppButton />
-      </>
-    </AdminProvider>
+      {!isAdmin && <Footer />}
+      {!isAdmin && <WhatsAppButton />}
+    </>
   );
+}
+
+export default function App() {
+  return <AdminProvider><AppShell /></AdminProvider>;
 }

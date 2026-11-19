@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
+import { CloseIcon, EyeOffIcon } from '../components/Icons';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ export default function AdminLogin() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (isLoggedIn) navigate('/admin', { replace: true });
@@ -30,9 +32,19 @@ export default function AdminLogin() {
   return (
     <div className="admin-login-page">
       <div className="admin-login-card">
+        <button
+          type="button"
+          className="admin-login-close"
+          onClick={() => navigate('/')}
+          aria-label="Back to store"
+        >
+          <CloseIcon size={18} />
+        </button>
+
         <div className="admin-login-header">
           <span className="logo-stoc">STOC</span><span className="logo-k">K</span> Admin
-          <p className="admin-login-tagline">Sign in to manage your store</p>
+          <h1>Sign in</h1>
+          <p className="admin-login-tagline">Manage your store catalog and orders</p>
         </div>
 
         <form onSubmit={handleSubmit} noValidate>
@@ -48,18 +60,32 @@ export default function AdminLogin() {
             />
           </div>
 
-          <div className="field">
+          <div className="field password-field">
             <label>Password</label>
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
             />
+            <button
+              type="button"
+              className="admin-toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeOffIcon size={18} /> : null}
+              {showPassword ? null : <EyeOffIcon size={18} style={{ opacity: 0.5 }} />}
+            </button>
           </div>
 
-          {error && <p className="admin-error">{error}</p>}
+          {error && (
+            <div className="admin-error">
+              <CloseIcon size={14} style={{ marginRight: '0.5rem' }} />
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"

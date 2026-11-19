@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { CATEGORIES, PRODUCTS, effectivePrice } from '../data/products';
+import { CATEGORIES, effectivePrice } from '../data/products';
 import { useSEO } from '../hooks/useSEO';
+import { useAdmin } from '../context/AdminContext';
 import ProductCard from '../components/ProductCard';
 import { FilterIcon, SearchIcon } from '../components/Icons';
 
@@ -15,6 +16,7 @@ const SORTS = [
 
 export default function Shop() {
   const [params, setParams] = useSearchParams();
+  const { products } = useAdmin();
   const [showFilters, setShowFilters] = useState(false);
   const sidebarPushedRef = useRef(false);
 
@@ -101,7 +103,8 @@ export default function Shop() {
     const term = q.trim().toLowerCase();
     const lo = min !== '' ? Number(min) : -Infinity;
     const hi = max !== '' ? Number(max) : Infinity;
-    let r = PRODUCTS.filter((p) => {
+    let r = products.filter((p) => {
+      if (p.active === false) return false;
       const price = effectivePrice(p);
       if (category !== 'all' && p.category !== category) return false;
       if (sale && p.salePrice == null) return false;

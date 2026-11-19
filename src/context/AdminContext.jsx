@@ -27,6 +27,9 @@ export function AdminProvider({ children }) {
     } catch { return initialProducts; }
   });
 
+  const [status, setStatus] = useState(null); // 'loading' | 'success' | 'error'
+  const [statusMsg, setStatusMsg] = useState('');
+
   useEffect(() => {
     try { localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products)); } catch {}
   }, [products]);
@@ -47,14 +50,33 @@ export function AdminProvider({ children }) {
 
   const addProduct = useCallback((product) => {
     setProducts((prev) => [...prev, product]);
+    setStatus('success');
+    setStatusMsg('Product created successfully.');
   }, []);
 
   const updateProduct = useCallback((id, updated) => {
     setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updated } : p)));
+    setStatus('success');
+    setStatusMsg('Product saved successfully.');
   }, []);
 
   const deleteProduct = useCallback((id) => {
     setProducts((prev) => prev.filter((p) => p.id !== id));
+    setStatus('success');
+    setStatusMsg('Product deleted.');
+  }, []);
+
+  const toggleProductActive = useCallback((id) => {
+    setProducts((prev) => prev.map((p) =>
+      p.id === id ? { ...p, active: p.active !== false } : p
+    ));
+    setStatus('success');
+    setStatusMsg('Product status updated.');
+  }, []);
+
+  const clearStatus = useCallback(() => {
+    setStatus(null);
+    setStatusMsg('');
   }, []);
 
   const value = {
@@ -65,6 +87,10 @@ export function AdminProvider({ children }) {
     addProduct,
     updateProduct,
     deleteProduct,
+    toggleProductActive,
+    status,
+    statusMsg,
+    clearStatus,
   };
 
   return (

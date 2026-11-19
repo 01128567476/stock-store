@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { CATEGORIES, PRODUCTS, discountPercent, getProduct } from '../data/products';
+import { CATEGORIES, discountPercent } from '../data/products';
+import { useAdmin } from '../context/AdminContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';
@@ -15,8 +16,9 @@ import NotFound from './NotFound';
 
 export default function ProductDetails() {
   const { id } = useParams();
-  const product = getProduct(id);
-  if (!product) return <NotFound />;
+  const { products } = useAdmin();
+  const product = products.find((p) => p.id === id);
+  if (!product || product.active === false) return <NotFound />;
   return <Details key={product.id} product={product} />;
 }
 
@@ -36,7 +38,8 @@ function Details({ product }) {
   const pct = discountPercent(product);
   const wished = has(product.id);
   const catLabel = CATEGORIES.find((c) => c.id === product.category)?.label;
-  const related = PRODUCTS.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
+  const { products } = useAdmin();
+  const related = products.filter((p) => p.active !== false && p.category === product.category && p.id !== product.id).slice(0, 4);
 
   const validate = () => {
     if (!size) {
