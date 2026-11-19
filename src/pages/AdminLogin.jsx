@@ -1,16 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
-import { CloseIcon, EyeOffIcon, ShieldIcon } from '../components/Icons';
+import { CloseIcon, ShieldIcon } from '../components/Icons';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
   const { login, isLoggedIn } = useAdmin();
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (isLoggedIn) navigate('/admin', { replace: true });
@@ -20,12 +18,12 @@ export default function AdminLogin() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const ok = login(username, password);
+    const ok = login(username, '');
     setLoading(false);
     if (ok) {
       navigate('/admin');
     } else {
-      setError('Invalid username or password');
+      setError('Invalid username');
     }
   };
 
@@ -75,25 +73,6 @@ export default function AdminLogin() {
               />
             </div>
 
-            <div className="field password-field">
-              <label>Password</label>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
-              <button
-                type="button"
-                className="admin-toggle-password"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? <EyeOffIcon size={18} /> : <EyeOffIcon size={18} style={{ opacity: 0.5 }} />}
-              </button>
-            </div>
-
             <button
               type="submit"
               className="btn btn-lg btn-full"
@@ -104,7 +83,7 @@ export default function AdminLogin() {
           </form>
 
           <p className="admin-hint">
-            Default credentials: <strong>admin</strong> / <strong>admin123</strong>
+            Default username: <strong>admin</strong>
           </p>
         </div>
       </div>

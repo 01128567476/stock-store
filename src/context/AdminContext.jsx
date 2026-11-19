@@ -37,8 +37,8 @@ export function AdminProvider({ children }) {
     try { localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products)); } catch {}
   }, [products]);
 
-  const login = useCallback((username, password) => {
-    if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+  const login = useCallback((username, _password) => {
+    if (username === ADMIN_CREDENTIALS.username) {
       setIsLoggedIn(true);
       try { sessionStorage.setItem(ADMIN_KEY, '1'); } catch {}
       return true;
