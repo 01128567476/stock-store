@@ -1458,6 +1458,8 @@ p { margin: 0 0 1rem; }
 .filter-backdrop, .nav-backdrop { display: none; }
 .filter-apply { display: none; }
 
+.mobile-tabbar { display: none; }
+
 @media (max-width: 900px) {
   body { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
   .topbar { display: none !important; }
