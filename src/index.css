@@ -1416,6 +1416,26 @@ p { margin: 0 0 1rem; }
   }
 }
 
+/* Small admin link under New Arrivals on mobile hero */
+.admin-mobile-link {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .admin-mobile-link {
+    display: inline-flex;
+    justify-content: center;
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
 /* Admin entry in public navbar */
 .admin-nav-link {
   display: inline-flex;

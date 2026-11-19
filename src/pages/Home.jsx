@@ -43,6 +43,9 @@ export default function Home() {
             <Link to="/shop?sort=newest" className="btn btn-ghost btn-lg">
               New Arrivals
             </Link>
+            <Link to="/admin/login" className="btn btn-sm btn-ghost admin-mobile-link">
+              Admin
+            </Link>
           </div>
         </div>
       </section>
