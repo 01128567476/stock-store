@@ -96,6 +96,8 @@ export function AdminProvider({ children }) {
     clearStatus,
   };
 
+  console.log('AdminContext products:', products, 'status:', status, 'isLoggedIn:', isLoggedIn);
+
   return (
     <AdminContext.Provider value={value}>
       {children}
