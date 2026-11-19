@@ -1,5 +1,5 @@
 ﻿import { lazy, Suspense, useEffect, useState } from 'react';
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
@@ -31,7 +31,7 @@ function AdminGuard({ children }) {
 }
 
 function AdminRoute({ children }) {
-  return <AdminLayout><AdminGuard>{children}</AdminGuard></AdminLayout>;
+  return <AdminLayout><AdminGuard>{children || <Outlet />}</AdminGuard></AdminLayout>;
 }
 
 function ScrollToTop() {
