@@ -22,8 +22,11 @@ export default function AdminLayout({ children }) {
     setDrawerOpen(false);
   }, [location.pathname]);
 
-  // Handle hardware back button on mobile
+  // Handle hardware back button: push a dummy history entry when drawer opens
   useEffect(() => {
+    if (drawerOpen) {
+      window.history.pushState({ adminDrawer: true }, '');
+    }
     const onPopState = () => {
       if (drawerOpen) setDrawerOpen(false);
     };
@@ -62,6 +65,11 @@ export default function AdminLayout({ children }) {
               </li>
             );
           })}
+          <li>
+            <Link to="/" className="admin-link">
+              View Store
+            </Link>
+          </li>
           <li>
             <button
               className="admin-link admin-link-danger"
