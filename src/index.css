@@ -510,6 +510,16 @@ p { margin: 0 0 1rem; }
   .topbar { font-size: 0.62rem; }
   .hero { min-height: 70vh; background: linear-gradient(0deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.15)), var(--hero-img) center / cover, #2a2724; }
   .card-body .btn { font-size: 0.68rem; padding-inline: 0.6rem; }
+  .pdp-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px;
+    gap: 0.45rem;
+  }
+  .pdp-actions .btn:first-child { flex: none; min-width: 0; }
+  .pdp-actions .btn { padding: 0.7rem 0.5rem; font-size: 0.64rem; letter-spacing: 0.08em; }
+  .pdp-actions .btn-buy { padding-inline: 0.4rem; }
+  .pdp-actions .wish-btn { width: 44px; height: 44px; }
+  .pdp-actions .wish-btn svg { width: 16px; height: 16px; }
 }
 
 /* Large phones / small tablets — tighten spacing, fonts & controls */
