@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CATEGORIES, PRODUCTS, effectivePrice } from '../data/products';
 import { useSEO } from '../hooks/useSEO';
@@ -16,13 +16,23 @@ const SORTS = [
 export default function Shop() {
   const [params, setParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
+  const pushedRef = useRef(false);
 
   useEffect(() => {
     if (!showFilters) return undefined;
-    const previousOverflow = document.body.style.overflow;
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    // Add a history entry so the hardware back button closes the drawer first
+    history.pushState({ filters: true }, '');
+    pushedRef.current = true;
+
     const closeOnEscape = (event) => {
       if (event.key === 'Escape') setShowFilters(false);
     };
+
     const closeOnOutside = (event) => {
       if (!(event.target instanceof Element)) return;
       if (event.target.closest('.filters, .filter-toggle')) return;
@@ -36,12 +46,24 @@ export default function Shop() {
       event.stopImmediatePropagation();
       setShowFilters(false);
     };
-    document.body.style.overflow = 'hidden';
+
+    const handlePopState = () => {
+      if (showFilters) setShowFilters(false);
+    };
+
     window.addEventListener('keydown', closeOnEscape);
+    window.addEventListener('popstate', handlePopState);
     document.addEventListener('click', closeOnOutside, true);
+
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      if (pushedRef.current) {
+        history.back();
+        pushedRef.current = false;
+      }
       window.removeEventListener('keydown', closeOnEscape);
+      window.removeEventListener('popstate', handlePopState);
       document.removeEventListener('click', closeOnOutside, true);
     };
   }, [showFilters]);

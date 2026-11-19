@@ -457,6 +457,7 @@ p { margin: 0 0 1rem; }
     width: min(88vw, 360px);
     padding: 0 1.25rem 1.5rem;
     overflow-y: auto;
+    overscroll-behavior: contain;
     border: 0;
     background: var(--surface);
     box-shadow: -18px 0 50px rgba(0, 0, 0, 0.18);
