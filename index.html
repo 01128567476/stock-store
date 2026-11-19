@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>STOCK STORE — Premium Fashion for Men</title>
     <meta name="description" content="Discover the latest fashion trends at STOCK STORE. Premium men's clothing, shoes and accessories with cash on delivery." />
-    <meta name="theme-color" content="#111111" />
+    <meta name="theme-color" content="#f8f7f4" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="STOCK STORE" />
     <meta property="og:title" content="STOCK STORE — Wear Your Style" />
@@ -22,10 +22,15 @@
     />
     <script>
       try {
-        var t = localStorage.getItem('mv-theme');
-        t = t ? JSON.parse(t) : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        localStorage.removeItem('mv-theme');
+        var t = localStorage.getItem('mv-theme-v2');
+        t = t ? JSON.parse(t) : 'light';
+        if (t !== 'light' && t !== 'dark') t = 'light';
         document.documentElement.setAttribute('data-theme', t);
-      } catch (e) {}
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', t === 'dark' ? '#11100f' : '#f8f7f4');
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
     </script>
     <script type="application/ld+json">
       {
