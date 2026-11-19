@@ -142,10 +142,10 @@ function Details({ product }) {
           </div>
 
           <div className="pdp-actions">
-            <button className="btn btn-lg" onClick={add}>
+            <button className="btn btn-lg btn-discover" onClick={add}>
               <BagIcon size={18} /> Add to Cart
             </button>
-            <button className="btn btn-outline btn-lg" onClick={buyNow}>
+            <button className="btn btn-outline btn-lg btn-buy" onClick={buyNow}>
               Buy Now
             </button>
             <button
