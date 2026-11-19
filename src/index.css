@@ -650,9 +650,8 @@ p { margin: 0 0 1rem; }
 }
 .nav { height: 72px; }
 .logo { gap: 0; font-family: var(--sans); font-size: 1.08rem; letter-spacing: 0.02em; }
-.logo-stoc, .logo-store { color: var(--text); }
+.logo-text, .logo-store { color: var(--text); }
 .logo-store { margin-left: 0.32em; }
-.logo-k { color: var(--accent); }
 .logo-mark {
   width: 34px;
   height: 34px;

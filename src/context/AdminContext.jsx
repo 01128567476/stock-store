@@ -23,7 +23,10 @@ export function AdminProvider({ children }) {
   const [products, setProducts] = useState(() => {
     try {
       const saved = localStorage.getItem(PRODUCTS_KEY);
-      return saved ? JSON.parse(saved) : initialProducts;
+      const parsed = saved ? JSON.parse(saved) : null;
+      // Fall back to sample catalog if localStorage is empty, null, or an empty array
+      if (parsed && Array.isArray(parsed) && parsed.length > 0) return parsed;
+      return initialProducts;
     } catch { return initialProducts; }
   });
 

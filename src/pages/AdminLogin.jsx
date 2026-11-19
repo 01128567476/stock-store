@@ -45,7 +45,7 @@ export default function AdminLogin() {
           <div className="admin-login-brand">
             <ShieldIcon size={32} />
             <div>
-              <span className="logo-stoc">STOC</span><span className="logo-k">K</span>
+              <span className="logo-text">STOCK</span>
               <span className="admin-brand-sub">Admin</span>
             </div>
           </div>
