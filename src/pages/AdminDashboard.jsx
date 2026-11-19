@@ -58,6 +58,7 @@ export default function AdminDashboard() {
 
   const categoryLabel = (id) =>
     CATEGORIES.find((c) => c.id === id)?.label || id;
+  const firstImage = (p) => Array.isArray(p.images) && p.images.length ? p.images[0] : '';
 
   return (
     <div className="admin-page">
@@ -119,7 +120,9 @@ export default function AdminDashboard() {
           <div className="admin-recent-list">
             {recent.map((p) => (
               <div key={p.id} className="admin-recent-item">
-                <img src={p.images[0]} alt={p.name} className="admin-recent-img" />
+                {firstImage(p)
+                  ? <img src={firstImage(p)} alt={p.name} className="admin-recent-img" />
+                  : <div className="admin-recent-img" aria-label="No product image" />}
                 <div className="admin-recent-info">
                   <span className="admin-recent-name">{p.name}</span>
                   <span className="admin-recent-cat muted small">{categoryLabel(p.category)}</span>

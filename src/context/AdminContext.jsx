@@ -71,7 +71,7 @@ export function AdminProvider({ children }) {
 
   const toggleProductActive = useCallback((id) => {
     setProducts((prev) => prev.map((p) =>
-      p.id === id ? { ...p, active: p.active !== false } : p
+      p.id === id ? { ...p, active: p.active === false ? true : false } : p
     ));
     setStatus('success');
     setStatusMsg('Product status updated.');
@@ -95,8 +95,6 @@ export function AdminProvider({ children }) {
     statusMsg,
     clearStatus,
   };
-
-  console.log('AdminContext products:', products, 'status:', status, 'isLoggedIn:', isLoggedIn);
 
   return (
     <AdminContext.Provider value={value}>

@@ -22,6 +22,7 @@ export default function AdminProducts() {
   const [confirmId, setConfirmId] = useState(null);
 
   const catLabel = (id) => CATEGORIES.find((c) => c.id === id)?.label || id;
+  const firstImage = (p) => Array.isArray(p.images) && p.images.length ? p.images[0] : '';
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -139,7 +140,9 @@ export default function AdminProducts() {
                   <tr key={p.id} className="admin-table-row">
                     <td>
                       <div className="admin-product-cell">
-                        <img src={p.images[0]} alt={p.name} className="admin-table-img" />
+                        {firstImage(p)
+                          ? <img src={firstImage(p)} alt={p.name} className="admin-table-img" />
+                          : <div className="admin-table-img" aria-label="No product image" />}
                         <div className="admin-product-meta">
                           <span className="admin-table-name">{p.name}</span>
                           <span className="admin-colors-count">
@@ -206,7 +209,9 @@ export default function AdminProducts() {
             const isActive = p.active !== false;
             return (
               <div key={p.id} className="admin-product-card">
-                <img src={p.images[0]} alt={p.name} className="admin-product-card-img" />
+                {firstImage(p)
+                  ? <img src={firstImage(p)} alt={p.name} className="admin-product-card-img" />
+                  : <div className="admin-product-card-img" aria-label="No product image" />}
                 <div className="admin-product-card-body">
                   <div className="admin-product-card-top">
                     <span className="admin-product-card-name">{p.name}</span>
