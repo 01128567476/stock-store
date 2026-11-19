@@ -42,7 +42,7 @@ export const IMAGES = {
 };
 
 export const CATEGORIES = [
-  { id: 'men', label: "Men's Clothing" },
+  { id: 'men', label: 'Clothing' },
   { id: 'shoes', label: 'Shoes' },
   { id: 'accessories', label: 'Accessories' },
 ];

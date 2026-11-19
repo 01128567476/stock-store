@@ -4,7 +4,7 @@ import { STORE } from '../config';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useTheme } from '../context/ThemeContext';
-import { BagIcon, HeartIcon, HomeIcon, MoonIcon, SearchIcon, SunIcon } from './Icons';
+import { BagIcon, HeartIcon, HomeIcon, MoonIcon, SearchIcon, ShieldIcon, SunIcon } from './Icons';
 
 const LINKS = [
   { to: '/shop?category=men', label: 'Men' },
@@ -57,6 +57,9 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
+          <Link to="/admin" className="admin-nav-link">
+            <ShieldIcon size={16} /> Admin
+          </Link>
         </nav>
 
         <div className="nav-actions">

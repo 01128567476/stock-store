@@ -1,9 +1,15 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import { PageLoader, SplashLoader } from './components/Loaders';
+import { AdminProvider, useAdmin } from './context/AdminContext';
+import AdminLayout from './components/AdminLayout';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminProducts from './pages/AdminProducts';
+import AdminProductForm from './pages/AdminProductForm';
 
 const Home = lazy(() => import('./pages/Home'));
 const Shop = lazy(() => import('./pages/Shop'));
@@ -13,6 +19,24 @@ const Checkout = lazy(() => import('./pages/Checkout'));
 const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+
+function AdminGuard({ children }) {
+  const { isLoggedIn } = useAdmin();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!isLoggedIn) navigate('/admin/login', { replace: true });
+  }, [isLoggedIn, navigate]);
+  if (!isLoggedIn) return null;
+  return children;
+}
+
+function AdminRoute({ children }) {
+  return (
+    <AdminLayout>
+      <AdminGuard>{children}</AdminGuard>
+    </AdminLayout>
+  );
+}
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -48,8 +72,9 @@ export default function App() {
   }, [booting]);
 
   return (
-    <>
-      {booting && <SplashLoader />}
+    <AdminProvider>
+      <>
+        {booting && <SplashLoader />}
       <ScrollToTop />
       <Navbar />
       <main>
@@ -63,6 +88,13 @@ export default function App() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order/:id" element={<OrderSuccess />} />
               <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route element={<AdminRoute />}>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/products" element={<AdminProducts />} />
+                <Route path="/admin/products/add" element={<AdminProductForm />} />
+                <Route path="/admin/products/edit/:id" element={<AdminProductForm />} />
+              </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
@@ -70,6 +102,7 @@ export default function App() {
       </main>
       <Footer />
       <WhatsAppButton />
-    </>
+      </>
+    </AdminProvider>
   );
 }
