@@ -2,6 +2,12 @@
 
 A complete e-commerce front end built with React 18, React Router 6 and Vite. Plain modern CSS (variables, grid, no framework).
 
+## Live demo
+
+https://01128567476.github.io/stock-store/
+
+> Hosted on GitHub Pages. Page URLs use hash routing (for example `/#/shop`) so direct links work on static hosting.
+
 ## Run locally
 
 Requires Node.js 18+.
