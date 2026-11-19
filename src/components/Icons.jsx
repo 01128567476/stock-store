@@ -130,6 +130,54 @@ export const EyeOffIcon = (p) => (
   </Svg>
 );
 
+export const LayoutIcon = (p) => (
+  <Svg {...p}>
+    <rect x="3" y="3" width="7" height="7" rx="1.5" />
+    <rect x="14" y="3" width="7" height="7" rx="1.5" />
+    <rect x="3" y="14" width="7" height="7" rx="1.5" />
+    <rect x="14" y="14" width="7" height="7" rx="1.5" />
+  </Svg>
+);
+export const PackageIcon = (p) => (
+  <Svg {...p}>
+    <path d="M21 10V8l-8-4-8 4v2l8 4 8-4z" />
+    <polyline points="21 10 14 12 7 10" />
+    <polyline points="21 16 14 14 7 16" />
+  </Svg>
+);
+export const LogoutIcon = (p) => (
+  <Svg {...p}>
+    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+    <polyline points="16 17 21 12 16 7" />
+    <line x1="21" y1="12" x2="9" y2="12" />
+  </Svg>
+);
+export const TagIcon = (p) => (
+  <Svg {...p}>
+    <path d="M12 2H2v10l9.29 9.29a1 1 0 001.42 0l8.58-8.58a1 1 0 000-1.42L12 2z" />
+    <line x1="7" y1="7" x2="7.01" y2="7" />
+  </Svg>
+);
+export const EyeIcon = (p) => (
+  <Svg {...p}>
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+    <circle cx="12" cy="12" r="3" />
+  </Svg>
+);
+export const UsersIcon = (p) => (
+  <Svg {...p}>
+    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 00-3-3.87" />
+    <path d="M16 3.13a4 4 0 010 7.75" />
+  </Svg>
+);
+export const ClockIcon = (p) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12 16 14" />
+  </Svg>
+);
 export const EditIcon = (p) => (
   <Svg {...p}>
     <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />

@@ -3,7 +3,15 @@ import { Link } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
 import { CATEGORIES } from '../data/products';
 import { money } from '../config';
-import { EditIcon, TrashIcon, CloseIcon } from '../components/Icons';
+import { EditIcon, TrashIcon, EyeIcon, EyeOffIcon, PlusIcon, SearchIcon } from '../components/Icons';
+
+const SORT_OPTIONS = [
+  { value: 'name-asc', label: 'Name A → Z' },
+  { value: 'name-desc', label: 'Name Z → A' },
+  { value: 'price-asc', label: 'Price: low → high' },
+  { value: 'price-desc', label: 'Price: high → low' },
+  { value: 'newest', label: 'Newest first' },
+];
 
 export default function AdminProducts() {
   const { products, deleteProduct, toggleProductActive, status, statusMsg, clearStatus } = useAdmin();
@@ -17,13 +25,13 @@ export default function AdminProducts() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    let list = products.filter((p) => {
+    const list = products.filter((p) => {
       const matchQ = !q || p.name.toLowerCase().includes(q);
       const matchC = category === 'all' || p.category === category;
       const matchSale = !saleOnly || p.salePrice != null;
       return matchQ && matchC && matchSale;
     });
-    list = [...list].sort((a, b) => {
+    return [...list].sort((a, b) => {
       switch (sortBy) {
         case 'name-desc': return b.name.localeCompare(a.name);
         case 'price-asc': return (a.salePrice ?? a.price) - (b.salePrice ?? b.price);
@@ -32,15 +40,16 @@ export default function AdminProducts() {
         default: return a.name.localeCompare(b.name);
       }
     });
-    return list;
   }, [products, query, category, saleOnly, sortBy]);
 
   useEffect(() => {
     if (!status) return undefined;
-    const t = setTimeout(clearStatus, 3000);
+    const t = setTimeout(clearStatus, 4000);
     return () => clearTimeout(t);
   }, [status, clearStatus]);
 
+  const activeFilters = query.trim() !== '' || category !== 'all' || saleOnly;
+  const resetFilters = () => { setQuery(''); setCategory('all'); setSaleOnly(false); };
   const target = products.find((p) => p.id === confirmId);
 
   const handleDelete = () => {
@@ -49,116 +58,151 @@ export default function AdminProducts() {
     setConfirmId(null);
   };
 
+  const priceOf = (p) => p.salePrice ?? p.price;
+  const pctOf = (p) => (p.salePrice != null && p.price > 0
+    ? Math.round((1 - p.salePrice / p.price) * 100)
+    : 0);
+
   return (
     <div className="admin-page">
       {status && statusMsg && (
         <div className="admin-toast admin-toast--success" onClick={clearStatus}>
-          <span className="muted small">{statusMsg}</span>
+          <span className="admin-toast-icon">✓</span>
+          <span className="admin-toast-msg">{statusMsg}</span>
         </div>
       )}
 
       <div className="admin-page-head">
         <div>
           <h2>Products</h2>
-          <p className="muted small">Manage your catalog — {products.length} products</p>
+          <p className="admin-page-sub">
+            {filtered.length} of {products.length} product{products.length === 1 ? '' : 's'} shown
+          </p>
         </div>
-        <Link to="/admin/products/add" className="btn btn-lg">
-          + Add Product
+        <Link to="/admin/products/add" className="btn btn-lg admin-btn-accent">
+          <PlusIcon size={17} />
+          <span>Add Product</span>
         </Link>
       </div>
 
-      <div className="admin-card">
+      <div className="admin-card admin-products-card">
         <div className="admin-toolbar">
           <div className="admin-search">
+            <span className="admin-search-icon"><SearchIcon size={16} /></span>
             <input
               type="text"
-              placeholder="Search products…"
+              placeholder="Search products by name…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Search products"
             />
           </div>
-          <select value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Filter by category">
-            <option value="all">All Categories</option>
-            {CATEGORIES.map((c) => (
-              <option key={c.id} value={c.id}>{c.label}</option>
-            ))}
-          </select>
-          <label className="admin-check">
-            <input type="checkbox" checked={saleOnly} onChange={(e) => setSaleOnly(e.target.checked)} />
-            Sale only
-          </label>
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} aria-label="Sort products">
-            <option value="name-asc">Name (A–Z)</option>
-            <option value="name-desc">Name (Z–A)</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="newest">Newest</option>
-          </select>
+          <div className="admin-toolbar-filters">
+            <select className="admin-select" value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Filter by category">
+              <option value="all">All categories</option>
+              {CATEGORIES.map((c) => (
+                <option key={c.id} value={c.id}>{c.label}</option>
+              ))}
+            </select>
+            <select className="admin-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)} aria-label="Sort products">
+              {SORT_OPTIONS.map((s) => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+            <label className={"admin-check" + (saleOnly ? ' is-on' : '')}>
+              <input type="checkbox" checked={saleOnly} onChange={(e) => setSaleOnly(e.target.checked)} />
+              On sale
+            </label>
+            {activeFilters && (
+              <button type="button" className="admin-clear-filters" onClick={resetFilters}>Clear</button>
+            )}
+          </div>
         </div>
 
-        {/* Desktop table */}
         <div className="admin-table-wrap admin-desktop-only">
           <table className="admin-table">
             <thead>
               <tr>
-                <th>Image</th>
-                <th>Name</th>
+                <th>Product</th>
                 <th>Category</th>
-                <th>Original</th>
+                <th>Price</th>
                 <th>Discount</th>
-                <th>Final</th>
                 <th>Status</th>
-                <th className="admin-cell-actions">Actions</th>
+                <th className="admin-th-actions">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((p) => {
-                const pct = p.salePrice != null
-                  ? Math.round((1 - p.salePrice / p.price) * 100) : 0;
+                const pct = pctOf(p);
                 const isActive = p.active !== false;
                 return (
                   <tr key={p.id} className="admin-table-row">
-                    <td><img src={p.images[0]} alt={p.name} className="admin-table-img" /></td>
-                    <td className="admin-table-name">{p.name}</td>
+                    <td>
+                      <div className="admin-product-cell">
+                        <img src={p.images[0]} alt={p.name} className="admin-table-img" />
+                        <div className="admin-product-meta">
+                          <span className="admin-table-name">{p.name}</span>
+                          <span className="admin-colors-count">
+                            {(p.colors || []).length} color{(p.colors || []).length === 1 ? '' : 's'}
+                            {' · '}
+                            {(p.sizes || []).length} size{(p.sizes || []).length === 1 ? '' : 's'}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
                     <td><span className="admin-pill">{catLabel(p.category)}</span></td>
-                    <td>{money(p.price)}</td>
-                    <td>{pct > 0 ? <span className="admin-pill admin-pill-sale">-{pct}%</span> : '—'}</td>
-                    <td className="admin-final-price">
-                      {money(p.salePrice ?? p.price)}
-                      {p.salePrice != null && <s className="admin-was">{money(p.price)}</s>}
+                    <td>
+                      <div className="admin-price-cell">
+                        <span className="admin-final-price">{money(priceOf(p))}</span>
+                        {p.salePrice != null && <s className="admin-was">{money(p.price)}</s>}
+                      </div>
+                    </td>
+                    <td>
+                      {p.salePrice != null
+                        ? <span className="admin-badge-discount">-{pct}%</span>
+                        : <span className="admin-muted-dash">—</span>}
                     </td>
                     <td>
                       <span className={`admin-status ${isActive ? 'active' : 'hidden'}`}>
+                        <span className="admin-status-dot" />
                         {isActive ? 'Active' : 'Hidden'}
                       </span>
                     </td>
-                    <td className="admin-cell-actions">
-                      <Link to={`/admin/products/edit/${p.id}`} className="admin-icon-btn" aria-label={`Edit ${p.name}`} title="Edit">
-                        <EditIcon size={16} />
-                      </Link>
-                      <button className="admin-icon-btn" onClick={() => toggleProductActive(p.id)} aria-label={isActive ? 'Hide' : 'Show'} title={isActive ? 'Hide' : 'Show'}>
-                        {isActive ? <CloseIcon size={16} /> : <span style={{ fontSize: '0.75rem' }}>Show</span>}
-                      </button>
-                      <button className="admin-icon-btn danger" onClick={() => setConfirmId(p.id)} aria-label={`Delete ${p.name}`} title="Delete">
-                        <TrashIcon size={16} />
-                      </button>
+                    <td>
+                      <div className="admin-cell-actions">
+                        <Link to={`/admin/products/edit/${p.id}`} className="admin-icon-btn" title="Edit" aria-label={`Edit ${p.name}`}>
+                          <EditIcon size={15} />
+                        </Link>
+                        <button
+                          type="button"
+                          className="admin-icon-btn"
+                          onClick={() => toggleProductActive(p.id)}
+                          title={isActive ? 'Hide from store' : 'Show in store'}
+                          aria-label={isActive ? 'Hide' : 'Show'}
+                        >
+                          {isActive ? <EyeOffIcon size={15} /> : <EyeIcon size={15} />}
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-icon-btn danger"
+                          onClick={() => setConfirmId(p.id)}
+                          title="Delete"
+                          aria-label={`Delete ${p.name}`}
+                        >
+                          <TrashIcon size={15} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
-          {filtered.length === 0 && (
-            <div className="admin-empty"><p className="muted">No products match your filters.</p></div>
-          )}
         </div>
 
-        {/* Mobile cards */}
         <div className="admin-mobile-cards admin-mobile-only">
           {filtered.map((p) => {
-            const pct = p.salePrice != null
-              ? Math.round((1 - p.salePrice / p.price) * 100) : 0;
+            const pct = pctOf(p);
             const isActive = p.active !== false;
             return (
               <div key={p.id} className="admin-product-card">
@@ -167,45 +211,59 @@ export default function AdminProducts() {
                   <div className="admin-product-card-top">
                     <span className="admin-product-card-name">{p.name}</span>
                     <span className={`admin-status ${isActive ? 'active' : 'hidden'}`}>
+                      <span className="admin-status-dot" />
                       {isActive ? 'Active' : 'Hidden'}
                     </span>
                   </div>
-                  <span className="admin-pill">{catLabel(p.category)}</span>
+                  <div className="admin-product-card-tags">
+                    <span className="admin-pill">{catLabel(p.category)}</span>
+                    {p.salePrice != null && <span className="admin-badge-discount">-{pct}%</span>}
+                  </div>
                   <div className="admin-product-card-price">
-                    <strong>{money(p.salePrice ?? p.price)}</strong>
-                    {p.salePrice != null && (
-                      <>
-                        <s className="admin-was">{money(p.price)}</s>
-                        <span className="admin-pill admin-pill-sale">-{pct}%</span>
-                      </>
-                    )}
+                    <strong>{money(priceOf(p))}</strong>
+                    {p.salePrice != null && <s className="admin-was">{money(p.price)}</s>}
                   </div>
                   <div className="admin-product-card-actions">
                     <Link to={`/admin/products/edit/${p.id}`} className="btn btn-sm btn-outline">Edit</Link>
-                    <button className="btn btn-sm btn-outline" onClick={() => toggleProductActive(p.id)}>
+                    <button type="button" className="btn btn-sm btn-outline" onClick={() => toggleProductActive(p.id)}>
                       {isActive ? 'Hide' : 'Show'}
                     </button>
-                    <button className="btn btn-sm btn-outline danger" onClick={() => setConfirmId(p.id)}>Delete</button>
+                    <button type="button" className="btn btn-sm btn-outline danger" onClick={() => setConfirmId(p.id)}>Delete</button>
                   </div>
                 </div>
               </div>
             );
           })}
-          {filtered.length === 0 && (
-            <div className="admin-empty"><p className="muted">No products match your filters.</p></div>
-          )}
         </div>
+
+        {filtered.length === 0 && (
+          <div className="admin-empty-state">
+            <span className="admin-empty-icon">🔍</span>
+            <h3>No products found</h3>
+            <p className="muted">
+              {products.length === 0
+                ? 'Your catalog is empty. Add your first product to get started.'
+                : 'No products match the current filters. Try adjusting your search.'}
+            </p>
+            {products.length === 0
+              ? <Link to="/admin/products/add" className="btn admin-btn-accent">+ Add Product</Link>
+              : <button type="button" className="btn btn-outline" onClick={resetFilters}>Clear filters</button>}
+          </div>
+        )}
       </div>
 
-      {/* Confirmation modal */}
       {target && (
         <div className="admin-modal-overlay" onClick={() => setConfirmId(null)}>
           <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-modal-icon admin-modal-icon-danger"><TrashIcon size={22} /></div>
             <h3>Delete product?</h3>
-            <p className="muted">Are you sure you want to delete <strong>{target.name}</strong>? This cannot be undone.</p>
+            <p className="muted">
+              You are about to permanently delete <strong>{target.name}</strong>.
+              This action cannot be undone.
+            </p>
             <div className="admin-modal-actions">
-              <button className="btn btn-outline" onClick={() => setConfirmId(null)}>Cancel</button>
-              <button className="btn btn-danger" onClick={handleDelete}>Delete</button>
+              <button type="button" className="btn btn-outline" onClick={() => setConfirmId(null)}>Cancel</button>
+              <button type="button" className="btn btn-danger" onClick={handleDelete}>Delete product</button>
             </div>
           </div>
         </div>

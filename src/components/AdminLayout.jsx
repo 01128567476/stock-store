@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
-import { CloseIcon, MenuIcon } from './Icons';
+import { ArrowIcon, CloseIcon, LayoutIcon, LogoutIcon, MenuIcon, PackageIcon, PlusIcon } from './Icons';
 
 export default function AdminLayout({ children }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -10,12 +10,18 @@ export default function AdminLayout({ children }) {
   const { logout } = useAdmin();
 
   const links = [
-    { to: '/admin', label: 'Dashboard' },
-    { to: '/admin/products', label: 'Products' },
-    { to: '/admin/products/add', label: 'Add Product' },
+    { to: '/admin', label: 'Dashboard', icon: <LayoutIcon size={18} /> },
+    { to: '/admin/products', label: 'Products', icon: <PackageIcon size={18} /> },
+    { to: '/admin/products/add', label: 'Add Product', icon: <PlusIcon size={18} /> },
   ];
 
-  const activeLink = links.find((l) => location.pathname === l.to || location.pathname.startsWith(l.to + '/'))?.label;
+  const isActiveLink = (to) =>
+    location.pathname === to ||
+    (to !== '/admin' && location.pathname.startsWith(to + '/'));
+
+  const activeLink = [...links]
+    .sort((a, b) => b.to.length - a.to.length)
+    .find((l) => isActiveLink(l.to))?.label;
 
   // Close drawer on route change
   useEffect(() => {
@@ -47,12 +53,13 @@ export default function AdminLayout({ children }) {
             <CloseIcon size={20} />
           </button>
           <div className="admin-brand">
-            <span className="logo-stoc">STOC</span><span className="logo-k">K</span> Admin
+            <span className="logo-stoc">STOC</span><span className="logo-k">K</span>
+            <span className="admin-brand-sub">Admin</span>
           </div>
         </div>
         <ul className="admin-nav">
           {links.map((l) => {
-            const isActive = location.pathname === l.to || location.pathname.startsWith(l.to + '/');
+            const isActive = isActiveLink(l.to);
             return (
               <li key={l.to}>
                 <Link
@@ -60,6 +67,7 @@ export default function AdminLayout({ children }) {
                   className={`admin-link ${isActive ? 'active' : ''}`}
                   onClick={() => setDrawerOpen(false)}
                 >
+                  <span className="admin-link-icon">{l.icon}</span>
                   {l.label}
                 </Link>
               </li>
@@ -67,6 +75,7 @@ export default function AdminLayout({ children }) {
           })}
           <li>
             <Link to="/" className="admin-link">
+              <span className="admin-link-icon"><ArrowIcon size={18} /></span>
               View Store
             </Link>
           </li>
@@ -78,12 +87,14 @@ export default function AdminLayout({ children }) {
                 navigate('/admin/login');
               }}
             >
+              <span className="admin-link-icon"><LogoutIcon size={18} /></span>
               Logout
             </button>
           </li>
         </ul>
         <div className="admin-sidebar-footer">
-          <span className="muted small">STOCK STORE</span>
+          <span className="admin-footer-text">STOCK STORE</span>
+          <span className="admin-footer-ver">v2.0 · 2026</span>
         </div>
       </aside>
 
@@ -99,9 +110,15 @@ export default function AdminLayout({ children }) {
           </button>
           <div className="admin-topbar-title">
             <h2>{activeLink || 'Admin'}</h2>
-            <p className="admin-subtitle">STOCK STORE</p>
+            <p className="admin-subtitle">Store management · STOCK STORE</p>
           </div>
           <div className="admin-topbar-actions">
+            <button
+              className="admin-btn-profile"
+              aria-label="Account"
+            >
+              <span className="admin-avatar">AD</span>
+            </button>
             <button
               className="admin-btn-logout"
               onClick={() => {
@@ -109,7 +126,7 @@ export default function AdminLayout({ children }) {
                 navigate('/admin/login');
               }}
             >
-              Logout
+              Sign out
             </button>
           </div>
         </header>
