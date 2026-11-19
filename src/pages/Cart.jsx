@@ -5,7 +5,7 @@ import { useToast } from '../context/ToastContext';
 import { useSEO } from '../hooks/useSEO';
 import ProductImage from '../components/ProductImage';
 import QtySelect from '../components/QtySelect';
-import { TrashIcon } from '../components/Icons';
+import { ArrowIcon, TrashIcon } from '../components/Icons';
 
 export default function Cart() {
   useSEO('Shopping Cart');
@@ -18,7 +18,9 @@ export default function Cart() {
       <div className="container empty page-pad">
         <h1>Your cart is empty</h1>
         <p className="muted">Looks like you haven't added anything yet.</p>
-        <Link to="/shop" className="btn btn-lg">Continue shopping</Link>
+        <Link to="/shop" className="btn btn-lg btn-discover">
+          Continue shopping <ArrowIcon size={16} />
+        </Link>
       </div>
     );
   }

@@ -1,7 +1,7 @@
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { STORE, money } from '../config';
 import { useSEO } from '../hooks/useSEO';
-import { CheckIcon, WhatsAppIcon } from '../components/Icons';
+import { ArrowIcon, CheckIcon, WhatsAppIcon } from '../components/Icons';
 
 const findOrder = (id, stateOrder) => {
   if (stateOrder && stateOrder.id === id) return stateOrder;
@@ -23,7 +23,9 @@ export default function OrderSuccess() {
       <div className="container empty page-pad">
         <h1>Order not found</h1>
         <p className="muted">We couldn't find an order with that number on this device.</p>
-        <Link to="/shop" className="btn btn-lg">Continue shopping</Link>
+        <Link to="/shop" className="btn btn-lg btn-discover">
+          Continue shopping <ArrowIcon size={16} />
+        </Link>
       </div>
     );
   }
@@ -72,7 +74,9 @@ export default function OrderSuccess() {
       </div>
 
       <div className="hero-actions center">
-        <Link to="/shop" className="btn btn-lg">Continue shopping</Link>
+        <Link to="/shop" className="btn btn-lg btn-discover">
+          Continue shopping <ArrowIcon size={16} />
+        </Link>
         <a href={wa} target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-lg">
           <WhatsAppIcon size={18} /> Send details on WhatsApp
         </a>
