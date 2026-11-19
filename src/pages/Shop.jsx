@@ -26,15 +26,23 @@ export default function Shop() {
     const closeOnOutside = (event) => {
       if (!(event.target instanceof Element)) return;
       if (event.target.closest('.filters, .filter-toggle')) return;
+      // First tap anywhere outside the drawer: close it and swallow the
+      // whole gesture so it never reaches whatever is underneath (product
+      // cards, search, bottom nav, WhatsApp, etc.). We handle this on
+      // `click` (not pointerdown/touchstart) so the backdrop is still
+      // present when the click is dispatched — this prevents ghost clicks.
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
       setShowFilters(false);
     };
     document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', closeOnEscape);
-    document.addEventListener('pointerdown', closeOnOutside);
+    document.addEventListener('click', closeOnOutside, true);
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', closeOnEscape);
-      document.removeEventListener('pointerdown', closeOnOutside);
+      document.removeEventListener('click', closeOnOutside, true);
     };
   }, [showFilters]);
 
