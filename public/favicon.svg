@@ -1,1 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#111"/><path d="M14 18l18 30 18-30" fill="none" stroke="#d9c9ae" stroke-width="4" stroke-linecap="square"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#171923"/>
+  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="24" letter-spacing="-1">
+    <tspan fill="#FFFFFF">S</tspan>
+    <tspan fill="#FFFFFF">T</tspan>
+    <tspan fill="#FFFFFF">O</tspan>
+    <tspan fill="#FFFFFF">C</tspan>
+    <tspan fill="#F58220">K</tspan>
+  </text>
+</svg>
