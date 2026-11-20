@@ -598,7 +598,7 @@ p { margin: 0 0 1rem; }
   .feature { gap: 0.9rem; }
   .cat-tile { aspect-ratio: 16 / 9; }
   .cat-tile span { font-size: 1.5rem; }
-  .grid { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: repeat(2, 1fr); }
   .grid-shop { grid-template-columns: repeat(2, 1fr); }
   .card-body .btn { font-size: 0.7rem; padding-inline: 0.6rem; }
   .thumb { width: 56px; }
