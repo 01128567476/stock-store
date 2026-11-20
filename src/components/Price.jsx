@@ -5,7 +5,9 @@ export default function Price({ product, large = false }) {
   return (
     <div className={`price ${large ? 'large' : ''}`}>
       <span className={onSale ? 'now sale' : 'now'}>{money(onSale ? product.salePrice : product.price)}</span>
-      {onSale && <s className="was">{money(product.price)}</s>}
+      {onSale && (
+        <div className="was"><s>{money(product.price)}</s></div>
+      )}
     </div>
   );
 }
