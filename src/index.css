@@ -146,6 +146,7 @@ p { margin: 0 0 1rem; }
 .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem 1.25rem; }
 .card {
   display: flex; flex-direction: column;
+  height: 100%;
   background: var(--surface);
   border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--line));
   border-radius: var(--radius);
@@ -1594,7 +1595,7 @@ p { margin: 0 0 1rem; }
   .card-media { border-radius: 10px; }
   .card-body { gap: .42rem; padding-inline: .3rem; }
   .card-title { min-height: 2.7em; font-size: .82rem; line-height: 1.35; }
-  .card-body .btn { margin-top: .25rem; font-size: .62rem; }
+  .card-body .btn { margin-top: auto; font-size: .62rem; }
   .badges { top: .5rem; left: .5rem; }
   .badge { font-size: .58rem; padding: .2rem .48rem; }
   .wish { width: 32px; height: 32px; top: .5rem; right: .5rem; }
