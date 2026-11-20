@@ -1648,7 +1648,7 @@ p { margin: 0 0 1rem; }
   --admin-radius: 18px;
 }
 
-.admin-layout { display: flex; min-height: 100vh; background: var(--bg); }
+.admin-layout { display: flex; min-height: 100vh; width: 100%; min-width: 0; background: var(--bg); }
 
 /* Sidebar */
 .admin-sidebar {
@@ -1699,18 +1699,18 @@ p { margin: 0 0 1rem; }
 .admin-btn-logout { padding: .6rem 1.15rem; border: 1px solid var(--line); border-radius: 999px; font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--muted); background: transparent; transition: .18s; }
 .admin-btn-logout:hover { border-color: var(--danger); color: var(--danger); }
 
-.admin-main { flex: 1; padding: 2rem; max-width: 1560px; width: 100%; margin: 0 auto; }
+.admin-main { flex: 1; padding: 2rem; max-width: 1560px; width: 100%; min-width: 0; margin: 0 auto; }
 
 /* Page scaffolding */
-.admin-page { display: flex; flex-direction: column; gap: 1.6rem; }
+.admin-page { display: flex; flex-direction: column; gap: 1.6rem; min-width: 0; }
 .admin-page-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .admin-page-head h2 { font-family: var(--serif); font-size: clamp(1.7rem, 3vw, 2.3rem); margin: 0; }
 .admin-page-sub { margin: .3rem 0 0; color: var(--muted); font-size: .9rem; }
 .admin-btn-accent { display: inline-flex; align-items: center; gap: .5rem; background: var(--accent); border-color: var(--accent); color: #171717; border-radius: 999px; font-weight: 700; box-shadow: 0 10px 24px rgba(242,122,53,.25); }
 .admin-btn-accent:hover { background: var(--accent-dark); border-color: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 14px 30px rgba(242,122,53,.35); }
 
-.admin-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.6rem; }
-.admin-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--admin-radius); padding: 1.6rem; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
+.admin-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.6rem; min-width: 0; }
+.admin-card { min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--admin-radius); padding: 1.6rem; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
 .admin-card-wide { grid-column: 1 / -1; }
 .admin-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
 .admin-section-head h2 { font-size: 1.3rem; margin: 0; }
@@ -1878,7 +1878,7 @@ p { margin: 0 0 1rem; }
 /* Responsive */
 @media (max-width: 1200px) {
   .admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .admin-grid { grid-template-columns: 1fr; }
+  .admin-grid { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 1024px) {
   .admin-sidebar { transform: translateX(-100%); box-shadow: var(--shadow); width: var(--admin-sidebar-w); }
@@ -1895,6 +1895,16 @@ p { margin: 0 0 1rem; }
 @media (max-width: 600px) {
   .admin-main { padding: 1rem; }
   .admin-page { gap: 1.2rem; }
+  .admin-grid { gap: 1rem; }
+  .admin-card { padding: 1rem; }
+  .admin-section-head { flex-direction: column; align-items: flex-start; gap: .35rem; }
+  .admin-cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
+  .admin-cat-card { min-width: 0; padding: .85rem; }
+  .admin-stats-grid { gap: .6rem; }
+  .admin-stat { min-width: 0; gap: .55rem; padding: .75rem; }
+  .admin-stat-icon { width: 34px; height: 34px; }
+  .admin-stat-label { font-size: .62rem; letter-spacing: .04em; overflow-wrap: normal; }
+  .admin-stat-info { min-width: 0; }
   .admin-page-head h2 { font-size: 1.7rem; }
   .admin-page-head .btn { width: 100%; justify-content: center; }
   .admin-form-grid { grid-template-columns: 1fr; }
@@ -1910,6 +1920,13 @@ p { margin: 0 0 1rem; }
   .admin-login-card { padding: 2rem 1.4rem; }
   .admin-product-card { flex-direction: column; }
   .admin-product-card-img { width: 100%; height: 170px; }
+  .admin-recent-item { gap: .65rem; }
+  .admin-recent-img { width: 44px; height: 54px; }
+  .admin-recent-info { min-width: 0; }
+  .admin-recent-name { font-size: .82rem; }
+  .admin-recent-cat { font-size: .68rem; }
+  .admin-recent-price { font-size: .76rem; }
+  .admin-recent-edit { width: 30px; height: 30px; flex: none; }
   .admin-toast { right: 1rem; left: 1rem; }
 }
 
