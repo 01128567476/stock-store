@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useSEO } from '../hooks/useSEO';
 import ProductImage from '../components/ProductImage';
-import { CashIcon } from '../components/Icons';
+import { CashIcon, InstapayIcon, WalletIcon } from '../components/Icons';
 
 const CITIES = ['Cairo', 'Giza', 'Alexandria', 'Mansoura', 'Tanta', 'Port Said', 'Suez', 'Ismailia', 'Luxor', 'Aswan', 'Hurghada', 'Sharm El Sheikh', 'Damanhour', 'Zagazig', 'Asyut'];
 
@@ -22,7 +22,7 @@ export default function Checkout() {
   const navigate = useNavigate();
   const toast = useToast();
   const placed = useRef(false);
-  const [form, setForm] = useState({ fullName: '', phone: '', address: '', city: '', notes: '' });
+  const [form, setForm] = useState({ fullName: '', phone: '', address: '', city: '', notes: '', payment: 'cod' });
   const [errors, setErrors] = useState({});
 
   if (lines.length === 0 && !placed.current) return <Navigate to="/cart" replace />;
@@ -61,7 +61,7 @@ export default function Checkout() {
         city: form.city.trim(),
         notes: form.notes.trim(),
       },
-      payment: 'Cash on Delivery',
+      payment: form.payment === 'cod' ? 'Cash on Delivery' : form.payment === 'instapay' ? 'InstaPay' : 'E-Wallet',
       items: lines.map((l) => ({
         name: l.product.name,
         size: l.size,
@@ -123,14 +123,32 @@ export default function Checkout() {
           </div>
 
           <h2>Payment method</h2>
-          <label className="pay-option">
-            <input type="radio" name="payment" checked readOnly />
-            <CashIcon size={22} />
-            <div>
-              <strong>Cash on Delivery</strong>
-              <span>Pay in cash when your order arrives.</span>
-            </div>
-          </label>
+          <div className="pay-grid">
+            <label className={`pay-option ${form.payment === 'cod' ? 'selected' : ''}`}>
+              <input type="radio" name="payment" value="cod" checked={form.payment === 'cod'} onChange={() => setForm((f) => ({ ...f, payment: 'cod' }))} />
+              <CashIcon size={22} />
+              <div>
+                <strong>Cash on Delivery</strong>
+                <span>Pay in cash when your order arrives.</span>
+              </div>
+            </label>
+            <label className={`pay-option ${form.payment === 'instapay' ? 'selected' : ''}`}>
+              <input type="radio" name="payment" value="instapay" checked={form.payment === 'instapay'} onChange={() => setForm((f) => ({ ...f, payment: 'instapay' }))} />
+              <InstapayIcon size={22} />
+              <div>
+                <strong>InstaPay</strong>
+                <span>Pay instantly via your InstaPay app.</span>
+              </div>
+            </label>
+            <label className={`pay-option ${form.payment === 'wallet' ? 'selected' : ''}`}>
+              <input type="radio" name="payment" value="wallet" checked={form.payment === 'wallet'} onChange={() => setForm((f) => ({ ...f, payment: 'wallet' }))} />
+              <WalletIcon size={22} />
+              <div>
+                <strong>E-Wallet</strong>
+                <span>Vodafone Cash · Etisalat Cash · Orange Money · We</span>
+              </div>
+            </label>
+          </div>
         </div>
 
         <aside className="summary">
@@ -156,7 +174,7 @@ export default function Checkout() {
             <div className="grand"><dt>Total</dt><dd>{money(total)}</dd></div>
           </dl>
           <button type="submit" className="btn btn-lg btn-full">Confirm Order</button>
-          <p className="muted small center">You will pay {money(total)} in cash on delivery.</p>
+          <p className="muted small center">You will pay {money(total)} via {form.payment === 'cod' ? 'cash on delivery' : form.payment === 'instapay' ? 'InstaPay' : 'E-Wallet'}.</p>
         </aside>
       </form>
     </div>

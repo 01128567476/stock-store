@@ -212,4 +212,20 @@ export const XIcon = (p) => (
   </Svg>
 );
 
+/* Payment method icons */
+export const InstapayIcon = (p) => (
+  <Svg {...p} fill="currentColor" strokeWidth="0">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18a8 8 0 110-16 8 8 0 010 16z" />
+    <path d="M8 10h8v2H8zM8 14h8v2H8zM8 6h2v2H8zM14 6h2v2h-2z" />
+  </Svg>
+);
+export const WalletIcon = (p) => (
+  <Svg {...p}>
+    <rect x="3" y="6" width="18" height="14" rx="2" />
+    <path d="M7 10h2M11 10h2M15 10h2M7 14h2M11 14h2M15 14h2" />
+    <line x1="7" y1="7" x2="17" y2="7" />
+    <line x1="7" y1="11" x2="17" y2="11" />
+  </Svg>
+);
+
 
