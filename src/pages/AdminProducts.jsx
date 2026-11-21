@@ -1,7 +1,7 @@
 ﻿import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
-import { CATEGORIES, SEASONS } from '../data/products';
+import { CATEGORIES, SEASONS, normalizeSeason } from '../data/products';
 import { money } from '../config';
 import { EditIcon, TrashIcon, EyeIcon, EyeOffIcon, PlusIcon, SearchIcon } from '../components/Icons';
 
@@ -32,7 +32,7 @@ export default function AdminProducts() {
       const matchQ = !q || p.name.toLowerCase().includes(q);
       const matchC = category === 'all' || p.category === category;
       const matchSale = !saleOnly || p.salePrice != null;
-      const matchS = season === 'all' || p.season === season;
+      const matchS = season === 'all' || normalizeSeason(p.season) === season;
       return matchQ && matchC && matchSale && matchS;
     });
     return [...list].sort((a, b) => {
@@ -103,7 +103,7 @@ export default function AdminProducts() {
             { id: 'summer', label: 'المنتجات الصيفية' },
           ].map(({ id, label }) => {
             const hidden = isSeasonHidden(id);
-            const count = products.filter((product) => product.season === id).length;
+            const count = products.filter((product) => normalizeSeason(product.season) === id).length;
             return (
               <article key={id} className={`admin-season-card ${hidden ? 'is-hidden' : ''}`}>
                 <div className="admin-season-copy">

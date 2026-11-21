@@ -61,6 +61,23 @@ export const SEASONS = [
   { id: 'both', label: 'كليهما' },
 ];
 
+export const normalizeSeason = (season) => {
+  const value = String(season ?? 'both').trim().toLowerCase();
+  const aliases = {
+    'شتوي': 'winter',
+    'الشتوي': 'winter',
+    'شتوية': 'winter',
+    'الشتوية': 'winter',
+    'صيفي': 'summer',
+    'الصيفي': 'summer',
+    'صيفية': 'summer',
+    'الصيفية': 'summer',
+    'كليهما': 'both',
+    'كلاهما': 'both',
+  };
+  return aliases[value] || value;
+};
+
 const COLOR = {
   Black: '#141414',
   White: '#f6f4ef',

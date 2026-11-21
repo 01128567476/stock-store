@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { PRODUCTS } from '../data/products';
+import { PRODUCTS, normalizeSeason } from '../data/products';
 
 const ADMIN_KEY = 'mv_admin';
 const PRODUCTS_KEY = 'mv_products_admin';
@@ -115,7 +115,10 @@ export function AdminProvider({ children }) {
       : `تم إظهار المنتجات ${label} في المتجر`);
   }, [hiddenSeasons]);
 
-  const isSeasonHidden = useCallback((season) => !!hiddenSeasons[season], [hiddenSeasons]);
+  const isSeasonHidden = useCallback(
+    (season) => !!hiddenSeasons[normalizeSeason(season)],
+    [hiddenSeasons]
+  );
 
   const clearStatus = useCallback(() => {
     setStatus(null);

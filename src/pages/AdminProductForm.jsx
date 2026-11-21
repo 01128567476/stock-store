@@ -1,7 +1,7 @@
 ﻿import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
-import { CATEGORIES, SEASONS } from '../data/products';
+import { CATEGORIES, SEASONS, normalizeSeason } from '../data/products';
 import { money } from '../config';
 import { CloseIcon, ArrowIcon } from '../components/Icons';
 
@@ -53,7 +53,7 @@ export default function AdminProductForm() {
       sizes: existing.sizes || [],
       images: existing.images || [],
       active: existing.active !== false,
-      season: existing.season || 'both',
+      season: normalizeSeason(existing.season),
     });
     setReady(true);
   }, [isEdit, existing]);
