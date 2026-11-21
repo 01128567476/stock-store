@@ -45,6 +45,10 @@ export const CATEGORIES = [
   { id: 'men', label: 'Clothing' },
   { id: 'shoes', label: 'Shoes' },
   { id: 'accessories', label: 'Accessories' },
+  { id: 'pants', label: 'بناطيل' },
+  { id: 'hoodies', label: 'هودي' },
+  { id: 'shirts', label: 'قمصان' },
+  { id: 'jackets', label: 'جواكت' },
 ];
 
 export const SEASONS = [

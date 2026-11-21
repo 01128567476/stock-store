@@ -500,7 +500,7 @@ p { margin: 0 0 1rem; }
 }
 @media (max-width: 600px) {
   .container { width: min(1280px, 100% - 1.5rem); }
-  .grid, .grid-shop, .reviews { grid-template-columns: repeat(2, 1fr); gap: 1.5rem 0.75rem; }
+  .grid, .grid-shop, .reviews, .chips { grid-template-columns: repeat(2, 1fr); gap: 1.5rem 0.75rem; }
   .reviews { grid-template-columns: 1fr; }
   .section { padding-top: 3rem; }
   .section-head { align-items: flex-start; flex-direction: column; }
@@ -601,6 +601,7 @@ p { margin: 0 0 1rem; }
   .cat-tile span { font-size: 1.5rem; }
   .grid { grid-template-columns: repeat(2, 1fr); }
   .grid-shop { grid-template-columns: repeat(2, 1fr); }
+  .chips { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
   .card-body .btn { font-size: 0.7rem; padding-inline: 0.6rem; }
   .thumb { width: 56px; }
   .cart-line { grid-template-columns: 64px 1fr; }
