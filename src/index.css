@@ -2243,12 +2243,14 @@ p { margin: 0 0 1rem; }
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  width: 100%;
   padding: 0.85rem 1rem;
   border: 1px solid var(--line);
   border-radius: var(--admin-radius, 12px);
   background: var(--surface);
   cursor: pointer;
   transition: all 0.18s;
+  box-sizing: border-box;
 }
 .pay-option input { accent-color: var(--accent, #111); }
 .pay-option:hover { border-color: var(--text); background: var(--surface-2); }
