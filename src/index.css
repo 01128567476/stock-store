@@ -864,6 +864,7 @@ p { margin: 0 0 1rem; }
   top: 0;
   bottom: 0;
   width: 260px;
+  height: 100vh;
   background: var(--surface);
   border-right: 1px solid var(--line);
   z-index: 50;
@@ -871,6 +872,7 @@ p { margin: 0 0 1rem; }
   transition: transform 0.25s var(--ease);
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .admin-sidebar.closed {
@@ -1797,7 +1799,7 @@ p { margin: 0 0 1rem; }
 .admin-btn-logout { padding: .6rem 1.15rem; border: 1px solid var(--line); border-radius: 999px; font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--muted); background: transparent; transition: .18s; }
 .admin-btn-logout:hover { border-color: var(--danger); color: var(--danger); }
 
-.admin-main { flex: 1; padding: 2rem; max-width: 1560px; width: 100%; min-width: 0; margin: 0 auto; }
+.admin-main { flex: 1; padding: 2rem; max-width: 1560px; width: 100%; min-width: 0; margin: 0 auto; overflow-y: auto; }
 
 /* Page scaffolding */
 .admin-page { display: flex; flex-direction: column; gap: 1.6rem; min-width: 0; }
