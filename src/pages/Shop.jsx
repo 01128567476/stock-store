@@ -16,7 +16,7 @@ const SORTS = [
 
 export default function Shop() {
   const [params, setParams] = useSearchParams();
-  const { products } = useAdmin();
+  const { products, isSeasonHidden } = useAdmin();
   const [showFilters, setShowFilters] = useState(false);
   const sidebarPushedRef = useRef(false);
 
@@ -105,6 +105,7 @@ export default function Shop() {
     const hi = max !== '' ? Number(max) : Infinity;
     let r = products.filter((p) => {
       if (p.active === false) return false;
+      if (isSeasonHidden(p.season)) return false;
       const price = effectivePrice(p);
       if (category !== 'all' && p.category !== category) return false;
       if (sale && p.salePrice == null) return false;

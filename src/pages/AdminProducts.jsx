@@ -14,7 +14,7 @@ const SORT_OPTIONS = [
 ];
 
 export default function AdminProducts() {
-  const { products, deleteProduct, toggleProductActive, status, statusMsg, clearStatus } = useAdmin();
+  const { products, deleteProduct, toggleProductActive, toggleSeasonVisibility, isSeasonHidden, status, statusMsg, clearStatus } = useAdmin();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [saleOnly, setSaleOnly] = useState(false);
@@ -87,6 +87,24 @@ export default function AdminProducts() {
           <PlusIcon size={17} />
           <span>Add Product</span>
         </Link>
+        <div className="admin-season-toggle">
+          <button
+            type="button"
+            className={`btn btn-sm btn-outline ${isSeasonHidden('winter') ? 'btn-danger' : ''}`}
+            onClick={() => toggleSeasonVisibility('winter')}
+            title={isSeasonHidden('winter') ? 'إظهار المنتجات الشتوية في المتجر' : 'إخفاء المنتجات الشتوية من المتجر'}
+          >
+            {isSeasonHidden('winter') ? 'إظهار شتوي' : 'إخفاء شتوي'}
+          </button>
+          <button
+            type="button"
+            className={`btn btn-sm btn-outline ${isSeasonHidden('summer') ? 'btn-danger' : ''}`}
+            onClick={() => toggleSeasonVisibility('summer')}
+            title={isSeasonHidden('summer') ? 'إظهار المنتجات الصيفية في المتجر' : 'إخفاء المنتجات الصيفية من المتجر'}
+          >
+            {isSeasonHidden('summer') ? 'إظهار صيفي' : 'إخفاء صيفي'}
+          </button>
+        </div>
       </div>
 
       <div className="admin-card admin-products-card">

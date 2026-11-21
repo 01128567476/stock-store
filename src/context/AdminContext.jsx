@@ -77,6 +77,21 @@ export function AdminProvider({ children }) {
     setStatusMsg('Product status updated.');
   }, []);
 
+  const [hiddenSeasons, setHiddenSeasons] = useState({}); // { winter: true, summer: false }
+
+  const toggleSeasonVisibility = useCallback((season) => {
+    setHiddenSeasons((prev) => ({
+      ...prev,
+      [season]: !prev[season],
+    }));
+    setStatus('success');
+    setStatusMsg(
+      prev[season] ? `تم إظهار منتجات ${season}` : `تم إخفاء منتجات ${season} من المتجر`
+    );
+  }, []);
+
+  const isSeasonHidden = useCallback((season) => !!hiddenSeasons[season], [hiddenSeasons]);
+
   const clearStatus = useCallback(() => {
     setStatus(null);
     setStatusMsg('');
@@ -91,6 +106,9 @@ export function AdminProvider({ children }) {
     updateProduct,
     deleteProduct,
     toggleProductActive,
+    toggleSeasonVisibility,
+    isSeasonHidden,
+    hiddenSeasons,
     status,
     statusMsg,
     clearStatus,
