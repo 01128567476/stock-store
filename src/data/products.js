@@ -32,7 +32,7 @@ const POOLS = {
 };
 
 export const IMAGES = {
-  hero: './store-hero.png',
+  hero: new URL(`${import.meta.env.BASE_URL}store-hero.png`, document.baseURI).href,
   banner: U('photo-1445205170230-053b83016050', 1600, 900),
   categories: {
     men: U(POOLS.men[2], 700, 900),
