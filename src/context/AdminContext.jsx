@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { PRODUCTS, CATEGORIES } from '../data/products';
+import { PRODUCTS } from '../data/products';
 
 const ADMIN_KEY = 'mv_admin';
 const PRODUCTS_KEY = 'mv_products_admin';
+const SEASON_VISIBILITY_KEY = 'mv_hidden_seasons';
 
 const ADMIN_CREDENTIALS = {
   username: 'admin',
@@ -77,18 +78,42 @@ export function AdminProvider({ children }) {
     setStatusMsg('Product status updated.');
   }, []);
 
-  const [hiddenSeasons, setHiddenSeasons] = useState({}); // { winter: true, summer: false }
+  const [hiddenSeasons, setHiddenSeasons] = useState(() => {
+    try {
+      const saved = localStorage.getItem(SEASON_VISIBILITY_KEY);
+      if (!saved) return {};
+      const parsed = JSON.parse(saved);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        throw new Error('Stored seasonal visibility settings must be an object.');
+      }
+      return {
+        winter: parsed.winter === true,
+        summer: parsed.summer === true,
+      };
+    } catch (error) {
+      console.error('Unable to load seasonal visibility settings.', error);
+      return {};
+    }
+  });
 
   const toggleSeasonVisibility = useCallback((season) => {
-    setHiddenSeasons((prev) => ({
-      ...prev,
-      [season]: !prev[season],
-    }));
+    const hidden = !hiddenSeasons[season];
+    const next = { ...hiddenSeasons, [season]: hidden };
+    try {
+      localStorage.setItem(SEASON_VISIBILITY_KEY, JSON.stringify(next));
+    } catch (error) {
+      console.error('Unable to save seasonal visibility settings.', error);
+      setStatus('error');
+      setStatusMsg('تعذر حفظ إعدادات ظهور المواسم. حاول مرة أخرى.');
+      return;
+    }
+    setHiddenSeasons(next);
     setStatus('success');
-    setStatusMsg(
-      prev[season] ? `تم إظهار منتجات ${season}` : `تم إخفاء منتجات ${season} من المتجر`
-    );
-  }, []);
+    const label = season === 'winter' ? 'الشتوية' : 'الصيفية';
+    setStatusMsg(hidden
+      ? `تم إخفاء المنتجات ${label} من المتجر`
+      : `تم إظهار المنتجات ${label} في المتجر`);
+  }, [hiddenSeasons]);
 
   const isSeasonHidden = useCallback((season) => !!hiddenSeasons[season], [hiddenSeasons]);
 

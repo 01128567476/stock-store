@@ -70,8 +70,8 @@ export default function AdminProducts() {
   return (
     <div className="admin-page">
       {status && statusMsg && (
-        <div className="admin-toast admin-toast--success" onClick={clearStatus}>
-          <span className="admin-toast-icon">✓</span>
+        <div className={`admin-toast admin-toast--${status}`} onClick={clearStatus}>
+          <span className="admin-toast-icon">{status === 'error' ? '!' : '✓'}</span>
           <span className="admin-toast-msg">{statusMsg}</span>
         </div>
       )}
@@ -87,25 +87,50 @@ export default function AdminProducts() {
           <PlusIcon size={17} />
           <span>Add Product</span>
         </Link>
-        <div className="admin-season-toggle">
-          <button
-            type="button"
-            className={`btn btn-sm btn-outline ${isSeasonHidden('winter') ? 'btn-danger' : ''}`}
-            onClick={() => toggleSeasonVisibility('winter')}
-            title={isSeasonHidden('winter') ? 'إظهار المنتجات الشتوية في المتجر' : 'إخفاء المنتجات الشتوية من المتجر'}
-          >
-            {isSeasonHidden('winter') ? 'إظهار شتوي' : 'إخفاء شتوي'}
-          </button>
-          <button
-            type="button"
-            className={`btn btn-sm btn-outline ${isSeasonHidden('summer') ? 'btn-danger' : ''}`}
-            onClick={() => toggleSeasonVisibility('summer')}
-            title={isSeasonHidden('summer') ? 'إظهار المنتجات الصيفية في المتجر' : 'إخفاء المنتجات الصيفية من المتجر'}
-          >
-            {isSeasonHidden('summer') ? 'إظهار صيفي' : 'إخفاء صيفي'}
-          </button>
-        </div>
       </div>
+
+      <section className="admin-season-panel" aria-labelledby="admin-season-title">
+        <div className="admin-season-panel-head">
+          <div>
+            <h3 id="admin-season-title">إدارة ظهور المنتجات حسب الموسم</h3>
+            <p>التحكم هنا ينعكس مباشرة على المنتجات المعروضة في المتجر.</p>
+          </div>
+          <span className="admin-season-panel-badge">إعدادات المتجر</span>
+        </div>
+        <div className="admin-season-grid">
+          {[
+            { id: 'winter', label: 'المنتجات الشتوية' },
+            { id: 'summer', label: 'المنتجات الصيفية' },
+          ].map(({ id, label }) => {
+            const hidden = isSeasonHidden(id);
+            const count = products.filter((product) => product.season === id).length;
+            return (
+              <article key={id} className={`admin-season-card ${hidden ? 'is-hidden' : ''}`}>
+                <div className="admin-season-copy">
+                  <span className={`admin-season-indicator ${hidden ? 'is-hidden' : ''}`} aria-hidden="true" />
+                  <div>
+                    <h4>{label}</h4>
+                    <p>
+                      {hidden ? 'مخفية حاليًا عن المتجر' : 'ظاهرة حاليًا في المتجر'}
+                      {' · '}{count} {count === 1 ? 'منتج' : 'منتجات'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className={`admin-season-action ${hidden ? 'is-hidden' : ''}`}
+                  onClick={() => toggleSeasonVisibility(id)}
+                  aria-pressed={!hidden}
+                  aria-label={`${hidden ? 'إظهار' : 'إخفاء'} ${label} ${hidden ? 'في' : 'من'} المتجر`}
+                >
+                  {hidden ? <EyeIcon size={17} /> : <EyeOffIcon size={17} />}
+                  <span>{hidden ? 'إظهار في المتجر' : 'إخفاء من المتجر'}</span>
+                </button>
+              </article>
+            );
+          })}
+        </div>
+      </section>
 
       <div className="admin-card admin-products-card">
         <div className="admin-toolbar">

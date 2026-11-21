@@ -16,9 +16,9 @@ import NotFound from './NotFound';
 
 export default function ProductDetails() {
   const { id } = useParams();
-  const { products } = useAdmin();
+  const { products, isSeasonHidden } = useAdmin();
   const product = products.find((p) => p.id === id);
-  if (!product || product.active === false) return <NotFound />;
+  if (!product || product.active === false || isSeasonHidden(product.season)) return <NotFound />;
   return <Details key={product.id} product={product} />;
 }
 
@@ -38,8 +38,13 @@ function Details({ product }) {
   const pct = discountPercent(product);
   const wished = has(product.id);
   const catLabel = CATEGORIES.find((c) => c.id === product.category)?.label;
-  const { products } = useAdmin();
-  const related = products.filter((p) => p.active !== false && p.category === product.category && p.id !== product.id).slice(0, 4);
+  const { products, isSeasonHidden } = useAdmin();
+  const related = products.filter((p) =>
+    p.active !== false &&
+    !isSeasonHidden(p.season) &&
+    p.category === product.category &&
+    p.id !== product.id
+  ).slice(0, 4);
 
   const validate = () => {
     if (!size) {

@@ -63,8 +63,8 @@ export default function AdminDashboard() {
   return (
     <div className="admin-page">
       {status && statusMsg && (
-        <div className="admin-toast admin-toast--success" onClick={clearStatus}>
-          <span className="admin-toast-icon">✓</span>
+        <div className={`admin-toast admin-toast--${status}`} onClick={clearStatus}>
+          <span className="admin-toast-icon">{status === 'error' ? '!' : '✓'}</span>
           <span className="admin-toast-msg">{statusMsg}</span>
         </div>
       )}

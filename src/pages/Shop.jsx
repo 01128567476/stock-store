@@ -124,7 +124,7 @@ export default function Shop() {
     }[sort];
     if (by) r = [...r].sort(by);
     return r;
-  }, [category, q, sort, min, max, sale]);
+  }, [category, q, sort, min, max, sale, isSeasonHidden]);
 
   const hasFilters = category !== 'all' || q || min || max || sale || sort !== 'featured';
 

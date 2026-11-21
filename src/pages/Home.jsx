@@ -24,11 +24,9 @@ const FEATURES = [
 
 export default function Home() {
   useSEO(null);
-  const { products } = useAdmin();
-  const visible = products.filter((p) => p.active !== false);
-  const featured = visible.filter((p) => p.featured).slice(0, 4);
+  const { products, isSeasonHidden } = useAdmin();
+  const visible = products.filter((p) => p.active !== false && !isSeasonHidden(p.season));
   const newArrivals = visible.filter((p) => p.isNew).slice(0, 4);
-  const best = visible.filter((p) => p.bestSeller).slice(0, 4);
   const onSale = visible.filter((p) => p.salePrice != null);
   const maxOff = onSale.length ? Math.max(...onSale.map(discountPercent)) : 0;
 
@@ -73,18 +71,23 @@ export default function Home() {
           </div>
         </div>
         <div className="cat-grid">
-          {CATEGORIES.map((c) => (
+          {CATEGORIES.map((c, index) => (
             <Link key={c.id} to={`/shop?category=${c.id}`} className="cat-tile" style={{ '--img': `url(${IMAGES.categories[c.id]})` }}>
-              <span>{c.label}</span>
-              <small>
-                Explore <ArrowIcon size={14} />
-              </small>
+              <span className="cat-tile-top">
+                <span className="cat-tile-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                <span className="cat-tile-tag" aria-hidden="true">Collection</span>
+              </span>
+              <span className="cat-tile-footer">
+                <span className="cat-tile-title">{c.label}</span>
+                <small className="cat-tile-action">
+                  Explore <ArrowIcon size={14} />
+                </small>
+              </span>
             </Link>
           ))}
         </div>
       </Reveal>
 
-      <ProductSection eyebrow="Curated for you" title="Featured products" products={featured} to="/shop" />
       <ProductSection eyebrow="Just landed" title="New arrivals" products={newArrivals} to="/shop?sort=newest" />
 
       <Reveal as="section" className="offer" >
@@ -100,7 +103,6 @@ export default function Home() {
         </div>
       </Reveal>
 
-      <ProductSection eyebrow="Loved by our customers" title="Best sellers" products={best} to="/shop" />
       <ProductSection eyebrow="Reduced" title="On sale now" products={onSale.slice(0, 4)} to="/shop?sale=1" linkLabel="See all offers" />
 
       <Reveal as="section" className="section container">

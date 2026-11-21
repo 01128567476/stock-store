@@ -47,12 +47,12 @@ export const IMAGES = {
 
 export const CATEGORIES = [
   { id: 'men', label: 'Clothing' },
-  { id: 'shoes', label: 'Shoes' },
-  { id: 'accessories', label: 'Accessories' },
   { id: 'pants', label: 'Pants' },
   { id: 'hoodies', label: 'Hoodies' },
   { id: 'shirts', label: 'Shirts' },
   { id: 'jackets', label: 'Jackets' },
+  { id: 'shoes', label: 'Shoes' },
+  { id: 'accessories', label: 'Accessories' },
 ];
 
 export const SEASONS = [

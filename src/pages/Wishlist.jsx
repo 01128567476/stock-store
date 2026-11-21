@@ -8,8 +8,10 @@ import ProductCard from '../components/ProductCard';
 export default function Wishlist() {
   useSEO('Wishlist');
   const { ids } = useWishlist();
-  const { products } = useAdmin();
-  const items = products.filter((p) => ids.includes(p.id) && p.active !== false);
+  const { products, isSeasonHidden } = useAdmin();
+  const items = products.filter((p) =>
+    ids.includes(p.id) && p.active !== false && !isSeasonHidden(p.season)
+  );
 
   return (
     <div className="container page-pad">
