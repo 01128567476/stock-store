@@ -23,7 +23,10 @@ export default function AdminProducts() {
   const [confirmId, setConfirmId] = useState(null);
 
   const catLabel = (id) => CATEGORIES.find((c) => c.id === id)?.label || id;
-  const seasonLabel = (id) => SEASONS.find((s) => s.id === id)?.label || id;
+  const seasonLabel = (id) => {
+    const normalizedSeason = normalizeSeason(id);
+    return SEASONS.find((s) => s.id === normalizedSeason)?.label || normalizedSeason;
+  };
   const firstImage = (p) => Array.isArray(p.images) && p.images.length ? p.images[0] : '';
 
   const filtered = useMemo(() => {
