@@ -1,7 +1,7 @@
 ﻿import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
-import { CATEGORIES } from '../data/products';
+import { CATEGORIES, SEASONS } from '../data/products';
 import { money } from '../config';
 import { EditIcon, TrashIcon, EyeIcon, EyeOffIcon, PlusIcon, SearchIcon } from '../components/Icons';
 
@@ -18,10 +18,12 @@ export default function AdminProducts() {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [saleOnly, setSaleOnly] = useState(false);
+  const [season, setSeason] = useState('all');
   const [sortBy, setSortBy] = useState('name-asc');
   const [confirmId, setConfirmId] = useState(null);
 
   const catLabel = (id) => CATEGORIES.find((c) => c.id === id)?.label || id;
+  const seasonLabel = (id) => SEASONS.find((s) => s.id === id)?.label || id;
   const firstImage = (p) => Array.isArray(p.images) && p.images.length ? p.images[0] : '';
 
   const filtered = useMemo(() => {
@@ -30,7 +32,8 @@ export default function AdminProducts() {
       const matchQ = !q || p.name.toLowerCase().includes(q);
       const matchC = category === 'all' || p.category === category;
       const matchSale = !saleOnly || p.salePrice != null;
-      return matchQ && matchC && matchSale;
+      const matchS = season === 'all' || p.season === season;
+      return matchQ && matchC && matchSale && matchS;
     });
     return [...list].sort((a, b) => {
       switch (sortBy) {
@@ -41,7 +44,7 @@ export default function AdminProducts() {
         default: return a.name.localeCompare(b.name);
       }
     });
-  }, [products, query, category, saleOnly, sortBy]);
+  }, [products, query, category, saleOnly, season, sortBy]);
 
   useEffect(() => {
     if (!status) return undefined;
@@ -49,8 +52,8 @@ export default function AdminProducts() {
     return () => clearTimeout(t);
   }, [status, clearStatus]);
 
-  const activeFilters = query.trim() !== '' || category !== 'all' || saleOnly;
-  const resetFilters = () => { setQuery(''); setCategory('all'); setSaleOnly(false); };
+  const activeFilters = query.trim() !== '' || category !== 'all' || saleOnly || season !== 'all';
+  const resetFilters = () => { setQuery(''); setCategory('all'); setSaleOnly(false); setSeason('all'); };
   const target = products.find((p) => p.id === confirmId);
 
   const handleDelete = () => {
@@ -114,6 +117,13 @@ export default function AdminProducts() {
               <input type="checkbox" checked={saleOnly} onChange={(e) => setSaleOnly(e.target.checked)} />
               On sale
             </label>
+            <select className="admin-select" value={season} onChange={(e) => setSeason(e.target.value)} aria-label="Filter by season">
+              <option value="all">All seasons</option>
+              {SEASONS.map((s) => (
+                <option key={s.id} value={s.id}>{s.label}</option>
+              ))}
+            </select>
+
             {activeFilters && (
               <button type="button" className="admin-clear-filters" onClick={resetFilters}>Clear</button>
             )}
@@ -222,6 +232,7 @@ export default function AdminProducts() {
                   </div>
                   <div className="admin-product-card-tags">
                     <span className="admin-pill">{catLabel(p.category)}</span>
+                    <span className="admin-pill admin-pill-season">{seasonLabel(p.season)}</span>
                     {p.salePrice != null && <span className="admin-badge-discount">-{pct}%</span>}
                   </div>
                   <div className="admin-product-card-price">

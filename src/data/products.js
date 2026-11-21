@@ -47,6 +47,12 @@ export const CATEGORIES = [
   { id: 'accessories', label: 'Accessories' },
 ];
 
+export const SEASONS = [
+  { id: 'winter', label: 'شتوي' },
+  { id: 'summer', label: 'صيفي' },
+  { id: 'both', label: 'كليهما' },
+];
+
 const COLOR = {
   Black: '#141414',
   White: '#f6f4ef',
@@ -78,7 +84,7 @@ const DETAILS = {
 const counters = { men: 0, shoes: 0, accessories: 0 };
 let order = 0;
 
-const make = (name, category, price, salePrice, colors, flags, description, sizes) => {
+const make = (name, category, price, salePrice, colors, flags, description, sizes, season = 'both') => {
   const ci = counters[category]++;
   const pool = POOLS[category];
   const idx = order++;
@@ -94,6 +100,7 @@ const make = (name, category, price, salePrice, colors, flags, description, size
     images: [0, 1, 2].map((k) => U(pool[(ci + k) % pool.length])),
     description,
     details: DETAILS[category],
+    season,
     featured: flags.includes('f'),
     isNew: flags.includes('n'),
     bestSeller: flags.includes('b'),

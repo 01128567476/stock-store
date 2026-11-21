@@ -1,7 +1,7 @@
 ﻿import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
-import { CATEGORIES } from '../data/products';
+import { CATEGORIES, SEASONS } from '../data/products';
 import { money } from '../config';
 import { CloseIcon, ArrowIcon } from '../components/Icons';
 
@@ -26,6 +26,7 @@ export default function AdminProductForm() {
     sizes: DEFAULT_SIZES.men,
     images: [],
     active: true,
+    season: 'both',
   });
 
   const [ready, setReady] = useState(!isEdit);
@@ -48,6 +49,7 @@ export default function AdminProductForm() {
       sizes: existing.sizes || [],
       images: existing.images || [],
       active: existing.active !== false,
+      season: existing.season || 'both',
     });
     setReady(true);
   }, [isEdit, existing]);
@@ -92,12 +94,7 @@ export default function AdminProductForm() {
       sizes: form.sizes,
       images: form.images,
       active: form.active,
-      details: existing?.details || ['Premium quality', 'Designed to last'],
-      featured: existing?.featured || false,
-      isNew: existing?.isNew || false,
-      bestSeller: existing?.bestSeller || false,
-      rating: existing?.rating || 4.5,
-      reviews: existing?.reviews || 0,
+      season: form.season,
     };
     if (isEdit) updateProduct(existing.id, payload);
     else addProduct(payload);
@@ -180,6 +177,14 @@ export default function AdminProductForm() {
           </div>
 
           <div className="admin-field">
+          <div className="admin-field">
+            <label>Season</label>
+            <select value={form.season} onChange={(e) => set('season', e.target.value)}>
+              {SEASONS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+            </select>
+            <span className="muted small">اختر الفصل المناسب للمنتج</span>
+          </div>
+
             <label>Status</label>
             <label className="admin-check">
               <input type="checkbox" checked={form.active} onChange={(e) => set('active', e.target.checked)} />
