@@ -674,11 +674,13 @@ p { margin: 0 0 1rem; }
 
 .hero {
   min-height: min(78vh, 720px);
-  background:
+  background-color: #26231f;
+  background-image:
     linear-gradient(90deg, rgba(12, 12, 12, 0.76) 0%, rgba(12, 12, 12, 0.32) 52%, rgba(12, 12, 12, 0.04) 100%),
-    var(--hero-img) left 32% / 120% auto,
-    #26231f;
-  background-position: left top, left 32%, left top;
+    var(--hero-img);
+  background-repeat: no-repeat;
+  background-size: auto, 120% auto;
+  background-position: left top, left 32%;
 }
 .hero-content { position: relative; z-index: 1; isolation: isolate; max-width: 1280px; }
 .hero-content::before {
@@ -1583,10 +1585,13 @@ p { margin: 0 0 1rem; }
   .hero {
     min-height: 520px;
     align-items: flex-end;
-    background:
+    background-color: #26231f;
+    background-image:
       linear-gradient(0deg, rgba(12,12,12,.82) 0%, rgba(12,12,12,.12) 70%),
-      var(--hero-img) center top / 120% auto,
-      #26231f;
+      var(--hero-img);
+    background-repeat: no-repeat;
+    background-size: auto, 120% auto;
+    background-position: left top, center top;
   }
   .hero-content { padding-block: 2.5rem 3rem; }
   .hero-content::before {
