@@ -1,8 +1,10 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { PRODUCTS, normalizeSeason } from '../data/products';
+import { PRODUCTS, REMOVED_CATEGORY_IDS, TEST_PRODUCTS, normalizeSeason } from '../data/products';
 
 const ADMIN_KEY = 'mv_admin';
 const PRODUCTS_KEY = 'mv_products_admin';
+const SWEATER_MIGRATION_KEY = 'mv_sweater_seeded_v4';
+const TEST_PRODUCTS_MIGRATION_KEY = 'mv_test_products_seed_v1';
 const SEASON_VISIBILITY_KEY = 'mv_hidden_seasons';
 
 const ADMIN_CREDENTIALS = {
@@ -24,10 +26,29 @@ export function AdminProvider({ children }) {
   const [products, setProducts] = useState(() => {
     try {
       const saved = localStorage.getItem(PRODUCTS_KEY);
-      if (!saved) return initialProducts;
+      if (!saved) {
+        localStorage.setItem(SWEATER_MIGRATION_KEY, '1');
+        localStorage.setItem(TEST_PRODUCTS_MIGRATION_KEY, '1');
+        return initialProducts;
+      }
       const parsed = JSON.parse(saved);
-      if (!Array.isArray(parsed) || parsed.length === 0) return initialProducts;
-      return parsed;
+      if (!Array.isArray(parsed)) return initialProducts;
+      const currentProducts = parsed.filter((product) => !REMOVED_CATEGORY_IDS.includes(product.category));
+      if (localStorage.getItem(SWEATER_MIGRATION_KEY) !== '1') {
+        const starterSweater = initialProducts.find((product) => product.category === 'sweaters');
+        if (starterSweater) {
+          if (!currentProducts.some((product) => product.id === starterSweater.id)) {
+            currentProducts.push(starterSweater);
+          }
+          localStorage.setItem(SWEATER_MIGRATION_KEY, '1');
+        }
+      }
+      if (localStorage.getItem(TEST_PRODUCTS_MIGRATION_KEY) !== '1') {
+        const existingIds = new Set(currentProducts.map((product) => product.id));
+        currentProducts.push(...TEST_PRODUCTS.filter((product) => !existingIds.has(product.id)));
+        localStorage.setItem(TEST_PRODUCTS_MIGRATION_KEY, '1');
+      }
+      return currentProducts;
     } catch { return initialProducts; }
   });
 
@@ -104,15 +125,15 @@ export function AdminProvider({ children }) {
     } catch (error) {
       console.error('Unable to save seasonal visibility settings.', error);
       setStatus('error');
-      setStatusMsg('تعذر حفظ إعدادات ظهور المواسم. حاول مرة أخرى.');
+      setStatusMsg('Unable to save seasonal visibility settings. Please try again.');
       return;
     }
     setHiddenSeasons(next);
     setStatus('success');
-    const label = season === 'winter' ? 'الشتوية' : 'الصيفية';
+    const label = season === 'winter' ? 'Winter' : 'Summer';
     setStatusMsg(hidden
-      ? `تم إخفاء المنتجات ${label} من المتجر`
-      : `تم إظهار المنتجات ${label} في المتجر`);
+      ? `${label} products are hidden from the store.`
+      : `${label} products are visible in the store.`);
   }, [hiddenSeasons]);
 
   const isSeasonHidden = useCallback(

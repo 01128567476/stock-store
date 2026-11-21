@@ -2,7 +2,7 @@ const U = (id, w = 900, h = 1125) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&h=${h}&q=80`;
 
 const POOLS = {
-  men: [
+  apparel: [
     'photo-1576566588028-4147f3842f27',
     'photo-1507679799987-c73779587ccf',
     'photo-1594938298603-c8148c4dae35',
@@ -11,6 +11,31 @@ const POOLS = {
     'photo-1618354691373-d851c5c3a990',
     'photo-1556821840-3a63f95609a7',
     'photo-1521572163474-6864f9cf17ab',
+  ],
+  pants: [
+    'photo-1542272604-787c3835535d',
+    'photo-1594938298603-c8148c4dae35',
+    'photo-1507679799987-c73779587ccf',
+  ],
+  hoodies: [
+    'photo-1556821840-3a63f95609a7',
+    'photo-1618354691373-d851c5c3a990',
+    'photo-1507679799987-c73779587ccf',
+  ],
+  jackets: [
+    'photo-1591047139829-d91aecb6caea',
+    'photo-1594938298603-c8148c4dae35',
+    'photo-1507679799987-c73779587ccf',
+  ],
+  sweaters: [
+    'photo-1618354691373-d851c5c3a990',
+    'photo-1576566588028-4147f3842f27',
+    'photo-1556821840-3a63f95609a7',
+  ],
+  pullover: [
+    'photo-1556821840-3a63f95609a7',
+    'photo-1618354691373-d851c5c3a990',
+    'photo-1576566588028-4147f3842f27',
   ],
   shoes: [
     'photo-1542291026-7eec264c27ff',
@@ -21,45 +46,37 @@ const POOLS = {
     'photo-1460353581641-37baddab0fa2',
     'photo-1520639888713-7851133b1ed0',
   ],
-  accessories: [
-    'photo-1584917865442-de89df76afd3',
-    'photo-1548036328-c9fa89d128fa',
-    'photo-1523170335258-f5ed11844a49',
-    'photo-1572635196237-14b3f281503f',
-    'photo-1511499767150-a48a237f0083',
-    'photo-1553062407-98eeb64c6a62',
-  ],
 };
 
 export const IMAGES = {
   hero: new URL(`${import.meta.env.BASE_URL}store-hero.png`, document.baseURI).href,
   banner: U('photo-1445205170230-053b83016050', 1600, 900),
   categories: {
-    men: U(POOLS.men[2], 700, 900),
     shoes: U(POOLS.shoes[0], 700, 900),
-    accessories: U(POOLS.accessories[2], 700, 900),
-    pants: U(POOLS.men[4], 700, 900),
-    hoodies: U(POOLS.men[6], 700, 900),
-    shirts: U(POOLS.men[7], 700, 900),
-    jackets: U(POOLS.men[3], 700, 900),
+    pants: U(POOLS.apparel[4], 700, 900),
+    hoodies: U(POOLS.apparel[6], 700, 900),
+    jackets: U(POOLS.apparel[3], 700, 900),
+    sweaters: U(POOLS.sweaters[0], 700, 900),
+    pullover: U(POOLS.sweaters[1], 700, 900),
   },
 };
 
 export const CATEGORIES = [
-  { id: 'men', label: 'Clothing' },
   { id: 'pants', label: 'Pants' },
   { id: 'hoodies', label: 'Hoodies' },
-  { id: 'shirts', label: 'Shirts' },
   { id: 'jackets', label: 'Jackets' },
+  { id: 'sweaters', label: 'Sweaters' },
+  { id: 'pullover', label: 'Pullover' },
   { id: 'shoes', label: 'Shoes' },
-  { id: 'accessories', label: 'Accessories' },
 ];
 
 export const SEASONS = [
-  { id: 'winter', label: 'شتوي' },
-  { id: 'summer', label: 'صيفي' },
-  { id: 'both', label: 'كليهما' },
+  { id: 'winter', label: 'Winter' },
+  { id: 'summer', label: 'Summer' },
+  { id: 'both', label: 'All Seasons' },
 ];
+
+export const REMOVED_CATEGORY_IDS = ['men', 'shirts', 'accessories'];
 
 export const normalizeSeason = (season) => {
   const value = String(season ?? 'both').trim().toLowerCase();
@@ -97,16 +114,12 @@ const cols = (...names) => names.map((name) => ({ name, hex: COLOR[name] }));
 
 const CLOTH_SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 const SHOE_SIZES = ['40', '41', '42', '43', '44', '45'];
-const BELT_SIZES = ['S', 'M', 'L', 'XL'];
-const ONE = ['One Size'];
 
 const DETAILS = {
-  men: ['Premium fabrics, responsibly sourced', 'Tailored contemporary fit', 'Machine washable at 30°C'],
   shoes: ['Genuine materials, hand finished', 'Cushioned insole for all-day comfort', 'Wipe clean with a soft cloth'],
-  accessories: ['Crafted with durable premium materials', 'Timeless, versatile design', 'Comes in a signature gift box'],
 };
 
-const counters = { men: 0, shoes: 0, accessories: 0 };
+const counters = { pants: 0, hoodies: 0, jackets: 0, sweaters: 0, pullover: 0, shoes: 0 };
 let order = 0;
 
 const make = (name, category, price, salePrice, colors, flags, description, sizes, season = 'both') => {
@@ -121,7 +134,7 @@ const make = (name, category, price, salePrice, colors, flags, description, size
     price,
     salePrice,
     colors,
-    sizes: sizes || (category === 'shoes' ? SHOE_SIZES : category === 'accessories' ? ONE : CLOTH_SIZES),
+    sizes: sizes || (category === 'shoes' ? SHOE_SIZES : CLOTH_SIZES),
     images: [0, 1, 2].map((k) => U(pool[(ci + k) % pool.length])),
     description,
     details: DETAILS[category],
@@ -134,20 +147,38 @@ const make = (name, category, price, salePrice, colors, flags, description, size
   };
 };
 
+export const TEST_PRODUCTS = [
+  make('TEST - Tapered Chino Pants', 'pants', 1450, null, cols('Beige', 'Navy'), 'n',
+    'Test catalog item for checking category browsing and product details.'),
+  make('TEST - Relaxed Everyday Pants', 'pants', 1750, 1575, cols('Olive', 'Black'), 'b',
+    'Test catalog item for checking discounted pricing and product filters.'),
+  make('TEST - Classic Fleece Hoodie', 'hoodies', 1850, null, cols('Grey', 'Black'), 'n',
+    'Test catalog item for checking category browsing and product details.'),
+  make('TEST - Zip-Up Hoodie', 'hoodies', 2200, 1980, cols('Navy', 'Grey'), 'b',
+    'Test catalog item for checking discounted pricing and product filters.'),
+  make('TEST - Lightweight Utility Jacket', 'jackets', 2600, null, cols('Olive', 'Black'), 'f',
+    'Test catalog item for checking category browsing and product details.'),
+  make('TEST - Classic Denim Jacket', 'jackets', 3100, 2790, cols('Indigo', 'Black'), 'n',
+    'Test catalog item for checking discounted pricing and product filters.'),
+  make('TEST - Ribbed Knit Sweater', 'sweaters', 1950, null, cols('Grey', 'Camel'), 'n',
+    'Test catalog item for checking category browsing and product details.'),
+  make('TEST - Wool Blend Cardigan', 'sweaters', 2450, 2205, cols('Navy', 'Beige'), 'b',
+    'Test catalog item for checking discounted pricing and product filters.'),
+  make('TEST - Cotton Pullover', 'pullover', 1700, null, cols('Black', 'White'), 'n',
+    'Test catalog item for checking category browsing and product details.'),
+  make('TEST - Textured Knit Pullover', 'pullover', 2100, 1890, cols('Brown', 'Grey'), 'b',
+    'Test catalog item for checking discounted pricing and product filters.'),
+  make('TEST - Everyday Canvas Sneakers', 'shoes', 2200, null, cols('White', 'Black'), 'n',
+    'Test catalog item for checking category browsing and product details.'),
+  make('TEST - Leather Ankle Boots', 'shoes', 2700, 2430, cols('Brown', 'Black'), 'b',
+    'Test catalog item for checking discounted pricing and product filters.'),
+];
+
 export const PRODUCTS = [
-  // Men
-  make('Essential Oversized Tee', 'men', 690, null, cols('Black', 'White', 'Beige'), 'nb',
-    'Heavyweight 240gsm organic cotton with a relaxed drop-shoulder fit. The everyday piece you will reach for first.'),
-  make('Tailored Wool Blazer', 'men', 4200, 3360, cols('Black', 'Navy', 'Charcoal'), 'f',
-    'A sharply cut single-breasted blazer in a soft wool blend, fully lined with horn-effect buttons.'),
-  make('Slim Fit Chino', 'men', 1450, null, cols('Beige', 'Olive', 'Navy'), 'b',
-    'Stretch cotton twill chinos with a clean tapered leg. Smart enough for the office, easy enough for weekends.'),
-  make('Merino Crewneck Sweater', 'men', 2100, 1680, cols('Grey', 'Navy', 'Camel'), 'fb',
+  ...TEST_PRODUCTS,
+  // Sweaters
+  make('Merino Crewneck Sweater', 'sweaters', 2100, 1680, cols('Grey', 'Navy', 'Camel'), 'fb',
     'Fine-gauge extra-soft merino wool, naturally temperature regulating and beautifully lightweight.'),
-  make('Heritage Denim Jacket', 'men', 2600, null, cols('Indigo', 'Black'), 'n',
-    'Rigid selvedge-style denim with a boxy cut that softens and fades with every wear.'),
-  make('Classic Oxford Shirt', 'men', 1350, null, cols('White', 'Blue'), 'n',
-    'A wardrobe staple in crisp brushed Oxford cotton with a button-down collar and a regular fit.'),
   // Shoes
   make('Minimal Leather Sneakers', 'shoes', 2900, null, cols('White', 'Black'), 'fb',
     'Hand-finished Italian leather sneakers with a clean low profile and a cushioned insole.'),
@@ -159,19 +190,6 @@ export const PRODUCTS = [
     'Retro-inspired court sneakers with a vulcanised sole and perforated detailing.'),
   make('Trail Runner', 'shoes', 3300, null, cols('Grey', 'Black'), '',
     'Lightweight technical runners with a grippy outsole and breathable engineered mesh upper.'),
-  // Accessories
-  make('Leather Crossbody Bag', 'accessories', 2700, null, cols('Black', 'Brown', 'Beige'), 'fb',
-    'A compact crossbody in pebbled leather with a magnetic flap, inner pocket and adjustable strap.'),
-  make('Aviator Sunglasses', 'accessories', 1100, 880, cols('Black', 'Gold'), 'n',
-    'Lightweight metal-frame aviators with UV400 polarised lenses and a hard protective case.'),
-  make('Minimal Steel Watch', 'accessories', 3900, null, cols('Silver', 'Black'), 'f',
-    'Slim 38mm stainless steel watch with sapphire-coated glass, Japanese movement and mesh strap.'),
-  make('Wool Scarf', 'accessories', 950, null, cols('Grey', 'Camel', 'Black'), 'b',
-    'An oversized scarf woven from soft brushed wool with fringed edges, warm and light.'),
-  make('Leather Belt', 'accessories', 850, null, cols('Black', 'Brown'), '',
-    'Full-grain leather belt with a brushed metal buckle. Cut to last for years.', BELT_SIZES),
-  make('Canvas Tote', 'accessories', 620, 496, cols('Beige', 'Black'), 'n',
-    'Heavy organic canvas tote with leather handles, an inner zip pocket and room for a laptop.'),
 ];
 
 export const getProduct = (id) => PRODUCTS.find((p) => p.id === id);

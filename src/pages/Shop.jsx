@@ -87,7 +87,7 @@ export default function Shop() {
   const sale = params.get('sale') === '1';
 
   const catLabel = CATEGORIES.find((c) => c.id === category)?.label;
-  useSEO(catLabel || (sale ? 'Sale' : 'Shop'), `Shop ${catLabel || 'all fashion'} at STOCK STORE — premium clothing, shoes and accessories.`);
+  useSEO(catLabel || (sale ? 'Sale' : 'Shop'), `Shop ${catLabel || 'all fashion'} at STOCK STORE — premium apparel, sweaters, and shoes.`);
 
   const update = (patch) => {
     const next = new URLSearchParams(params);

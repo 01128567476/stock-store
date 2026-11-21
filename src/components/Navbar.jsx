@@ -7,9 +7,9 @@ import { useTheme } from '../context/ThemeContext';
 import { BagIcon, HeartIcon, HomeIcon, MoonIcon, SearchIcon, ShieldIcon, SunIcon } from './Icons';
 
 const LINKS = [
-  { to: '/shop?category=men', label: 'Men' },
+  { to: '/shop?category=sweaters', label: 'Sweaters' },
+  { to: '/shop?category=pullover', label: 'Pullover' },
   { to: '/shop?category=shoes', label: 'Shoes' },
-  { to: '/shop?category=accessories', label: 'Accessories' },
   { to: '/shop?sale=1', label: 'Sale' },
 ];
 

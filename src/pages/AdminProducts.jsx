@@ -92,15 +92,15 @@ export default function AdminProducts() {
       <section className="admin-season-panel" aria-labelledby="admin-season-title">
         <div className="admin-season-panel-head">
           <div>
-            <h3 id="admin-season-title">إدارة ظهور المنتجات حسب الموسم</h3>
-            <p>التحكم هنا ينعكس مباشرة على المنتجات المعروضة في المتجر.</p>
+            <h3 id="admin-season-title">Seasonal Product Visibility</h3>
+            <p>These settings control which seasonal products appear in your store.</p>
           </div>
-          <span className="admin-season-panel-badge">إعدادات المتجر</span>
+          <span className="admin-season-panel-badge">Store Settings</span>
         </div>
         <div className="admin-season-grid">
           {[
-            { id: 'winter', label: 'المنتجات الشتوية' },
-            { id: 'summer', label: 'المنتجات الصيفية' },
+            { id: 'winter', label: 'Winter Products' },
+            { id: 'summer', label: 'Summer Products' },
           ].map(({ id, label }) => {
             const hidden = isSeasonHidden(id);
             const count = products.filter((product) => normalizeSeason(product.season) === id).length;
@@ -111,8 +111,8 @@ export default function AdminProducts() {
                   <div>
                     <h4>{label}</h4>
                     <p>
-                      {hidden ? 'مخفية حاليًا عن المتجر' : 'ظاهرة حاليًا في المتجر'}
-                      {' · '}{count} {count === 1 ? 'منتج' : 'منتجات'}
+                      {hidden ? 'Currently hidden from the store' : 'Currently visible in the store'}
+                      {' · '}{count} {count === 1 ? 'product' : 'products'}
                     </p>
                   </div>
                 </div>
@@ -121,10 +121,10 @@ export default function AdminProducts() {
                   className={`admin-season-action ${hidden ? 'is-hidden' : ''}`}
                   onClick={() => toggleSeasonVisibility(id)}
                   aria-pressed={!hidden}
-                  aria-label={`${hidden ? 'إظهار' : 'إخفاء'} ${label} ${hidden ? 'في' : 'من'} المتجر`}
+                  aria-label={`${hidden ? 'Show' : 'Hide'} ${label} ${hidden ? 'in' : 'from'} the store`}
                 >
                   {hidden ? <EyeIcon size={17} /> : <EyeOffIcon size={17} />}
-                  <span>{hidden ? 'إظهار في المتجر' : 'إخفاء من المتجر'}</span>
+                  <span>{hidden ? 'Show in store' : 'Hide from store'}</span>
                 </button>
               </article>
             );

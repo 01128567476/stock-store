@@ -6,13 +6,12 @@ import { money } from '../config';
 import { CloseIcon, ArrowIcon } from '../components/Icons';
 
 const DEFAULT_SIZES = {
-  men: ['S', 'M', 'L', 'XL', 'XXL'],
   shoes: ['40', '41', '42', '43', '44', '45'],
-  accessories: ['One Size'],
   pants: ['S', 'M', 'L', 'XL', 'XXL'],
   hoodies: ['S', 'M', 'L', 'XL', 'XXL'],
-  shirts: ['S', 'M', 'L', 'XL', 'XXL'],
   jackets: ['S', 'M', 'L', 'XL', 'XXL'],
+  sweaters: ['S', 'M', 'L', 'XL', 'XXL'],
+  pullover: ['S', 'M', 'L', 'XL', 'XXL'],
 };
 
 export default function AdminProductForm() {
@@ -25,9 +24,9 @@ export default function AdminProductForm() {
   const imageInput = useRef(null);
 
   const [form, setForm] = useState({
-    name: '', description: '', category: 'men', price: '', discount: '',
+    name: '', description: '', category: 'pants', price: '', discount: '',
     colors: [{ name: 'Black', hex: '#141414' }],
-    sizes: DEFAULT_SIZES.men,
+    sizes: DEFAULT_SIZES.pants,
     images: [],
     active: true,
     season: 'both',
@@ -186,7 +185,7 @@ export default function AdminProductForm() {
             <select value={form.season} onChange={(e) => set('season', e.target.value)}>
               {SEASONS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
             </select>
-            <span className="muted small">اختر الفصل المناسب للمنتج</span>
+            <span className="muted small">Choose the season that best fits this product.</span>
           </div>
 
             <label>Status</label>

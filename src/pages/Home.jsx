@@ -9,10 +9,10 @@ import Stars from '../components/Stars';
 import { ArrowIcon, CashIcon, ReturnIcon, ShieldIcon, TruckIcon } from '../components/Icons';
 
 const REVIEWS = [
-  { name: 'Nour A.', city: 'Cairo', rating: 5, text: 'The quality is outstanding. The tailored blazer fits perfectly and the delivery was faster than promised.' },
-  { name: 'Omar H.', city: 'Alexandria', rating: 5, text: 'Finally a local brand that feels international. The oversized tee is my new favourite, ordered three more.' },
+  { name: 'Nour A.', city: 'Cairo', rating: 5, text: 'The quality is outstanding. The suede loafers fit perfectly and the delivery was faster than promised.' },
+  { name: 'Omar H.', city: 'Alexandria', rating: 5, text: 'Finally a local brand that feels international. The trail runners are my new favourite, ordered another pair.' },
   { name: 'Salma K.', city: 'Giza', rating: 4, text: 'Beautiful fabrics and elegant packaging. Cash on delivery made ordering stress-free.' },
-  { name: 'Youssef M.', city: 'Mansoura', rating: 5, text: 'The wool blazer looks far more expensive than it is. Great customer service on WhatsApp too.' },
+  { name: 'Youssef M.', city: 'Mansoura', rating: 5, text: 'The leather sneakers look far more expensive than they are. Great customer service on WhatsApp too.' },
 ];
 
 const FEATURES = [
@@ -95,7 +95,7 @@ export default function Home() {
           <div className="container offer-inner">
             <p className="eyebrow light">Special offer</p>
             <h2>Up to {maxOff}% off selected styles</h2>
-            <p>Limited-time prices on blazers, knitwear, shirts and sneakers while stock lasts.</p>
+            <p>Limited-time prices on sweaters and sneakers while stock lasts.</p>
             <Link to="/shop?sale=1" className="btn btn-light btn-lg">
               Shop the sale <ArrowIcon size={18} />
             </Link>

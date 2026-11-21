@@ -23,9 +23,9 @@ export default function Footer() {
           </div>
           <div>
             <h4>Shop</h4>
-            <Link to="/shop?category=men">Men</Link>
+            <Link to="/shop?category=sweaters">Sweaters</Link>
+            <Link to="/shop?category=pullover">Pullover</Link>
             <Link to="/shop?category=shoes">Shoes</Link>
-            <Link to="/shop?category=accessories">Accessories</Link>
             <Link to="/shop?sale=1">Sale</Link>
           </div>
           <div>
