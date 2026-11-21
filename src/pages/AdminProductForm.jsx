@@ -9,6 +9,10 @@ const DEFAULT_SIZES = {
   men: ['S', 'M', 'L', 'XL', 'XXL'],
   shoes: ['40', '41', '42', '43', '44', '45'],
   accessories: ['One Size'],
+  pants: ['S', 'M', 'L', 'XL', 'XXL'],
+  hoodies: ['S', 'M', 'L', 'XL', 'XXL'],
+  shirts: ['S', 'M', 'L', 'XL', 'XXL'],
+  jackets: ['S', 'M', 'L', 'XL', 'XXL'],
 };
 
 export default function AdminProductForm() {

@@ -38,6 +38,10 @@ export const IMAGES = {
     men: U(POOLS.men[2], 700, 900),
     shoes: U(POOLS.shoes[0], 700, 900),
     accessories: U(POOLS.accessories[2], 700, 900),
+    pants: U(POOLS.men[4], 700, 900),
+    hoodies: U(POOLS.men[6], 700, 900),
+    shirts: U(POOLS.men[7], 700, 900),
+    jackets: U(POOLS.men[3], 700, 900),
   },
 };
 
@@ -45,10 +49,10 @@ export const CATEGORIES = [
   { id: 'men', label: 'Clothing' },
   { id: 'shoes', label: 'Shoes' },
   { id: 'accessories', label: 'Accessories' },
-  { id: 'pants', label: 'بناطيل' },
-  { id: 'hoodies', label: 'هودي' },
-  { id: 'shirts', label: 'قمصان' },
-  { id: 'jackets', label: 'جواكت' },
+  { id: 'pants', label: 'Pants' },
+  { id: 'hoodies', label: 'Hoodies' },
+  { id: 'shirts', label: 'Shirts' },
+  { id: 'jackets', label: 'Jackets' },
 ];
 
 export const SEASONS = [
