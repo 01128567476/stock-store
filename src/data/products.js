@@ -32,7 +32,7 @@ const POOLS = {
 };
 
 export const IMAGES = {
-  hero: U('photo-1516257984-b1b4d707412e', 1800, 1200),
+  hero: './store-hero.png',
   banner: U('photo-1445205170230-053b83016050', 1600, 900),
   categories: {
     men: U(POOLS.men[2], 700, 900),
