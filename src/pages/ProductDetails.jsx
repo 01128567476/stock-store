@@ -5,6 +5,7 @@ import { useAdmin } from '../context/AdminContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';
+import { useLang } from '../context/LangContext';
 import { useSEO } from '../hooks/useSEO';
 import ProductImage from '../components/ProductImage';
 import ProductCard from '../components/ProductCard';
@@ -23,6 +24,7 @@ export default function ProductDetails() {
 }
 
 function Details({ product }) {
+  const { t } = useLang();
   const navigate = useNavigate();
   const { addItem } = useCart();
   const { has, toggle } = useWishlist();
@@ -45,7 +47,8 @@ function Details({ product }) {
   const pct = discountPercent(product);
   const details = getProductDetails(product);
   const wished = has(product.id);
-  const catLabel = CATEGORIES.find((c) => c.id === product.category)?.label;
+  const catId = CATEGORIES.find((c) => c.id === product.category)?.id;
+  const catLabel = catId ? t(`category.${catId}`) : '';
   const { products, isSeasonHidden } = useAdmin();
   const related = products.filter((p) =>
     p.active !== false &&
@@ -83,7 +86,7 @@ function Details({ product }) {
     const invalidVariants = variants.filter((variant) => !variant.color || !variant.size);
     if (invalidVariants.length) {
       setVariantErrors(invalidVariants.map((variant) => variant.id));
-      toast('Choose a color and size for each item', 'error');
+      toast(t('product.chooseColorSize'), 'error');
       return false;
     }
 
@@ -93,7 +96,7 @@ function Details({ product }) {
 
   const add = () => {
     if (!addVariantsToCart()) return;
-    toast(`${product.name} added to cart`);
+    toast(`${product.name} ${t('product.addedToCart')}`);
   };
 
   const buyNow = () => {
@@ -102,13 +105,13 @@ function Details({ product }) {
   };
 
   if (!colors.length || !sizes.length || !images.length) {
-    return <div className="container pdp"><p>Product details are incomplete. Please contact the store.</p></div>;
+    return <div className="container pdp"><p>{t('product.incomplete')}</p></div>;
   }
 
   return (
     <div className="container pdp">
       <nav className="breadcrumbs" aria-label="Breadcrumb">
-        <Link to="/">Home</Link> / <Link to="/shop">Shop</Link> / <Link to={`/shop?category=${product.category}`}>{catLabel}</Link> /{' '}
+        <Link to="/">{t('product.home')}</Link> / <Link to="/shop">{t('product.shop')}</Link> / <Link to={`/shop?category=${product.category}`}>{catLabel}</Link> /{' '}
         <span>{product.name}</span>
       </nav>
 
@@ -116,7 +119,7 @@ function Details({ product }) {
         <div className="gallery">
           <div className="thumbs">
             {images.map((src, i) => (
-              <button key={src} className={`thumb ${i === img ? 'active' : ''}`} onClick={() => setImg(i)} aria-label={`View image ${i + 1}`}>
+              <button key={src} className={`thumb ${i === img ? 'active' : ''}`} onClick={() => setImg(i)} aria-label={t('product.viewImage', { index: i + 1 })}>
                 <ProductImage src={src} alt={`${product.name} view ${i + 1}`} />
               </button>
             ))}
@@ -125,7 +128,7 @@ function Details({ product }) {
             <ProductImage src={images[img % images.length]} alt={product.name} loading="eager" />
             <div className="badges">
               {pct > 0 && <span className="badge badge-sale">-{pct}%</span>}
-              {product.isNew && <span className="badge">New</span>}
+              {product.isNew && <span className="badge">{t('product.new')}</span>}
             </div>
           </div>
         </div>
@@ -141,26 +144,26 @@ function Details({ product }) {
             {variants.map((variant, index) => {
               const hasError = variantErrors.includes(variant.id);
               return (
-                <section key={variant.id} className="variant-row" aria-label={`Item ${index + 1} options`}>
+                <section key={variant.id} className="variant-row" aria-label={t('product.item', { index: index + 1 })}>
                   <div className="variant-row-head">
                     <div className="variant-item-title">
                       <span className="variant-item-number">{String(index + 1).padStart(2, '0')}</span>
-                      <strong>Item {index + 1}</strong>
+                      <strong>{t('product.item', { index: index + 1 })}</strong>
                     </div>
                     {variants.length > 1 && (
                       <button type="button" className="variant-remove" onClick={() => removeVariant(variant.id)}>
-                        <TrashIcon size={15} /> Remove
+                        <TrashIcon size={15} /> {t('product.remove')}
                       </button>
                     )}
                   </div>
                   <div className="option">
                     <div className="option-label">
-                      Color: <strong>{variant.color || 'Select a color'}</strong>
+                      {t('product.color')} <strong>{variant.color || t('product.selectColor')}</strong>
                     </div>
                     <div
                       className={`swatches big variant-swatches ${hasError && !variant.color ? 'error' : ''}`}
                       role="radiogroup"
-                      aria-label={`Color for item ${index + 1}`}
+                      aria-label={t('product.color')}
                     >
                       {colors.map((c) => (
                         <button
@@ -179,9 +182,9 @@ function Details({ product }) {
                   </div>
                   <div className="option">
                     <div className="option-label">
-                      Size: <strong>{variant.size || 'Select a size'}</strong>
+                      {t('product.size')} <strong>{variant.size || t('product.selectSize')}</strong>
                     </div>
-                    <div className={`sizes big ${hasError && !variant.size ? 'error' : ''}`} role="radiogroup" aria-label={`Size for item ${index + 1}`}>
+                    <div className={`sizes big ${hasError && !variant.size ? 'error' : ''}`} role="radiogroup" aria-label={t('product.size')}>
                       {sizes.map((sizeOption) => (
                         <button
                           key={sizeOption}
@@ -195,10 +198,10 @@ function Details({ product }) {
                         </button>
                       ))}
                     </div>
-                    {hasError && <p className="form-msg error">Choose a color and size for this item.</p>}
+                    {hasError && <p className="form-msg error">{t('product.chooseColorSize')}</p>}
                   </div>
                   <div className="option variant-quantity">
-                    <div className="option-label">Quantity</div>
+                    <div className="option-label">{t('product.quantity')}</div>
                     <QtySelect
                       value={variant.qty}
                       onChange={(qty) => updateVariant(variant.id, 'qty', qty)}
@@ -209,37 +212,37 @@ function Details({ product }) {
             })}
           </div>
           <button type="button" className="btn btn-outline btn-sm variant-add" onClick={addVariant}>
-            + Add another color and size
+            {t('product.addAnother')}
           </button>
 
           <div className="pdp-actions">
             <button className="btn btn-lg btn-discover" onClick={add}>
-              <BagIcon size={18} /> Add to Cart
+              <BagIcon size={18} /> {t('product.addToCart')}
             </button>
             <button className="btn btn-outline btn-lg btn-buy" onClick={buyNow}>
-              Buy Now
+              {t('product.buyNow')}
             </button>
             <button
               className={`btn btn-outline btn-lg icon-only wish-btn ${wished ? 'on' : ''}`}
               onClick={() => {
                 toggle(product.id);
-                toast(wished ? 'Removed from wishlist' : 'Saved to wishlist', wished ? 'wishlist-remove' : 'wishlist');
+                toast(wished ? t('product.removedWishlist') : t('product.savedWishlist'), wished ? 'wishlist-remove' : 'wishlist');
               }}
               aria-pressed={wished}
-              aria-label={wished ? 'Remove from wishlist' : 'Add to wishlist'}
+              aria-label={wished ? t('product.removeWishlist') : t('product.addWishlist')}
             >
               <HeartIcon filled={wished} />
             </button>
           </div>
 
           <ul className="pdp-perks">
-            <li><TruckIcon size={18} /> Free delivery over 3,000 EGP</li>
-            <li><CashIcon size={18} /> Cash on delivery available</li>
-            <li><ReturnIcon size={18} /> 14-day easy returns</li>
+            <li><TruckIcon size={18} /> {t('product.freeDeliveryOver')}</li>
+            <li><CashIcon size={18} /> {t('product.codAvailable')}</li>
+            <li><ReturnIcon size={18} /> {t('product.returns')}</li>
           </ul>
 
           <div className="pdp-details">
-            <h3>Details</h3>
+            <h3>{t('product.details')}</h3>
             <ul>
               {details.map((d) => (
                 <li key={d}>{d}</li>
@@ -252,7 +255,7 @@ function Details({ product }) {
       {related.length > 0 && (
         <section className="section">
           <div className="section-head">
-            <h2>You may also like</h2>
+            <h2>{t('product.youMayAlsoLike')}</h2>
           </div>
           <div className="grid">
             {related.map((p) => (

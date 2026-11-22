@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
+import { useLang } from '../context/LangContext';
 import { ArrowIcon, CloseIcon, ImageIcon, LayoutIcon, LogoutIcon, MenuIcon, PackageIcon, PlusIcon } from './Icons';
 
 export default function AdminLayout({ children }) {
@@ -8,21 +9,22 @@ export default function AdminLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useAdmin();
+  const { t } = useLang();
 
   const links = [
-    { to: '/admin', label: 'Dashboard', icon: <LayoutIcon size={18} /> },
-    { to: '/admin/products', label: 'Products', icon: <PackageIcon size={18} /> },
-    { to: '/admin/products/add', label: 'Add Product', icon: <PlusIcon size={18} /> },
-    { to: '/admin/ads', label: 'Advertisements', icon: <ImageIcon size={18} /> },
+    { to: '/admin', labelKey: 'admin.dashboard', icon: <LayoutIcon size={18} /> },
+    { to: '/admin/products', labelKey: 'admin.products', icon: <PackageIcon size={18} /> },
+    { to: '/admin/products/add', labelKey: 'admin.addProduct', icon: <PlusIcon size={18} /> },
+    { to: '/admin/ads', labelKey: 'admin.advertisements', icon: <ImageIcon size={18} /> },
   ];
 
   const isActiveLink = (to) =>
     location.pathname === to ||
     (to !== '/admin' && location.pathname.startsWith(to + '/'));
 
-  const activeLink = [...links]
+  const activeLinkKey = [...links]
     .sort((a, b) => b.to.length - a.to.length)
-    .find((l) => isActiveLink(l.to))?.label;
+    .find((l) => isActiveLink(l.to))?.labelKey;
 
   // Close drawer on route change
   useEffect(() => {
@@ -49,11 +51,11 @@ export default function AdminLayout({ children }) {
           <button
             className="admin-close-drawer"
             onClick={() => setDrawerOpen(false)}
-            aria-label="Close menu"
+            aria-label={t('admin.closeMenu')}
           >
             <CloseIcon size={20} />
           </button>
-          <div className="admin-brand">
+          <div className="admin-brand brand-ltr" dir="ltr">
             <span className="logo-text">STOCK</span>
             <span className="admin-brand-sub">Admin</span>
           </div>
@@ -69,7 +71,7 @@ export default function AdminLayout({ children }) {
                   onClick={() => setDrawerOpen(false)}
                 >
                   <span className="admin-link-icon">{l.icon}</span>
-                  {l.label}
+                  {t(l.labelKey)}
                 </Link>
               </li>
             );
@@ -77,7 +79,7 @@ export default function AdminLayout({ children }) {
           <li>
             <Link to="/" className="admin-link">
               <span className="admin-link-icon"><ArrowIcon size={18} /></span>
-              View Store
+              {t('admin.viewStore')}
             </Link>
           </li>
           <li>
@@ -89,12 +91,12 @@ export default function AdminLayout({ children }) {
               }}
             >
               <span className="admin-link-icon"><LogoutIcon size={18} /></span>
-              Logout
+              {t('admin.logout')}
             </button>
           </li>
         </ul>
         <div className="admin-sidebar-footer">
-          <span className="admin-footer-text">STOCK STORE</span>
+          <span className="admin-footer-text brand-ltr" dir="ltr">STOCK STORE</span>
           <span className="admin-footer-ver">v2.0 · 2026</span>
         </div>
       </aside>
@@ -110,13 +112,13 @@ export default function AdminLayout({ children }) {
             <MenuIcon size={22} />
           </button>
           <div className="admin-topbar-title">
-            <h2>{activeLink || 'Admin'}</h2>
-            <p className="admin-subtitle">Store management · STOCK STORE</p>
+            <h2>{activeLinkKey ? t(activeLinkKey) : t('admin.admin')}</h2>
+            <p className="admin-subtitle brand-ltr" dir="ltr">{t('admin.storeMgmt')}</p>
           </div>
           <div className="admin-topbar-actions">
             <button
               className="admin-btn-profile"
-              aria-label="Account"
+              aria-label={t('admin.account')}
             >
               <span className="admin-avatar">AD</span>
             </button>
@@ -127,7 +129,7 @@ export default function AdminLayout({ children }) {
                 navigate('/admin/login');
               }}
             >
-              Sign out
+              {t('admin.signOut')}
             </button>
           </div>
         </header>

@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAdmin } from '../context/AdminContext';
+import { useLang } from '../context/LangContext';
 import { ArrowIcon, EyeIcon, EyeOffIcon, ImageIcon, PlusIcon, TrashIcon } from '../components/Icons';
 
 export default function AdminAds() {
+  const { t } = useLang();
   const {
     shopAds,
     addAdBanners,
@@ -31,7 +33,7 @@ export default function AdminAds() {
 
     const validFiles = files.filter((file) => file.type.startsWith('image/'));
     if (validFiles.length !== files.length) {
-      setUploadError('Only image files can be uploaded.');
+      setUploadError(t('admin.onlyImages'));
     }
     if (!validFiles.length) return;
 
@@ -40,7 +42,7 @@ export default function AdminAds() {
         const reader = new FileReader();
         reader.onload = () => {
           if (typeof reader.result !== 'string') {
-            reject(new Error(`Unable to read ${file.name}.`));
+            reject(new Error(t('admin.couldNotRead')));
             return;
           }
           resolve({
@@ -50,13 +52,13 @@ export default function AdminAds() {
             active: true,
           });
         };
-        reader.onerror = () => reject(new Error(`Unable to read ${file.name}.`));
+        reader.onerror = () => reject(new Error(t('admin.couldNotRead')));
         reader.readAsDataURL(file);
       })));
       addAdBanners(banners);
     } catch (error) {
       console.error('Unable to read advertisement images.', error);
-      setUploadError('Could not read the selected images. Please try again.');
+      setUploadError(t('admin.couldNotRead'));
     }
   };
 
@@ -73,27 +75,27 @@ export default function AdminAds() {
 
       <div className="admin-page-head">
         <div>
-          <h2>Advertisements</h2>
-          <p className="admin-page-sub">Manage the full-width banner on the shop page.</p>
+          <h2>{t('admin.advertisements')}</h2>
+          <p className="admin-page-sub">{t('admin.manageBanner')}</p>
         </div>
         <button type="button" className="btn btn-lg admin-btn-accent" onClick={() => inputRef.current?.click()}>
           <PlusIcon size={17} />
-          <span>Add images</span>
+          <span>{t('admin.addAdImages')}</span>
         </button>
         <input ref={inputRef} type="file" accept="image/*" multiple onChange={handleFiles} hidden />
       </div>
 
       <section className="admin-card admin-ad-settings">
         <div>
-          <h3>Shop page ad space</h3>
-          <p>Full screen width · 160px high · Slides change every 5 seconds.</p>
+          <h3>{t('admin.shopAdSpace')}</h3>
+          <p>{t('admin.shopAdSpaceHint')}</p>
           <span className={`admin-ad-state ${shopAds.enabled ? 'is-visible' : 'is-hidden'}`}>
-            {shopAds.enabled ? 'Ad space enabled' : 'Ad space hidden'}
+            {shopAds.enabled ? t('admin.adSpaceEnabled') : t('admin.adSpaceHidden')}
           </span>
         </div>
         <button type="button" className="btn btn-outline" onClick={toggleShopAds}>
           {shopAds.enabled ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
-          {shopAds.enabled ? 'Hide ad space' : 'Show ad space'}
+          {shopAds.enabled ? t('admin.hideAdSpace') : t('admin.showAdSpace')}
         </button>
       </section>
 
@@ -102,10 +104,10 @@ export default function AdminAds() {
       <section className="admin-card">
         <div className="admin-section-head admin-ad-list-head">
           <div>
-            <h2>Ad images</h2>
-            <p className="admin-subtitle">{activeCount} of {shopAds.banners.length} images active in the slider</p>
+            <h2>{t('admin.adImages')}</h2>
+            <p className="admin-subtitle">{t('admin.adImagesSubtitle', { active: activeCount, total: shopAds.banners.length })}</p>
           </div>
-          {shopAds.banners.length > 1 && <span className="admin-ad-hint">Use arrows to set slide order</span>}
+          {shopAds.banners.length > 1 && <span className="admin-ad-hint">{t('admin.useArrows')}</span>}
         </div>
 
         {shopAds.banners.length ? (
@@ -114,22 +116,22 @@ export default function AdminAds() {
               const active = banner.active !== false;
               return (
                 <article key={banner.id} className={`admin-ad-item ${active ? '' : 'is-inactive'}`}>
-                  <img src={banner.src} alt={banner.name || 'Advertisement preview'} />
+                  <img src={banner.src} alt={banner.name || t('admin.adPreview')} />
                   <div className="admin-ad-item-info">
-                    <strong>{banner.name || `Advertisement ${index + 1}`}</strong>
-                    <span>{active ? 'Included in slider' : 'Hidden from slider'}</span>
+                    <strong>{banner.name || t('admin.advertisementN', { index: index + 1 })}</strong>
+                    <span>{active ? t('admin.includedInSlider') : t('admin.hiddenFromSlider')}</span>
                   </div>
                   <div className="admin-ad-item-actions">
-                    <button type="button" className="admin-icon-btn" onClick={() => moveAdBanner(banner.id, -1)} disabled={index === 0} aria-label={`Move ${banner.name || 'advertisement'} up`}>
+                    <button type="button" className="admin-icon-btn" onClick={() => moveAdBanner(banner.id, -1)} disabled={index === 0} aria-label={t('admin.moveUpAria', { name: banner.name || t('admin.advertisementN', { index: index + 1 }) })}>
                       <ArrowIcon size={16} style={{ transform: 'rotate(-90deg)' }} />
                     </button>
-                    <button type="button" className="admin-icon-btn" onClick={() => moveAdBanner(banner.id, 1)} disabled={index === shopAds.banners.length - 1} aria-label={`Move ${banner.name || 'advertisement'} down`}>
+                    <button type="button" className="admin-icon-btn" onClick={() => moveAdBanner(banner.id, 1)} disabled={index === shopAds.banners.length - 1} aria-label={t('admin.moveDownAria', { name: banner.name || t('admin.advertisementN', { index: index + 1 }) })}>
                       <ArrowIcon size={16} style={{ transform: 'rotate(90deg)' }} />
                     </button>
-                    <button type="button" className="admin-icon-btn" onClick={() => toggleAdBanner(banner.id)} aria-label={`${active ? 'Hide' : 'Show'} ${banner.name || 'advertisement'}`}>
+                    <button type="button" className="admin-icon-btn" onClick={() => toggleAdBanner(banner.id)} aria-label={t(active ? 'admin.hideAriaNamed' : 'admin.showAriaNamed', { name: banner.name || t('admin.advertisementN', { index: index + 1 }) })}>
                       {active ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
                     </button>
-                    <button type="button" className="admin-icon-btn danger" onClick={() => deleteAdBanner(banner.id)} aria-label={`Delete ${banner.name || 'advertisement'}`}>
+                    <button type="button" className="admin-icon-btn danger" onClick={() => deleteAdBanner(banner.id)} aria-label={t('admin.deleteAriaNamed', { name: banner.name || t('admin.advertisementN', { index: index + 1 }) })}>
                       <TrashIcon size={16} />
                     </button>
                   </div>
@@ -140,10 +142,10 @@ export default function AdminAds() {
         ) : (
           <div className="admin-empty-state">
             <span className="admin-empty-icon"><ImageIcon size={24} /></span>
-            <h3>No ad images yet</h3>
-            <p className="muted">Add one or more images to start the shop page slider.</p>
+            <h3>{t('admin.noAdImages')}</h3>
+            <p className="muted">{t('admin.noAdImagesHint')}</p>
             <button type="button" className="btn admin-btn-accent" onClick={() => inputRef.current?.click()}>
-              <PlusIcon size={16} /> Add images
+              <PlusIcon size={16} /> {t('admin.addAdImages')}
             </button>
           </div>
         )}

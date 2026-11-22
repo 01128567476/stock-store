@@ -4,19 +4,22 @@ import { STORE } from '../config';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useTheme } from '../context/ThemeContext';
+import { useLang } from '../context/LangContext';
 import { BagIcon, HeartIcon, HomeIcon, MoonIcon, SearchIcon, ShieldIcon, SunIcon } from './Icons';
+import LanguageToggle from './LanguageToggle';
 
 const LINKS = [
-  { to: '/shop?category=sweaters', label: 'Sweaters' },
-  { to: '/shop?category=pullover', label: 'Pullover' },
-  { to: '/shop?category=shoes', label: 'Shoes' },
-  { to: '/shop?sale=1', label: 'Sale' },
+  { to: '/shop?category=sweaters', labelKey: 'nav.sweaters' },
+  { to: '/shop?category=pullover', labelKey: 'nav.pullover' },
+  { to: '/shop?category=shoes', labelKey: 'nav.shoes' },
+  { to: '/shop?sale=1', labelKey: 'nav.sale', isSale: true },
 ];
 
 export default function Navbar() {
   const { count } = useCart();
   const { ids } = useWishlist();
   const { theme, toggle } = useTheme();
+  const { t } = useLang();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
@@ -43,37 +46,43 @@ export default function Navbar() {
 
   return (
     <header className={`header ${scrolled ? 'scrolled' : ''}`}>
-      <div className="topbar">Free shipping on orders over {STORE.freeShippingThreshold.toLocaleString('en-US')} {STORE.currency} · Cash on delivery</div>
+      <div className="topbar">
+        {t('nav.topbar', {
+          amount: STORE.freeShippingThreshold.toLocaleString('en-US'),
+          currency: STORE.currency,
+        })}
+      </div>
       <div className="container nav">
-        <Link to="/" className="logo" aria-label={`${STORE.name} home`}>
+        <Link to="/" className="logo brand-ltr" dir="ltr" aria-label={`${STORE.name} home`}>
           <span className="logo-stoc">STOC</span><span className="logo-k">K</span><span className="logo-store">STORE</span>
         </Link>
 
         <nav className="nav-links" aria-label="Main">
-          <NavLink to="/" end>Home</NavLink>
-          <NavLink to="/shop" end>Shop</NavLink>
+          <NavLink to="/" end>{t('nav.home')}</NavLink>
+          <NavLink to="/shop" end>{t('nav.shop')}</NavLink>
           {LINKS.map((l) => (
-            <Link key={l.to} to={l.to} className={l.label === 'Sale' ? 'sale-link' : ''}>
-              {l.label}
+            <Link key={l.to} to={l.to} className={l.isSale ? 'sale-link' : ''}>
+              {t(l.labelKey)}
             </Link>
           ))}
           <Link to="/admin" className="admin-nav-link">
-            <ShieldIcon size={16} /> Admin
+            <ShieldIcon size={16} /> {t('nav.admin')}
           </Link>
         </nav>
 
         <div className="nav-actions">
-          <button className="icon-btn" onClick={() => setSearchOpen((o) => !o)} aria-label="Search">
+          <button className="icon-btn" onClick={() => setSearchOpen((o) => !o)} aria-label={t('nav.search')}>
             <SearchIcon />
           </button>
-          <button className="icon-btn" onClick={toggle} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
+          <button className="icon-btn" onClick={toggle} aria-label={theme === 'dark' ? t('nav.themeLight') : t('nav.themeDark')}>
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
           </button>
-          <Link to="/wishlist" className="icon-btn" aria-label={`Wishlist, ${ids.length} items`}>
+          <LanguageToggle className="lang-toggle-nav" />
+          <Link to="/wishlist" className="icon-btn" aria-label={t('nav.wishlistLabel', { count: ids.length })}>
             <HeartIcon />
             {ids.length > 0 && <span className="count">{ids.length}</span>}
           </Link>
-          <Link to="/cart" className="icon-btn" aria-label={`Cart, ${count} items`}>
+          <Link to="/cart" className="icon-btn" aria-label={t('nav.cartLabel', { count })}>
             <BagIcon />
             {count > 0 && <span className="count">{count}</span>}
           </Link>
@@ -84,29 +93,29 @@ export default function Navbar() {
         <form className="search-panel" onSubmit={submitSearch}>
           <div className="container">
             <SearchIcon />
-            <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search products, e.g. blazer, sneakers…" aria-label="Search products" />
-            <button className="btn btn-sm" type="submit">Search</button>
+            <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('nav.searchPlaceholder')} aria-label={t('nav.search')} />
+            <button className="btn btn-sm" type="submit">{t('nav.search')}</button>
           </div>
         </form>
       )}
 
-      <nav className="mobile-tabbar" aria-label="Mobile navigation">
+      <nav className="mobile-tabbar" dir="ltr" aria-label="Mobile navigation">
         <NavLink to="/" end>
           <HomeIcon size={20} />
-          <span>Home</span>
+          <span>{t('nav.mobile.home')}</span>
         </NavLink>
         <NavLink to="/shop" end>
           <SearchIcon size={20} />
-          <span>Search</span>
+          <span>{t('nav.mobile.search')}</span>
         </NavLink>
         <NavLink to="/wishlist" end>
           <HeartIcon size={20} />
-          <span>Saved</span>
+          <span>{t('nav.mobile.saved')}</span>
           {ids.length > 0 && <b>{ids.length}</b>}
         </NavLink>
         <NavLink to="/cart" end>
           <BagIcon size={20} />
-          <span>Bag</span>
+          <span>{t('nav.mobile.bag')}</span>
           {count > 0 && <b>{count}</b>}
         </NavLink>
       </nav>

@@ -1,14 +1,16 @@
 import { Link } from 'react-router-dom';
+import { useLang } from '../context/LangContext';
 import { useSEO } from '../hooks/useSEO';
 
 export default function NotFound() {
-  useSEO('Page not found');
+  const { t } = useLang();
+  useSEO(t('notfound.title'));
   return (
     <div className="container empty page-pad">
-      <p className="eyebrow">Error 404</p>
-      <h1>This page doesn't exist</h1>
-      <p className="muted">The page you are looking for may have moved or no longer exists.</p>
-      <Link to="/shop" className="btn btn-lg">Back to the shop</Link>
+      <p className="eyebrow">{t('notfound.error')}</p>
+      <h1>{t('notfound.title')}</h1>
+      <p className="muted">{t('notfound.hint')}</p>
+      <Link to="/shop" className="btn btn-lg">{t('notfound.backToShop')}</Link>
     </div>
   );
 }

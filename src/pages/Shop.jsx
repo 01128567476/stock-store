@@ -3,20 +3,14 @@ import { useSearchParams } from 'react-router-dom';
 import { CATEGORIES, effectivePrice, sortByNewest, sortBySaleAndNewest } from '../data/products';
 import { useSEO } from '../hooks/useSEO';
 import { useAdmin } from '../context/AdminContext';
+import { useLang } from '../context/LangContext';
 import ProductCard from '../components/ProductCard';
 import { FilterIcon, SearchIcon } from '../components/Icons';
 import AdBanner from '../components/AdBanner';
 
-const SORTS = [
-  { id: 'featured', label: 'Featured' },
-  { id: 'newest', label: 'Newest' },
-  { id: 'price-asc', label: 'Price: low to high' },
-  { id: 'price-desc', label: 'Price: high to low' },
-  { id: 'name', label: 'Name: A–Z' },
-];
-
 export default function Shop() {
   const [params, setParams] = useSearchParams();
+  const { t } = useLang();
   const { products, isSeasonHidden } = useAdmin();
   const [showFilters, setShowFilters] = useState(false);
   const sidebarPushedRef = useRef(false);
@@ -87,8 +81,9 @@ export default function Shop() {
   const max = params.get('max') || '';
   const sale = params.get('sale') === '1';
 
-  const catLabel = CATEGORIES.find((c) => c.id === category)?.label;
-  useSEO(catLabel || (sale ? 'Sale' : 'Shop'), `Shop ${catLabel || 'all fashion'} at STOCK STORE — premium apparel, sweaters, and shoes.`);
+  const catId = CATEGORIES.find((c) => c.id === category)?.id;
+  const catLabel = catId ? t(`category.${catId}`) : undefined;
+  useSEO(catLabel || (sale ? t('shop.sale') : t('nav.shop')), `Shop ${catLabel || 'all fashion'} at STOCK STORE — premium apparel, sweaters, and shoes.`);
 
   const update = (patch) => {
     const next = new URLSearchParams(params);
@@ -136,8 +131,8 @@ export default function Shop() {
       <AdBanner />
       <div className="container shop">
         <div className="page-head">
-          <p className="eyebrow">{sale ? 'Special offers' : 'The collection'}</p>
-          <h1>{catLabel || (sale ? 'Sale' : 'All products')}</h1>
+          <p className="eyebrow">{sale ? t('shop.specialOffers') : t('shop.theCollection')}</p>
+          <h1>{catLabel || (sale ? t('shop.sale') : t('shop.allProducts'))}</h1>
         </div>
 
         <div className="shop-bar">
@@ -147,23 +142,13 @@ export default function Shop() {
               type="search"
               value={q}
               onChange={(e) => update({ q: e.target.value })}
-              placeholder="Search products…"
-              aria-label="Search products"
+              placeholder={t('shop.searchPlaceholder')}
+              aria-label={t('shop.searchPlaceholder')}
             />
           </label>
           <button className="btn btn-outline filter-toggle" onClick={() => setShowFilters((s) => !s)} aria-expanded={showFilters}>
-            <FilterIcon size={16} /> Filters
+            <FilterIcon size={16} /> {t('shop.filters')}
           </button>
-          <label className="sort">
-            <span className="sr-only">Sort by</span>
-            <select value={sort} onChange={(e) => update({ sort: e.target.value })} aria-label="Sort products">
-              {SORTS.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-          </label>
         </div>
 
         <div className="shop-layout">
@@ -172,56 +157,62 @@ export default function Shop() {
               type="button"
               className="filter-backdrop"
               onClick={() => setShowFilters(false)}
-              aria-label="Close filters"
+              aria-label={t('shop.closeFilters')}
             />
           )}
-          <aside className={`filters ${showFilters ? 'open' : ''}`} aria-label="Filters">
+          <aside className={`filters ${showFilters ? 'open' : ''}`} aria-label={t('shop.filters')}>
             <div className="filter-drawer-head">
-              <h2>Filters</h2>
-              <button type="button" className="icon-btn" onClick={() => setShowFilters(false)} aria-label="Close filters">
+              <h2>{t('shop.filters')}</h2>
+              <button type="button" className="icon-btn" onClick={() => setShowFilters(false)} aria-label={t('shop.closeFilters')}>
                 ×
               </button>
             </div>
             <div className="filter-group">
-              <h3>Category</h3>
+              <h3>{t('shop.category')}</h3>
               <div className="chips">
-                {[{ id: 'all', label: 'All' }, ...CATEGORIES].map((c) => (
+                <button className={`chip ${category === 'all' ? 'active' : ''}`} onClick={() => update({ category: 'all' })}>
+                  {t('shop.all')}
+                </button>
+                {CATEGORIES.map((c) => (
                   <button key={c.id} className={`chip ${category === c.id ? 'active' : ''}`} onClick={() => update({ category: c.id })}>
-                    {c.label}
+                    {t(`category.${c.id}`)}
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="filter-group">
-              <h3>Price (EGP)</h3>
+              <h3>{t('shop.priceEgp')}</h3>
               <div className="range">
-                <input type="number" min="0" inputMode="numeric" placeholder="Min" value={min} onChange={(e) => update({ min: e.target.value })} aria-label="Minimum price" />
+                <input type="number" min="0" inputMode="numeric" placeholder={t('shop.min')} value={min} onChange={(e) => update({ min: e.target.value })} aria-label={t('shop.min')} />
                 <span>–</span>
-                <input type="number" min="0" inputMode="numeric" placeholder="Max" value={max} onChange={(e) => update({ max: e.target.value })} aria-label="Maximum price" />
+                <input type="number" min="0" inputMode="numeric" placeholder={t('shop.max')} value={max} onChange={(e) => update({ max: e.target.value })} aria-label={t('shop.max')} />
               </div>
             </div>
 
             <div className="filter-group">
               <label className="check">
                 <input type="checkbox" checked={sale} onChange={(e) => update({ sale: e.target.checked })} />
-                <span>On sale only</span>
+                <span>{t('shop.onSaleOnly')}</span>
               </label>
             </div>
 
             {hasFilters && (
               <button className="btn btn-outline btn-full" onClick={() => setParams({}, { replace: true })}>
-                Clear all filters
+                {t('shop.clearAllFilters')}
               </button>
             )}
             <button className="btn btn-full filter-apply" type="button" onClick={() => setShowFilters(false)}>
-              Show {list.length} {list.length === 1 ? 'product' : 'products'}
+              {t('shop.showProducts', {
+                count: list.length,
+                label: list.length === 1 ? t('shop.product') : t('shop.products'),
+              })}
             </button>
           </aside>
 
           <section aria-live="polite">
             <p className="muted results-count">
-              {list.length} {list.length === 1 ? 'product' : 'products'}
+              {list.length} {list.length === 1 ? t('shop.product') : t('shop.products')}
             </p>
             {list.length > 0 ? (
               <div className="grid grid-shop">
@@ -231,10 +222,10 @@ export default function Shop() {
               </div>
             ) : (
               <div className="empty">
-                <h2>No products found</h2>
-                <p className="muted">Try adjusting your search or filters.</p>
+                <h2>{t('shop.noProductsFound')}</h2>
+                <p className="muted">{t('shop.tryAdjusting')}</p>
                 <button className="btn" onClick={() => setParams({}, { replace: true })}>
-                  Clear filters
+                  {t('shop.clearFilters')}
                 </button>
               </div>
             )}

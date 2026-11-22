@@ -2,11 +2,13 @@ import { Link } from 'react-router-dom';
 import { ArrowIcon } from '../components/Icons';
 import { useWishlist } from '../context/WishlistContext';
 import { useAdmin } from '../context/AdminContext';
+import { useLang } from '../context/LangContext';
 import { useSEO } from '../hooks/useSEO';
 import ProductCard from '../components/ProductCard';
 
 export default function Wishlist() {
-  useSEO('Wishlist');
+  const { t } = useLang();
+  useSEO(t('wishlist.title'));
   const { ids } = useWishlist();
   const { products, isSeasonHidden } = useAdmin();
   const items = products.filter((p) =>
@@ -16,15 +18,15 @@ export default function Wishlist() {
   return (
     <div className="container page-pad">
       <div className="page-head">
-        <p className="eyebrow">{items.length} saved</p>
-        <h1>Your wishlist</h1>
+        <p className="eyebrow">{t('wishlist.saved', { count: items.length })}</p>
+        <h1>{t('wishlist.title')}</h1>
       </div>
       {items.length === 0 ? (
         <div className="empty">
-          <h2>Nothing saved yet</h2>
-          <p className="muted">Tap the heart on any product to save it here.</p>
+          <h2>{t('wishlist.nothingSaved')}</h2>
+          <p className="muted">{t('wishlist.hint')}</p>
           <Link to="/shop" className="btn btn-lg btn-discover">
-            Discover the collection <ArrowIcon size={16} />
+            {t('wishlist.discover')} <ArrowIcon size={16} />
           </Link>
         </div>
       ) : (

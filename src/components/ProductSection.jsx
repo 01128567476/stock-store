@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import Reveal from './Reveal';
 import { ArrowIcon } from './Icons';
+import { useLang } from '../context/LangContext';
 
-export default function ProductSection({ eyebrow, title, products, to, linkLabel = 'View all' }) {
+export default function ProductSection({ eyebrow, title, products, to, linkLabel }) {
+  const { t } = useLang();
   return (
     <Reveal as="section" className="section container">
       <div className="section-head">
@@ -13,7 +15,7 @@ export default function ProductSection({ eyebrow, title, products, to, linkLabel
         </div>
         {to && (
           <Link to={to} className="link-arrow">
-            {linkLabel} <ArrowIcon size={16} />
+            {linkLabel || t('home.viewAll')} <ArrowIcon size={16} />
           </Link>
         )}
       </div>

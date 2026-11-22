@@ -1,19 +1,25 @@
 import { Link } from 'react-router-dom';
 import { STORE } from '../config';
 import Newsletter from './Newsletter';
+import { useLang } from '../context/LangContext';
 import { FacebookIcon, InstagramIcon, TiktokIcon, XIcon } from './Icons';
 
 export default function Footer() {
+  const { t } = useLang();
+  const rightsParts = t('footer.rights', {
+    year: new Date().getFullYear(),
+    name: '__STORE_NAME__',
+  }).split('__STORE_NAME__');
   return (
     <>
       <Newsletter />
       <footer className="footer">
         <div className="container footer-grid">
-          <div>
-            <Link to="/" className="logo">
+          <div className="footer-contact">
+            <Link to="/" className="logo brand-ltr" dir="ltr">
               <span className="logo-stoc">STOC</span><span className="logo-k">K</span><span className="logo-store">STORE</span>
             </Link>
-            <p className="muted footer-about">{STORE.tagline} Premium essentials designed for modern living.</p>
+            <p className="footer-about" style={{ color: '#000000', WebkitTextFillColor: '#000000', opacity: 1 }}>{t('footer.tagline')}</p>
             <div className="socials">
               <a href={STORE.social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><InstagramIcon /></a>
               <a href={STORE.social.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook"><FacebookIcon /></a>
@@ -22,29 +28,26 @@ export default function Footer() {
             </div>
           </div>
           <div>
-            <h4>Shop</h4>
-            <Link to="/shop?category=sweaters">Sweaters</Link>
-            <Link to="/shop?category=pullover">Pullover</Link>
-            <Link to="/shop?category=shoes">Shoes</Link>
-            <Link to="/shop?sale=1">Sale</Link>
-          </div>
-          <div>
-            <h4>Account</h4>
-            <Link to="/cart">Shopping cart</Link>
-            <Link to="/wishlist">Wishlist</Link>
-            <Link to="/checkout">Checkout</Link>
-          </div>
-          <div>
-            <h4>Contact</h4>
+            <h4>{t('footer.contact')}</h4>
             <span>{STORE.address}</span>
             <a href={`tel:${STORE.phone.replace(/\s/g, '')}`}>{STORE.phone}</a>
             <a href={`mailto:${STORE.email}`}>{STORE.email}</a>
-            <span>Daily 10:00 – 22:00</span>
+            <span>{t('footer.hours')}</span>
           </div>
         </div>
         <div className="container footer-bottom">
-          <span>© {new Date().getFullYear()} {STORE.name}. All rights reserved.</span>
-          <span>Cash on delivery · 14-day returns</span>
+          <div className="footer-credit">
+            <span>{t('footer.designedBy')}</span>
+            <bdi className="footer-credit-names" dir="ltr">
+              <strong>Mohanad 5alil</strong>
+              <strong>Mostafa Moghazy</strong>
+            </bdi>
+          </div>
+          <span className="footer-copyright">
+            {rightsParts[0]}
+            <bdi className="brand-ltr" dir="ltr">{STORE.name}</bdi>
+            {rightsParts[1]}
+          </span>
         </div>
       </footer>
     </>

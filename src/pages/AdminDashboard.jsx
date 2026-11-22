@@ -1,37 +1,19 @@
 import { useAdmin } from '../context/AdminContext';
+import { useLang } from '../context/LangContext';
 import { Link } from 'react-router-dom';
 import { money } from '../config';
 import { CATEGORIES, sortByNewest } from '../data/products';
 import { EditIcon, PackageIcon, TagIcon, UsersIcon, ClockIcon } from '../components/Icons';
 
 const STAT_CARDS = [
-  {
-    label: 'Total Products',
-    value: 0,
-    icon: <PackageIcon size={20} />,
-    color: 'var(--accent)',
-  },
-  {
-    label: 'Active',
-    value: 0,
-    icon: <UsersIcon size={20} />,
-    color: 'var(--success)',
-  },
-  {
-    label: 'Hidden',
-    value: 0,
-    icon: <ClockIcon size={20} />,
-    color: 'var(--muted)',
-  },
-  {
-    label: 'On Sale',
-    value: 0,
-    icon: <TagIcon size={20} />,
-    color: 'var(--danger)',
-  },
+  { labelKey: 'admin.statTotalProducts', icon: <PackageIcon size={20} />, color: 'var(--accent)' },
+  { labelKey: 'admin.statActive', icon: <UsersIcon size={20} />, color: 'var(--success)' },
+  { labelKey: 'admin.statHidden', icon: <ClockIcon size={20} />, color: 'var(--muted)' },
+  { labelKey: 'admin.statOnSale', icon: <TagIcon size={20} />, color: 'var(--danger)' },
 ];
 
 export default function AdminDashboard() {
+  const { t } = useLang();
   const { products, status, statusMsg, clearStatus } = useAdmin();
 
   const total = products.length;
@@ -44,18 +26,20 @@ export default function AdminDashboard() {
     { ...STAT_CARDS[1], value: active },
     { ...STAT_CARDS[2], value: hidden },
     { ...STAT_CARDS[3], value: onSale },
-  ];
+  ].map((s) => ({ ...s, label: t(s.labelKey) }));
 
   const catCounts = CATEGORIES.map((c) => ({
     id: c.id,
-    label: c.label,
+    label: t(`category.${c.id}`, { defaultValue: c.label }),
     count: products.filter((p) => p.category === c.id).length,
   }));
 
   const recent = sortByNewest(products).slice(0, 6);
 
-  const categoryLabel = (id) =>
-    CATEGORIES.find((c) => c.id === id)?.label || id;
+  const categoryLabel = (id) => {
+    const cat = CATEGORIES.find((c) => c.id === id);
+    return cat ? t(`category.${cat.id}`, { defaultValue: cat.label }) : id;
+  };
   const firstImage = (p) => Array.isArray(p.images) && p.images.length ? p.images[0] : '';
 
   return (
@@ -69,11 +53,11 @@ export default function AdminDashboard() {
 
       <div className="admin-page-head">
         <div>
-          <h2>Dashboard</h2>
-          <p className="admin-subtitle">Overview of your store catalog</p>
+          <h2>{t('admin.dashboard')}</h2>
+          <p className="admin-subtitle">{t('admin.dashboardSubtitle')}</p>
         </div>
         <Link to="/admin/products/add" className="btn btn-lg btn-primary">
-          <span>+ Add Product</span>
+          <span>+ {t('admin.addProduct')}</span>
         </Link>
       </div>
 
@@ -96,8 +80,8 @@ export default function AdminDashboard() {
         {/* Category breakdown */}
         <div className="admin-card admin-card-wide">
           <div className="admin-section-head">
-            <h2>Products by Category</h2>
-            <span className="admin-subtitle">Catalog breakdown</span>
+            <h2>{t('admin.productsByCategory')}</h2>
+            <span className="admin-subtitle">{t('admin.catalogBreakdown')}</span>
           </div>
           <div className="admin-cat-grid">
             {catCounts.map((c) => (
@@ -112,15 +96,15 @@ export default function AdminDashboard() {
         {/* Recently added */}
         <div className="admin-card admin-card-wide">
           <div className="admin-section-head">
-            <h2>Recently Added</h2>
-            <span className="admin-subtitle">Quick links to edit</span>
+            <h2>{t('admin.recentlyAdded')}</h2>
+            <span className="admin-subtitle">{t('admin.quickLinksEdit')}</span>
           </div>
           <div className="admin-recent-list">
             {recent.map((p) => (
               <div key={p.id} className="admin-recent-item">
                 {firstImage(p)
                   ? <img src={firstImage(p)} alt={p.name} className="admin-recent-img" />
-                  : <div className="admin-recent-img" aria-label="No product image" />}
+                  : <div className="admin-recent-img" aria-label={t('admin.noProductImage')} />}
                 <div className="admin-recent-info">
                   <span className="admin-recent-name">{p.name}</span>
                   <span className="admin-recent-cat muted small">{categoryLabel(p.category)}</span>
@@ -129,7 +113,7 @@ export default function AdminDashboard() {
                 <Link
                   to={`/admin/products/edit/${p.id}`}
                   className="admin-recent-edit"
-                  aria-label={`Edit ${p.name}`}
+                  aria-label={t('admin.editProductAria', { name: p.name })}
                 >
                   <EditIcon size={16} />
                 </Link>
@@ -137,7 +121,7 @@ export default function AdminDashboard() {
             ))}
             {recent.length === 0 && (
               <div className="admin-empty">
-                <p className="muted">No products yet. Add your first product.</p>
+                <p className="muted">{t('admin.noProductsYet')}</p>
               </div>
             )}
           </div>

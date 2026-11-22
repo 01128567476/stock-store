@@ -49,6 +49,13 @@ export const MoonIcon = (p) => (
     <path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z" />
   </Svg>
 );
+export const GlobeIcon = (p) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M3 12h18" />
+    <path d="M12 3a15 15 0 010 18a15 15 0 010-18z" />
+  </Svg>
+);
 export const MenuIcon = (p) => (
   <Svg {...p}>
     <path d="M3 7h18M3 12h18M3 17h18" />
@@ -221,17 +228,19 @@ export const XIcon = (p) => (
 
 /* Payment method icons */
 export const InstapayIcon = (p) => (
-  <Svg {...p} fill="currentColor" strokeWidth="0">
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18a8 8 0 110-16 8 8 0 010 16z" />
-    <path d="M8 10h8v2H8zM8 14h8v2H8zM8 6h2v2H8zM14 6h2v2h-2z" />
+  <Svg {...p} viewBox="0 0 34 34" fill="none" stroke="none">
+    <circle cx="17" cy="17" r="16" fill="#642B7C" />
+    <path d="M8.5 19.5l3.2-3.1 2.8 2.7 7.9-7.7" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="22.5" cy="11.5" r="2.3" fill="#fff" />
+    <text x="17" y="27" textAnchor="middle" fill="#fff" fontFamily="Arial, sans-serif" fontSize="5.8" fontWeight="700">InstaPay</text>
   </Svg>
 );
 export const WalletIcon = (p) => (
-  <Svg {...p}>
-    <rect x="3" y="6" width="18" height="14" rx="2" />
-    <path d="M7 10h2M11 10h2M15 10h2M7 14h2M11 14h2M15 14h2" />
-    <line x1="7" y1="7" x2="17" y2="7" />
-    <line x1="7" y1="11" x2="17" y2="11" />
+  <Svg {...p} viewBox="0 0 34 34" fill="none" stroke="none">
+    <rect x="1" y="1" width="32" height="32" rx="16" fill="#E60000" />
+    <path d="M10.5 7.5h13v18h-13z" fill="#fff" opacity=".95" />
+    <path d="M13.5 7.5c.2 5.4 1.8 10.5 6.8 18" fill="none" stroke="#E60000" strokeWidth="2.2" strokeLinecap="round" />
+    <path d="M20.5 7.5c-.2 5.4-1.8 10.5-6.8 18" fill="none" stroke="#E60000" strokeWidth="2.2" strokeLinecap="round" />
   </Svg>
 );
 

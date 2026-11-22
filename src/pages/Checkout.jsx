@@ -3,21 +3,24 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { money } from '../config';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import { useLang } from '../context/LangContext';
 import { useSEO } from '../hooks/useSEO';
 import ProductImage from '../components/ProductImage';
 import { CashIcon, InstapayIcon, WalletIcon } from '../components/Icons';
 
 const CITIES = ['Cairo', 'Giza', 'Alexandria', 'Mansoura', 'Tanta', 'Port Said', 'Suez', 'Ismailia', 'Luxor', 'Aswan', 'Hurghada', 'Sharm El Sheikh', 'Damanhour', 'Zagazig', 'Asyut'];
 
-const validators = {
-  fullName: (v) => (v.trim().length >= 3 ? '' : 'Please enter your full name'),
-  phone: (v) => (/^\+?[\d\s-]{9,15}$/.test(v.trim()) ? '' : 'Enter a valid phone number'),
-  address: (v) => (v.trim().length >= 8 ? '' : 'Please enter your full address'),
-  city: (v) => (v.trim().length >= 2 ? '' : 'Please enter your city'),
-};
+const makeValidators = (t) => ({
+  fullName: (v) => (v.trim().length >= 3 ? '' : t('checkout.errFullName')),
+  phone: (v) => (/^\+?[\d\s-]{9,15}$/.test(v.trim()) ? '' : t('checkout.errPhone')),
+  address: (v) => (v.trim().length >= 8 ? '' : t('checkout.errAddress')),
+  city: (v) => (v.trim().length >= 2 ? '' : t('checkout.errCity')),
+});
 
 export default function Checkout() {
-  useSEO('Checkout');
+  const { t } = useLang();
+  const validators = makeValidators(t);
+  useSEO(t('checkout.title'));
   const { lines, subtotal, shipping, total, clear } = useCart();
   const navigate = useNavigate();
   const toast = useToast();
@@ -44,13 +47,17 @@ export default function Checkout() {
     });
     setErrors(found);
     if (Object.keys(found).length) {
-      toast('Please fix the highlighted fields', 'error');
+      toast(t('checkout.fixFields'), 'error');
       const first = document.querySelector(`[name="${Object.keys(found)[0]}"]`);
       first?.focus();
       return;
     }
 
     const id = `MV-${Date.now().toString(36).toUpperCase()}`;
+    // normalize the city back to its canonical English key so orders/WhatsApp
+    // messages stay consistent regardless of the UI language
+    const cityLabel = form.city.trim();
+    const canonicalCity = CITIES.find((c) => t(`checkout.cities.${c}`) === cityLabel) || cityLabel;
     const order = {
       id,
       date: new Date().toISOString(),
@@ -58,10 +65,10 @@ export default function Checkout() {
         fullName: form.fullName.trim(),
         phone: form.phone.trim(),
         address: form.address.trim(),
-        city: form.city.trim(),
+        city: canonicalCity,
         notes: form.notes.trim(),
       },
-      payment: form.payment === 'cod' ? 'Cash on Delivery' : form.payment === 'instapay' ? 'InstaPay' : 'E-Wallet',
+      payment: form.payment === 'cod' ? 'cod' : form.payment === 'instapay' ? 'instapay' : 'ewallet',
       items: lines.map((l) => ({
         name: l.product.name,
         size: l.size,
@@ -99,60 +106,60 @@ export default function Checkout() {
   return (
     <div className="container page-pad">
       <div className="page-head">
-        <p className="eyebrow">Almost there</p>
-        <h1>Checkout</h1>
+        <p className="eyebrow">{t('checkout.almostThere')}</p>
+        <h1>{t('checkout.title')}</h1>
       </div>
 
       <form className="cart-layout" onSubmit={submit} noValidate>
         <div className="checkout-form">
-          <h2>Delivery details</h2>
+          <h2>{t('checkout.deliveryDetails')}</h2>
           <div className="form-grid">
-            {field('fullName', 'Full name', { autoComplete: 'name', placeholder: 'e.g. Ahmed Hassan' })}
-            {field('phone', 'Phone number', { type: 'tel', autoComplete: 'tel', placeholder: '+20 1xx xxx xxxx' })}
-            <div className="span-2">{field('address', 'Address', { autoComplete: 'street-address', placeholder: 'Street, building, apartment' })}</div>
-            {field('city', 'City', { list: 'cities', autoComplete: 'address-level2', placeholder: 'Select or type your city' })}
+            {field('fullName', t('checkout.fullName'), { autoComplete: 'name', placeholder: t('checkout.namePlaceholder') })}
+            {field('phone', t('checkout.phone'), { type: 'tel', autoComplete: 'tel', placeholder: t('checkout.phonePlaceholder') })}
+            <div className="span-2">{field('address', t('checkout.address'), { autoComplete: 'street-address', placeholder: t('checkout.addressPlaceholder') })}</div>
+            {field('city', t('checkout.city'), { list: 'cities', autoComplete: 'address-level2', placeholder: t('checkout.cityPlaceholder') })}
             <datalist id="cities">
               {CITIES.map((c) => (
-                <option key={c} value={c} />
+                <option key={c} value={t(`checkout.cities.${c}`, { defaultValue: c })} />
               ))}
             </datalist>
             <div className="field">
-              <label htmlFor="notes">Order notes (optional)</label>
-              <input id="notes" name="notes" value={form.notes} onChange={set('notes')} placeholder="Delivery instructions" />
+              <label htmlFor="notes">{t('checkout.notes')}</label>
+              <input id="notes" name="notes" value={form.notes} onChange={set('notes')} placeholder={t('checkout.notesPlaceholder')} />
             </div>
           </div>
 
-          <h2>Payment method</h2>
+          <h2>{t('checkout.paymentMethod')}</h2>
           <div className="pay-grid">
             <label className={`pay-option ${form.payment === 'cod' ? 'selected' : ''}`}>
               <input type="radio" name="payment" value="cod" checked={form.payment === 'cod'} onChange={() => setForm((f) => ({ ...f, payment: 'cod' }))} />
               <CashIcon size={22} />
               <div>
-                <strong>Cash on Delivery</strong>
-                <span>Pay in cash when your order arrives.</span>
+                <strong>{t('checkout.cod')}</strong>
+                <span>{t('checkout.codHint')}</span>
               </div>
             </label>
             <label className={`pay-option ${form.payment === 'instapay' ? 'selected' : ''}`}>
               <input type="radio" name="payment" value="instapay" checked={form.payment === 'instapay'} onChange={() => setForm((f) => ({ ...f, payment: 'instapay' }))} />
-              <InstapayIcon size={22} />
+              <InstapayIcon size={34} />
               <div>
-                <strong>InstaPay</strong>
-                <span>Pay instantly via your InstaPay app.</span>
+                <strong>{t('checkout.instapay')}</strong>
+                <span>{t('checkout.instapayHint')}</span>
               </div>
             </label>
-            <label className={`pay-option ${form.payment === 'wallet' ? 'selected' : ''}`}>
-              <input type="radio" name="payment" value="wallet" checked={form.payment === 'wallet'} onChange={() => setForm((f) => ({ ...f, payment: 'wallet' }))} />
-              <WalletIcon size={22} />
+            <label className={`pay-option ${form.payment === 'ewallet' ? 'selected' : ''}`}>
+              <input type="radio" name="payment" value="ewallet" checked={form.payment === 'ewallet'} onChange={() => setForm((f) => ({ ...f, payment: 'ewallet' }))} />
+              <WalletIcon size={34} />
               <div>
-                <strong>E-Wallet</strong>
-                <span>Vodafone Cash · Etisalat Cash · Orange Money · We</span>
+                <strong>{t('checkout.ewallet')}</strong>
+                <span>{t('checkout.ewalletHint')}</span>
               </div>
             </label>
           </div>
         </div>
 
         <aside className="summary">
-          <h2>Order summary</h2>
+          <h2>{t('checkout.orderSummary')}</h2>
           <ul className="summary-items">
             {lines.map((l) => (
               <li key={l.key}>
@@ -169,12 +176,17 @@ export default function Checkout() {
             ))}
           </ul>
           <dl>
-            <div><dt>Subtotal</dt><dd>{money(subtotal)}</dd></div>
-            <div><dt>Shipping</dt><dd>{shipping === 0 ? 'Free' : money(shipping)}</dd></div>
-            <div className="grand"><dt>Total</dt><dd>{money(total)}</dd></div>
+            <div><dt>{t('cart.subtotal')}</dt><dd>{money(subtotal)}</dd></div>
+            <div><dt>{t('cart.shipping')}</dt><dd>{shipping === 0 ? t('cart.free') : money(shipping)}</dd></div>
+            <div className="grand"><dt>{t('cart.total')}</dt><dd>{money(total)}</dd></div>
           </dl>
-          <button type="submit" className="btn btn-lg btn-full">Confirm Order</button>
-          <p className="muted small center">You will pay {money(total)} via {form.payment === 'cod' ? 'cash on delivery' : form.payment === 'instapay' ? 'InstaPay' : 'E-Wallet'}.</p>
+          <button type="submit" className="btn btn-lg btn-full">{t('checkout.confirmOrder')}</button>
+          <p className="muted small center">
+            {t('checkout.youWillPay', {
+              amount: money(total),
+              method: form.payment === 'cod' ? t('checkout.codShort') : form.payment === 'instapay' ? t('checkout.instapay') : t('checkout.ewallet'),
+            })}
+          </p>
         </aside>
       </form>
     </div>

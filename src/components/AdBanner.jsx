@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAdmin } from '../context/AdminContext';
+import { useLang } from '../context/LangContext';
 
 export default function AdBanner() {
+  const { t } = useLang();
   const { shopAds } = useAdmin();
   const activeBanners = shopAds.banners.filter((banner) => banner.active !== false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -43,7 +45,7 @@ export default function AdBanner() {
   return (
     <section
       className="shop-ad-slot"
-      aria-label="Store advertisements"
+      aria-label={t('admin.advertisements')}
       aria-roledescription="carousel"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -54,7 +56,7 @@ export default function AdBanner() {
           <img
             key={banner.id}
             src={banner.src}
-            alt={banner.name || 'Store advertisement'}
+            alt={banner.name || t('admin.advertisements')}
             className="shop-ad-image"
           />
           {banner.headline && (
