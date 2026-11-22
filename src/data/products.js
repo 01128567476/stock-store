@@ -76,7 +76,7 @@ export const SEASONS = [
   { id: 'both', label: 'All Seasons' },
 ];
 
-export const REMOVED_CATEGORY_IDS = ['men', 'shirts', 'accessories'];
+export const isKnownCategory = (id) => CATEGORIES.some((c) => c.id === id);
 
 export const normalizeSeason = (season) => {
   const value = String(season ?? 'both').trim().toLowerCase();

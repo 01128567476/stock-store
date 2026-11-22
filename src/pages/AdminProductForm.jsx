@@ -45,7 +45,7 @@ export default function AdminProductForm() {
     setForm({
       name: existing.name || '',
       description: existing.description || '',
-      category: existing.category || 'men',
+      category: existing.category || 'pants',
       price: String(existing.price ?? ''),
       discount: existing.salePrice != null
         ? String(Math.round(((existing.price - existing.salePrice) / existing.price) * 100))

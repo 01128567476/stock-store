@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { PRODUCTS, REMOVED_CATEGORY_IDS, TEST_PRODUCTS, normalizeSeason } from '../data/products';
+import { PRODUCTS, TEST_PRODUCTS, isKnownCategory, normalizeSeason } from '../data/products';
 
 const ADMIN_KEY = 'mv_admin';
 const PRODUCTS_KEY = 'mv_products_admin';
@@ -111,7 +111,7 @@ export function AdminProvider({ children }) {
       }
       const parsed = JSON.parse(saved);
       if (!Array.isArray(parsed)) return initialProducts;
-      const currentProducts = parsed.filter((product) => !REMOVED_CATEGORY_IDS.includes(product.category));
+      const currentProducts = parsed.filter((product) => isKnownCategory(product.category));
       if (localStorage.getItem(SWEATER_MIGRATION_KEY) !== '1') {
         const starterSweater = initialProducts.find((product) => product.category === 'sweaters');
         if (starterSweater) {
