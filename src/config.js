@@ -2,10 +2,9 @@ export const STORE = {
   name: 'STOCK STORE',
   tagline: 'Contemporary fashion, considered.',
   currency: 'EGP',
-  // Replace with your real WhatsApp number (country code, digits only)
-  whatsapp: '201000000000',
-  email: 'hello@maisonvera.com',
-  phone: '+20 100 000 0000',
+  whatsapp: '201289661122',
+  email: 'mohamedalrosasy7@gmail.com',
+  phone: '01289661122',
   address: 'المنشية، شارع متولي سردينة',
   stores: [
     { key: 'clothing', address: 'المنشية، شارع متولي سردينة' },
