@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { STORE } from '../config';
 import Newsletter from './Newsletter';
 import { useLang } from '../context/LangContext';
-import { FacebookIcon, InstagramIcon, TiktokIcon, XIcon } from './Icons';
+import { FacebookIcon, InstagramIcon, TiktokIcon } from './Icons';
 
 export default function Footer() {
   const { t } = useLang();
@@ -24,7 +24,6 @@ export default function Footer() {
               <a href={STORE.social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><InstagramIcon /></a>
               <a href={STORE.social.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook"><FacebookIcon /></a>
               <a href={STORE.social.tiktok} target="_blank" rel="noopener noreferrer" aria-label="TikTok"><TiktokIcon /></a>
-              <a href={STORE.social.x} target="_blank" rel="noopener noreferrer" aria-label="X"><XIcon /></a>
             </div>
           </div>
           <div>
