@@ -66,16 +66,19 @@ export default function Home() {
         <div className="hero-media">
           {/* LQIP: tiny blurred placeholder painted instantly; the full image fades in once loaded */}
           <img className="hero-media-lqip" src={HERO_LQIP} alt="" aria-hidden="true" width="24" height="36" />
-          <img
-            className="hero-media-main"
-            src={IMAGES.hero}
-            alt={t('hero.alt')}
-            width="768"
-            height="1152"
-            fetchpriority="high"
-            decoding="async"
-            onLoad={(e) => e.currentTarget.classList.add('is-loaded')}
-          />
+          <picture className="hero-media-picture">
+            <source media="(min-width: 601px)" srcSet={IMAGES.heroDesktop} />
+            <img
+              className="hero-media-main"
+              src={IMAGES.hero}
+              alt={t('hero.alt')}
+              width="768"
+              height="1152"
+              fetchpriority="high"
+              decoding="async"
+              onLoad={(e) => e.currentTarget.classList.add('is-loaded')}
+            />
+          </picture>
         </div>
       </section>
 

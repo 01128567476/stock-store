@@ -801,7 +801,6 @@ p { margin: 0 0 1rem; }
   position: absolute;
   z-index: 1;
   inset: 0;
-  background: linear-gradient(90deg, rgba(38, 35, 31, 0.96), rgba(38, 35, 31, 0.78) 42%, rgba(38, 35, 31, 0.08));
   content: '';
   pointer-events: none;
 }
@@ -826,6 +825,11 @@ p { margin: 0 0 1rem; }
   object-fit: cover;
   filter: blur(14px);
   transform: scale(1.08);
+}
+.hero-media-picture {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
 }
 .hero-media-main {
   display: block;
