@@ -27,7 +27,7 @@ export default function Cart() {
     );
   }
 
-  const remaining = STORE.freeShippingThreshold - subtotal;
+  const remaining = subtotal > STORE.freeShippingThreshold ? 0 : STORE.freeShippingThreshold - subtotal + 1;
 
   return (
     <div className="container page-pad">

@@ -10,8 +10,8 @@ export const STORE = {
     { key: 'clothing', address: 'المنشية، شارع متولي سردينة' },
     { key: 'shoes', address: 'المنشية، شارع برج الشروق' },
   ],
-  freeShippingThreshold: 3000,
-  shippingFee: 80,
+  freeShippingThreshold: 2500,
+  shippingFee: 120,
   social: {
     instagram: 'https://www.instagram.com/stockstore6?cnvx=MWcycnUyNTBzZDM5dg==',
     facebook: 'https://www.facebook.com/share/19nwErp11m/',

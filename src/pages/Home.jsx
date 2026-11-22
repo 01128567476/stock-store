@@ -48,9 +48,12 @@ export default function Home() {
       <section className="hero">
         <div className="hero-content">
           <LanguageToggle className="lang-toggle-hero" />
-          <p className="eyebrow light">{t('hero.eyebrow')}</p>
-          <h1>{t('hero.h1Line1')}<br /><span>{t('hero.h1Line2')}</span></h1>
-          <p className="hero-sub">{t('hero.sub')}</p>
+          <p className="eyebrow light" dir="rtl" lang="ar">مش مجرد لبس</p>
+          <h1>{t('hero.h1Line1')} <span>{t('hero.h1Line2')}</span></h1>
+          <p className="hero-sub">
+            {t('hero.subLine1')}
+            <span>{t('hero.subLine2')}</span>
+          </p>
           <div className="hero-actions">
             <Link to="/shop" className="btn btn-light btn-lg">
               {t('hero.shopNow')} <ArrowIcon size={18} />
@@ -81,6 +84,13 @@ export default function Home() {
           </picture>
         </div>
       </section>
+
+      <div className="hero-free-shipping" dir="ltr" aria-label={t('hero.freeShippingBar')}>
+        <div className="hero-free-shipping-track" aria-hidden="true">
+          <span>{t('hero.freeShippingBar')}</span>
+          <span>{t('hero.freeShippingBar')}</span>
+        </div>
+      </div>
 
       <section className="features container">
         {features.map(({ icon: Icon, title, text }) => (
