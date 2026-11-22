@@ -116,8 +116,18 @@ const CLOTH_SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 const SHOE_SIZES = ['40', '41', '42', '43', '44', '45'];
 
 const DETAILS = {
+  pants: ['Versatile everyday style', 'Available in selected sizes and colors', 'Easy to pair with casual and smart-casual outfits'],
+  hoodies: ['Comfortable everyday layer', 'Available in selected sizes and colors', 'Designed for casual styling'],
+  jackets: ['Versatile outer layer for everyday wear', 'Available in selected sizes and colors', 'Easy to style across seasons'],
+  sweaters: ['Comfortable knit layer for everyday wear', 'Available in selected sizes and colors', 'Easy to layer with your everyday outfits'],
+  pullover: ['Comfortable pullover for everyday wear', 'Available in selected sizes and colors', 'Easy to layer with your everyday outfits'],
   shoes: ['Genuine materials, hand finished', 'Cushioned insole for all-day comfort', 'Wipe clean with a soft cloth'],
 };
+
+export const getProductDetails = (product) =>
+  Array.isArray(product.details) && product.details.length
+    ? product.details
+    : DETAILS[product.category] || [];
 
 const counters = { pants: 0, hoodies: 0, jackets: 0, sweaters: 0, pullover: 0, shoes: 0 };
 let order = 0;
