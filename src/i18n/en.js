@@ -24,6 +24,7 @@ export default {
     sub: 'Modern essentials, considered details, and effortless style for every day.',
     shopNow: 'Shop Now',
     newArrivals: 'New Arrivals',
+    alt: 'Full look from the new season collection',
   },
   features: {
     fastDelivery: 'Fast delivery',

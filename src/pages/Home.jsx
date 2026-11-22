@@ -40,7 +40,7 @@ export default function Home() {
 
   return (
     <>
-      <section className="hero" style={{ '--hero-img': `url(${IMAGES.hero})` }}>
+      <section className="hero">
         <div className="hero-content">
           <LanguageToggle className="lang-toggle-hero" />
           <p className="eyebrow light">{t('hero.eyebrow')}</p>
@@ -57,6 +57,9 @@ export default function Home() {
               {t('nav.admin')}
             </Link>
           </div>
+        </div>
+        <div className="hero-media">
+          <img src={IMAGES.hero} alt={t('hero.alt')} width="768" height="1152" fetchpriority="high" decoding="async" />
         </div>
       </section>
 

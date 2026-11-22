@@ -121,7 +121,7 @@ p { margin: 0 0 1rem; }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } }
 
 /* Hero */
-.hero { min-height: min(82vh, 760px); display: flex; align-items: center; color: #fff; background: linear-gradient(90deg, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.1) 70%), var(--hero-img) center / cover, #2a2724; }
+.hero { min-height: min(82vh, 760px); display: flex; align-items: center; color: #fff; background: #26231f; }
 .hero-content { padding-block: 5rem; }
 .hero h1 { font-size: clamp(3rem, 9vw, 7rem); letter-spacing: 0.04em; margin-bottom: 1rem; animation: fadeUp 1s var(--ease) both 0.1s; }
 .hero .eyebrow { animation: fadeUp 1s var(--ease) both; }
@@ -600,7 +600,7 @@ p { margin: 0 0 1rem; }
   .span-2 { grid-column: auto; }
   .footer-grid { grid-template-columns: 1fr; }
   .topbar { font-size: 0.62rem; }
-  .hero { min-height: 70vh; background: linear-gradient(0deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.15)), var(--hero-img) center / cover, #2a2724; }
+  .hero { background-color: #26231f; }
   .card-body .btn { font-size: 0.68rem; padding-inline: 0.6rem; }
   .pdp-actions {
     display: grid;
@@ -761,26 +761,38 @@ p { margin: 0 0 1rem; }
 
 .hero {
   min-height: min(78vh, 720px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: center;
   background-color: #26231f;
-  background-image:
-    linear-gradient(90deg, rgba(12, 12, 12, 0.76) 0%, rgba(12, 12, 12, 0.32) 52%, rgba(12, 12, 12, 0.04) 100%),
-    var(--hero-img);
-  background-repeat: no-repeat;
-  background-size: auto, 120% auto;
-  background-position: left top, left 32%;
+  overflow: hidden;
 }
 .hero-content {
-  width: 100%;
-  min-height: inherit;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   position: relative;
   z-index: 1;
   box-sizing: border-box;
   padding-inline: max(1.25rem, calc((100vw - 1280px) / 2));
-  padding-block: 5rem;
+  padding-block: 5rem 4rem;
   isolation: isolate;
+}
+/* Image column — exact 2:3 box (native image ratio) so the photo is never cropped */
+.hero-media {
+  height: min(78vh, 720px);
+  max-height: 720px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: #26231f;
+}
+.hero-media img {
+  display: block;
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: contain;
+  object-position: center;
 }
 .lang-toggle {
   display: inline-flex;
@@ -1754,17 +1766,15 @@ p { margin: 0 0 1rem; }
 @media (max-width: 600px) {
   .topbar { min-height: 30px; display: grid; place-items: center; }
   .hero {
-    min-height: 520px;
-    align-items: flex-end;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
     background-color: #26231f;
-    background-image:
-      linear-gradient(0deg, rgba(12,12,12,.82) 0%, rgba(12,12,12,.12) 70%),
-      var(--hero-img);
-    background-repeat: no-repeat;
-    background-size: auto, 120% auto;
-    background-position: left top, center top;
   }
-  .hero-content { padding: 3.5rem 1.25rem 2.5rem; }
+  /* Mobile: full image on top (never cropped), text below on solid background */
+  .hero-media { order: 0; height: auto; width: 100%; }
+  .hero-media img { width: 100%; height: auto; }
+  .hero-content { order: 1; padding: 2.25rem 1.25rem 2.75rem; }
   .hero h1 { font-size: clamp(2.7rem, 14vw, 4.2rem); line-height: .96; }
   .hero-sub { font-size: .92rem; max-width: 330px; }
   .hero-actions { gap: .65rem; margin-top: 1.25rem; }
@@ -1801,7 +1811,6 @@ p { margin: 0 0 1rem; }
 }
 
 @media (max-width: 380px) {
-  .hero { min-height: 480px; }
   .hero h1 { font-size: 2.55rem; }
   .features { grid-template-columns: 1fr 1fr; }
   .feature strong { font-size: .62rem; }
@@ -2511,12 +2520,6 @@ p { margin: 0 0 1rem; }
 [dir='rtl'] .nav-links a::after { transform-origin: right; }
 [dir='rtl'] .link-arrow:hover svg,
 [dir='rtl'] .btn-discover:hover svg { transform: translateX(-4px); }
-[dir='rtl'] .hero {
-  background-image:
-    linear-gradient(270deg, rgba(12, 12, 12, 0.76) 0%, rgba(12, 12, 12, 0.32) 52%, rgba(12, 12, 12, 0.04) 100%),
-    var(--hero-img);
-  background-position: right top, right 32%;
-}
 [dir='rtl'] .hero .eyebrow::before { order: 2; }
 [dir='rtl'] .wish { right: auto; left: 0.8rem; }
 [dir='rtl'] .icon-btn .count { right: auto; left: 1px; }
@@ -2557,7 +2560,7 @@ p { margin: 0 0 1rem; }
 [dir='rtl'] .logo-text,
 [dir='rtl'] .admin-footer-text { direction: ltr; unicode-bidi: isolate; }
 
-/* Hero language toggle stays pinned to the top-right corner of the hero image (both directions) */
+/* Hero language toggle stays pinned to the top-right corner of the hero (both directions) */
 .lang-toggle-hero {
   top: 1.25rem;
   right: max(1.25rem, calc((100vw - 1280px) / 2));
