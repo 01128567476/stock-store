@@ -63,7 +63,7 @@ export default {
   shop: {
     specialOffers: 'عروض خاصة',
     theCollection: 'التشكيلة',
-    allProducts: 'كل المنتجات',
+    allProducts: 'التشكيلة',
     sale: 'تخفيضات',
     searchPlaceholder: 'ابحث عن المنتجات…',
     filters: 'فلترة',

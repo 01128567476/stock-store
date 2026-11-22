@@ -131,7 +131,9 @@ export default function Shop() {
       <AdBanner />
       <div className="container shop">
         <div className="page-head">
-          <p className="eyebrow">{sale ? t('shop.specialOffers') : t('shop.theCollection')}</p>
+          {(sale || catLabel) && (
+            <p className="eyebrow">{sale ? t('shop.specialOffers') : t('shop.theCollection')}</p>
+          )}
           <h1>{catLabel || (sale ? t('shop.sale') : t('shop.allProducts'))}</h1>
         </div>
 

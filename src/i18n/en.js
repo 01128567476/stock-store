@@ -63,7 +63,7 @@ export default {
   shop: {
     specialOffers: 'Special offers',
     theCollection: 'The collection',
-    allProducts: 'All products',
+    allProducts: 'The collection',
     sale: 'Sale',
     searchPlaceholder: 'Search products…',
     filters: 'Filters',
