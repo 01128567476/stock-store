@@ -13,10 +13,9 @@ export const STORE = {
   freeShippingThreshold: 3000,
   shippingFee: 80,
   social: {
-    instagram: 'https://instagram.com/',
-    facebook: 'https://facebook.com/',
-    tiktok: 'https://tiktok.com/',
-    x: 'https://x.com/',
+    instagram: 'https://www.instagram.com/stockstore6?cnvx=MWcycnUyNTBzZDM5dg==',
+    facebook: 'https://www.facebook.com/share/19nwErp11m/',
+    tiktok: 'https://www.tiktok.com/@stockstore33?_r=1&_t=ZS-9BcqyqkT4Z4',
   },
 };
 
