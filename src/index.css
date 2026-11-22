@@ -760,14 +760,14 @@ p { margin: 0 0 1rem; }
 .icon-btn .count { background: var(--accent); color: #171717; }
 .header.header-home,
 .header.header-home.scrolled {
-  background: #111;
-  border-bottom-color: #252525;
-  color: #f7f5ef;
+  background: var(--bg);
+  border-bottom-color: var(--line);
+  color: var(--text);
 }
 .header-home .logo-stoc,
-.header-home .logo-store { color: #f7f5ef; }
+.header-home .logo-store { color: var(--text); }
 .header-home .logo-k { color: var(--accent); }
-.header-home .icon-btn:hover { border-color: #3a3a3a; background: #292929; }
+.header-home .icon-btn:hover { border-color: var(--line); background: var(--surface); }
 
 .hero {
   position: relative;

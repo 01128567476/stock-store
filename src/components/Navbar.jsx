@@ -45,7 +45,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className={`header ${scrolled ? 'scrolled' : ''}`}>
+    <header className={`header ${pathname === '/' ? 'header-home' : ''} ${scrolled ? 'scrolled' : ''}`}>
       <div className="topbar">
         {t('nav.topbar', {
           amount: STORE.freeShippingThreshold.toLocaleString('en-US'),
