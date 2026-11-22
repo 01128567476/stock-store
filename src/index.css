@@ -745,6 +745,11 @@ p { margin: 0 0 1rem; }
 .navbar-logo .logo-store { color: var(--text); }
 .navbar-logo .logo-k,
 .footer-logo .logo-k { color: var(--accent); }
+.footer-logo {
+  display: flex;
+  width: fit-content;
+  margin-inline: auto;
+}
 .footer-logo .logo-stoc,
 .footer-logo .logo-store { color: #111; }
 .logo-mark {
