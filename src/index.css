@@ -1710,7 +1710,7 @@ p { margin: 0 0 1rem; }
     height: 64px;
     justify-content: center;
   }
-  .logo {
+  .navbar-logo {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -1724,6 +1724,11 @@ p { margin: 0 0 1rem; }
   .navbar-logo .logo-store { color: #f7f5ef; }
   .header.header-home .logo-stoc,
   .header.header-home .logo-store { color: #f7f5ef; }
+  /* Footer logo keeps its own identity on mobile: black wordmark, orange K */
+  .footer-logo { position: static; transform: none; }
+  .footer-logo .logo-stoc,
+  .footer-logo .logo-store { color: #111; }
+  .footer-logo .logo-k { color: var(--accent); }
   .logo-mark { display: none; }
   .features { width: calc(100% - 1.5rem); grid-template-columns: repeat(2, 1fr); margin-top: 0.9rem; }
   .feature { border-right: 0; }
