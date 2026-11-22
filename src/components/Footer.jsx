@@ -16,7 +16,7 @@ export default function Footer() {
       <footer className="footer">
         <div className="container footer-grid">
           <div className="footer-contact">
-            <Link to="/" className="logo brand-ltr" dir="ltr">
+            <Link to="/" className="logo footer-logo brand-ltr" dir="ltr">
               <span className="logo-stoc">STOC</span><span className="logo-k">K</span><span className="logo-store">STORE</span>
             </Link>
             <p className="footer-about" style={{ color: '#000000', WebkitTextFillColor: '#000000', opacity: 1 }}>{t('footer.tagline')}</p>

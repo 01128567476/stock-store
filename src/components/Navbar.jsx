@@ -53,7 +53,7 @@ export default function Navbar() {
         })}
       </div>
       <div className="container nav">
-        <Link to="/" className="logo brand-ltr" dir="ltr" aria-label={`${STORE.name} home`}>
+        <Link to="/" className="logo navbar-logo brand-ltr" dir="ltr" aria-label={`${STORE.name} home`}>
           <span className="logo-stoc">STOC</span><span className="logo-k">K</span><span className="logo-store">STORE</span>
         </Link>
 
