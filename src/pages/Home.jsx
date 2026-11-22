@@ -59,7 +59,7 @@ export default function Home() {
           </div>
         </div>
         <div className="hero-media">
-          <img src={IMAGES.hero} alt={t('hero.alt')} width="768" height="1152" fetchpriority="high" decoding="async" />
+          <img className="hero-media-main" src={IMAGES.hero} alt={t('hero.alt')} width="768" height="1152" fetchpriority="high" decoding="async" />
         </div>
       </section>
 
