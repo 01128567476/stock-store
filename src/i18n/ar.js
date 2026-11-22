@@ -193,7 +193,7 @@ export default {
     saved: '{count} محفوظ',
     nothingSaved: 'لا يوجد شيء محفوظ بعد',
     hint: 'اضغط على القلب في أي منتج لحفظه هنا.',
-    discover: 'اكتشف التشكيلة',
+    discover: 'اكتشف الكوليكشن',
   },
   order: {
     confirmed: 'تم تأكيد طلبك',
