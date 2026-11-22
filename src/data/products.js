@@ -62,12 +62,12 @@ export const IMAGES = {
 };
 
 export const CATEGORIES = [
-  { id: 'pants', label: 'Pants' },
-  { id: 'hoodies', label: 'Hoodies' },
-  { id: 'jackets', label: 'Jackets' },
-  { id: 'sweaters', label: 'Sweaters' },
-  { id: 'pullover', label: 'Pullover' },
-  { id: 'shoes', label: 'Shoes' },
+  { id: 'pants', label: 'Pants', labelAr: 'بناطيل', image: IMAGES.categories.pants },
+  { id: 'hoodies', label: 'Hoodies', labelAr: 'هودي', image: IMAGES.categories.hoodies },
+  { id: 'jackets', label: 'Jackets', labelAr: 'جواكت', image: IMAGES.categories.jackets },
+  { id: 'sweaters', label: 'Sweaters', labelAr: 'سويتر', image: IMAGES.categories.sweaters },
+  { id: 'pullover', label: 'Pullover', labelAr: 'بلوفرات', image: IMAGES.categories.pullover },
+  { id: 'shoes', label: 'Shoes', labelAr: 'أحذية', image: IMAGES.categories.shoes },
 ];
 
 export const SEASONS = [
@@ -77,6 +77,8 @@ export const SEASONS = [
 ];
 
 export const isKnownCategory = (id) => CATEGORIES.some((c) => c.id === id);
+export const getCategoryName = (category, lang) =>
+  category ? (lang === 'ar' ? category.labelAr || category.label : category.label) : '';
 
 export const normalizeSeason = (season) => {
   const value = String(season ?? 'both').trim().toLowerCase();

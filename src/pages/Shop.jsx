@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { CATEGORIES, effectivePrice, sortByNewest, sortBySaleAndNewest } from '../data/products';
+import { effectivePrice, getCategoryName, sortByNewest, sortBySaleAndNewest } from '../data/products';
 import { useSEO } from '../hooks/useSEO';
 import { useAdmin } from '../context/AdminContext';
 import { useLang } from '../context/LangContext';
@@ -10,8 +10,8 @@ import AdBanner from '../components/AdBanner';
 
 export default function Shop() {
   const [params, setParams] = useSearchParams();
-  const { t } = useLang();
-  const { products, isSeasonHidden } = useAdmin();
+  const { t, lang } = useLang();
+  const { products, categories, isSeasonHidden } = useAdmin();
   const [showFilters, setShowFilters] = useState(false);
   const sidebarPushedRef = useRef(false);
 
@@ -81,8 +81,8 @@ export default function Shop() {
   const max = params.get('max') || '';
   const sale = params.get('sale') === '1';
 
-  const catId = CATEGORIES.find((c) => c.id === category)?.id;
-  const catLabel = catId ? t(`category.${catId}`) : undefined;
+  const selectedCategory = categories.find((item) => item.id === category);
+  const catLabel = selectedCategory ? getCategoryName(selectedCategory, lang) : undefined;
   useSEO(catLabel || (sale ? t('shop.sale') : t('nav.shop')), `Shop ${catLabel || 'all fashion'} at STOCK STORE — premium apparel, sweaters, and shoes.`);
 
   const update = (patch) => {
@@ -175,9 +175,9 @@ export default function Shop() {
                 <button className={`chip ${category === 'all' ? 'active' : ''}`} onClick={() => update({ category: 'all' })}>
                   {t('shop.all')}
                 </button>
-                {CATEGORIES.map((c) => (
+                {categories.map((c) => (
                   <button key={c.id} className={`chip ${category === c.id ? 'active' : ''}`} onClick={() => update({ category: c.id })}>
-                    {t(`category.${c.id}`)}
+                    {getCategoryName(c, lang)}
                   </button>
                 ))}
               </div>

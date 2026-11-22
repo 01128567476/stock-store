@@ -28,7 +28,7 @@ export default function AdminLogin() {
     if (ok) {
       navigate('/admin');
     } else {
-      setError(t('admin.invalidCredentials'));
+      setError('admin.invalidCredentials');
     }
   };
 
@@ -85,7 +85,7 @@ export default function AdminLogin() {
             {error && (
               <div className="admin-error" role="alert">
                 <span className="admin-error-mark">!</span>
-                <span>{error}</span>
+                <span>{t(error)}</span>
               </div>
             )}
 

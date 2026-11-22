@@ -2,7 +2,7 @@ import { useAdmin } from '../context/AdminContext';
 import { useLang } from '../context/LangContext';
 import { Link } from 'react-router-dom';
 import { money } from '../config';
-import { CATEGORIES, sortByNewest } from '../data/products';
+import { getCategoryName, sortByNewest } from '../data/products';
 import { EditIcon, PackageIcon, TagIcon, UsersIcon, ClockIcon } from '../components/Icons';
 
 const STAT_CARDS = [
@@ -13,8 +13,8 @@ const STAT_CARDS = [
 ];
 
 export default function AdminDashboard() {
-  const { t } = useLang();
-  const { products, status, statusMsg, clearStatus } = useAdmin();
+  const { t, lang } = useLang();
+  const { products, categories, status, statusMsg, clearStatus } = useAdmin();
 
   const total = products.length;
   const active = products.filter((p) => p.active !== false).length;
@@ -28,17 +28,17 @@ export default function AdminDashboard() {
     { ...STAT_CARDS[3], value: onSale },
   ].map((s) => ({ ...s, label: t(s.labelKey) }));
 
-  const catCounts = CATEGORIES.map((c) => ({
+  const catCounts = categories.map((c) => ({
     id: c.id,
-    label: t(`category.${c.id}`, { defaultValue: c.label }),
+    label: getCategoryName(c, lang),
     count: products.filter((p) => p.category === c.id).length,
   }));
 
   const recent = sortByNewest(products).slice(0, 6);
 
   const categoryLabel = (id) => {
-    const cat = CATEGORIES.find((c) => c.id === id);
-    return cat ? t(`category.${cat.id}`, { defaultValue: cat.label }) : id;
+    const cat = categories.find((c) => c.id === id);
+    return cat ? getCategoryName(cat, lang) : id;
   };
   const firstImage = (p) => Array.isArray(p.images) && p.images.length ? p.images[0] : '';
 
@@ -47,7 +47,7 @@ export default function AdminDashboard() {
       {status && statusMsg && (
         <div className={`admin-toast admin-toast--${status}`} onClick={clearStatus}>
           <span className="admin-toast-icon">{status === 'error' ? '!' : '✓'}</span>
-          <span className="admin-toast-msg">{statusMsg}</span>
+          <span className="admin-toast-msg">{t(statusMsg)}</span>
         </div>
       )}
 

@@ -55,7 +55,7 @@ export default function Cart() {
                     className="link-btn"
                     onClick={() => {
                       removeItem(l.key);
-                      toast(t('cart.removed', { name: l.product.name }));
+                      toast('cart.removed', 'success', { name: l.product.name });
                     }}
                   >
                     <TrashIcon size={16} /> {t('cart.remove')}
@@ -65,7 +65,7 @@ export default function Cart() {
               <strong className="cart-total">{money(l.total)}</strong>
             </div>
           ))}
-          <button className="link-btn" onClick={() => { clear(); toast(t('cart.cleared')); }}>
+          <button className="link-btn" onClick={() => { clear(); toast('cart.cleared'); }}>
             {t('cart.clear')}
           </button>
         </div>

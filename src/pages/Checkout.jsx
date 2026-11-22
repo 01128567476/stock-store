@@ -10,16 +10,16 @@ import { CashIcon, InstapayIcon, WalletIcon } from '../components/Icons';
 
 const CITIES = ['Cairo', 'Giza', 'Alexandria', 'Mansoura', 'Tanta', 'Port Said', 'Suez', 'Ismailia', 'Luxor', 'Aswan', 'Hurghada', 'Sharm El Sheikh', 'Damanhour', 'Zagazig', 'Asyut'];
 
-const makeValidators = (t) => ({
-  fullName: (v) => (v.trim().length >= 3 ? '' : t('checkout.errFullName')),
-  phone: (v) => (/^\+?[\d\s-]{9,15}$/.test(v.trim()) ? '' : t('checkout.errPhone')),
-  address: (v) => (v.trim().length >= 8 ? '' : t('checkout.errAddress')),
-  city: (v) => (v.trim().length >= 2 ? '' : t('checkout.errCity')),
+const makeValidators = () => ({
+  fullName: (v) => (v.trim().length >= 3 ? '' : 'checkout.errFullName'),
+  phone: (v) => (/^\+?[\d\s-]{9,15}$/.test(v.trim()) ? '' : 'checkout.errPhone'),
+  address: (v) => (v.trim().length >= 8 ? '' : 'checkout.errAddress'),
+  city: (v) => (v.trim().length >= 2 ? '' : 'checkout.errCity'),
 });
 
 export default function Checkout() {
   const { t } = useLang();
-  const validators = makeValidators(t);
+  const validators = makeValidators();
   useSEO(t('checkout.title'));
   const { lines, subtotal, shipping, total, clear } = useCart();
   const navigate = useNavigate();
@@ -47,7 +47,7 @@ export default function Checkout() {
     });
     setErrors(found);
     if (Object.keys(found).length) {
-      toast(t('checkout.fixFields'), 'error');
+      toast('checkout.fixFields', 'error');
       const first = document.querySelector(`[name="${Object.keys(found)[0]}"]`);
       first?.focus();
       return;
@@ -99,7 +99,7 @@ export default function Checkout() {
     <div className={`field ${errors[name] ? 'invalid' : ''}`}>
       <label htmlFor={name}>{label}</label>
       <input id={name} name={name} value={form[name]} onChange={set(name)} onBlur={blur(name)} aria-invalid={!!errors[name]} {...props} />
-      {errors[name] && <span className="field-error">{errors[name]}</span>}
+      {errors[name] && <span className="field-error">{t(errors[name])}</span>}
     </div>
   );
 

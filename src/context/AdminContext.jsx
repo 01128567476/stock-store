@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { PRODUCTS, TEST_PRODUCTS, isKnownCategory, normalizeSeason } from '../data/products';
+import { CATEGORIES, IMAGES, PRODUCTS, TEST_PRODUCTS, normalizeSeason } from '../data/products';
 
 const ADMIN_KEY = 'mv_admin';
 const PRODUCTS_KEY = 'mv_products_admin';
+const CATEGORIES_KEY = 'mv_categories_admin';
 const SWEATER_MIGRATION_KEY = 'mv_sweater_seeded_v4';
 const TEST_PRODUCTS_MIGRATION_KEY = 'mv_test_products_seed_v1';
 const SEASON_VISIBILITY_KEY = 'mv_hidden_seasons';
@@ -47,6 +48,33 @@ const ADMIN_CREDENTIALS = {
 };
 
 const initialProducts = JSON.parse(JSON.stringify(PRODUCTS));
+
+const loadCategories = () => {
+  try {
+    const saved = localStorage.getItem(CATEGORIES_KEY);
+    if (!saved) return CATEGORIES;
+    const parsed = JSON.parse(saved);
+    if (!Array.isArray(parsed)) {
+      throw new Error('Stored categories must be a list.');
+    }
+    const categories = parsed.filter((category) =>
+      category &&
+      typeof category.id === 'string' &&
+      typeof category.label === 'string' &&
+      typeof category.labelAr === 'string'
+    ).map((category) => ({
+      ...category,
+      image: typeof category.image === 'string' && category.image
+        ? category.image
+        : IMAGES.categories[category.id] || IMAGES.banner,
+    }));
+    if (!categories.length) throw new Error('Stored categories cannot be empty.');
+    return categories;
+  } catch (error) {
+    console.error('Unable to load categories.', error);
+    return CATEGORIES;
+  }
+};
 
 const loadShopAds = () => {
   try {
@@ -101,6 +129,7 @@ export function AdminProvider({ children }) {
     } catch { return false; }
   });
 
+  const [categories, setCategories] = useState(loadCategories);
   const [products, setProducts] = useState(() => {
     try {
       const saved = localStorage.getItem(PRODUCTS_KEY);
@@ -111,7 +140,9 @@ export function AdminProvider({ children }) {
       }
       const parsed = JSON.parse(saved);
       if (!Array.isArray(parsed)) return initialProducts;
-      const currentProducts = parsed.filter((product) => isKnownCategory(product.category));
+      const currentProducts = parsed.filter((product) =>
+        categories.some((category) => category.id === product.category)
+      );
       if (localStorage.getItem(SWEATER_MIGRATION_KEY) !== '1') {
         const starterSweater = initialProducts.find((product) => product.category === 'sweaters');
         if (starterSweater) {
@@ -134,6 +165,69 @@ export function AdminProvider({ children }) {
   const [status, setStatus] = useState(null); // 'loading' | 'success' | 'error'
   const [statusMsg, setStatusMsg] = useState('');
 
+  const saveCategories = useCallback((nextCategories, message) => {
+    try {
+      localStorage.setItem(CATEGORIES_KEY, JSON.stringify(nextCategories));
+    } catch (error) {
+      console.error('Unable to save categories.', error);
+      setStatus('error');
+      setStatusMsg('admin.toastCategorySaveFailed');
+      return false;
+    }
+    setCategories(nextCategories);
+    setStatus('success');
+    setStatusMsg(message);
+    return true;
+  }, []);
+
+  const addCategory = useCallback((category) => {
+    if (
+      !category ||
+      !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(category.id) ||
+      !category.label?.trim() ||
+      !category.labelAr?.trim() ||
+      categories.some((item) => item.id === category.id)
+    ) {
+      setStatus('error');
+      setStatusMsg('admin.toastCategoryInvalid');
+      return false;
+    }
+    return saveCategories([...categories, {
+      ...category,
+      label: category.label.trim(),
+      labelAr: category.labelAr.trim(),
+      image: category.image || IMAGES.banner,
+    }], 'admin.toastCategoryAdded');
+  }, [categories, saveCategories]);
+
+  const updateCategory = useCallback((id, updates) => {
+    if (!categories.some((category) => category.id === id)) return false;
+    if (!updates.label?.trim() || !updates.labelAr?.trim()) {
+      setStatus('error');
+      setStatusMsg('admin.toastCategoryNamesRequired');
+      return false;
+    }
+    return saveCategories(categories.map((category) => (
+      category.id === id
+        ? { ...category, label: updates.label.trim(), labelAr: updates.labelAr.trim(), image: updates.image || category.image }
+        : category
+    )), 'admin.toastCategoryUpdated');
+  }, [categories, saveCategories]);
+
+  const deleteCategory = useCallback((id) => {
+    if (products.some((product) => product.category === id)) {
+      setStatus('error');
+      setStatusMsg('admin.toastCategoryHasProducts');
+      return false;
+    }
+    if (categories.length <= 1) {
+      setStatus('error');
+      setStatusMsg('admin.toastCategoryKeepOne');
+      return false;
+    }
+    return saveCategories(categories.filter((category) => category.id !== id), 'admin.toastCategoryDeleted');
+  }, [categories, products, saveCategories]);
+
   useEffect(() => {
     try { localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products)); } catch {}
   }, [products]);
@@ -155,19 +249,19 @@ export function AdminProvider({ children }) {
   const addProduct = useCallback((product) => {
     setProducts((prev) => [product, ...prev]);
     setStatus('success');
-    setStatusMsg('Product created successfully.');
+    setStatusMsg('admin.toastProductCreated');
   }, []);
 
   const updateProduct = useCallback((id, updated) => {
     setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updated } : p)));
     setStatus('success');
-    setStatusMsg('Product saved successfully.');
+    setStatusMsg('admin.toastProductSaved');
   }, []);
 
   const deleteProduct = useCallback((id) => {
     setProducts((prev) => prev.filter((p) => p.id !== id));
     setStatus('success');
-    setStatusMsg('Product deleted.');
+    setStatusMsg('admin.toastProductDeleted');
   }, []);
 
   const toggleProductActive = useCallback((id) => {
@@ -175,7 +269,7 @@ export function AdminProvider({ children }) {
       p.id === id ? { ...p, active: p.active === false ? true : false } : p
     ));
     setStatus('success');
-    setStatusMsg('Product status updated.');
+    setStatusMsg('admin.toastProductStatusUpdated');
   }, []);
 
   const saveShopAds = useCallback((nextAds, message) => {
@@ -184,7 +278,7 @@ export function AdminProvider({ children }) {
     } catch (error) {
       console.error('Unable to save shop advertisements.', error);
       setStatus('error');
-      setStatusMsg('Unable to save advertisements. Browser storage may be full.');
+      setStatusMsg('admin.toastAdsSaveFailed');
       return false;
     }
     setShopAds(nextAds);
@@ -194,24 +288,24 @@ export function AdminProvider({ children }) {
   }, []);
 
   const addAdBanners = useCallback((banners) => {
-    saveShopAds({ ...shopAds, banners: [...shopAds.banners, ...banners] }, 'Advertisement images added.');
+    saveShopAds({ ...shopAds, banners: [...shopAds.banners, ...banners] }, 'admin.toastAdImagesAdded');
   }, [saveShopAds, shopAds]);
 
   const toggleShopAds = useCallback(() => {
     const enabled = !shopAds.enabled;
-    saveShopAds({ ...shopAds, enabled }, `Advertisement area ${enabled ? 'shown' : 'hidden'} on the store.`);
+    saveShopAds({ ...shopAds, enabled }, enabled ? 'admin.toastAdAreaShown' : 'admin.toastAdAreaHidden');
   }, [saveShopAds, shopAds]);
 
   const toggleAdBanner = useCallback((id) => {
     const banners = shopAds.banners.map((banner) =>
       banner.id === id ? { ...banner, active: banner.active === false } : banner
     );
-    saveShopAds({ ...shopAds, banners }, 'Advertisement visibility updated.');
+    saveShopAds({ ...shopAds, banners }, 'admin.toastAdVisibilityUpdated');
   }, [saveShopAds, shopAds]);
 
   const deleteAdBanner = useCallback((id) => {
     const banners = shopAds.banners.filter((banner) => banner.id !== id);
-    saveShopAds({ ...shopAds, banners }, 'Advertisement image deleted.');
+    saveShopAds({ ...shopAds, banners }, 'admin.toastAdDeleted');
   }, [saveShopAds, shopAds]);
 
   const moveAdBanner = useCallback((id, direction) => {
@@ -220,7 +314,7 @@ export function AdminProvider({ children }) {
     if (index < 0 || target < 0 || target >= shopAds.banners.length) return;
     const banners = [...shopAds.banners];
     [banners[index], banners[target]] = [banners[target], banners[index]];
-    saveShopAds({ ...shopAds, banners }, 'Advertisement order updated.');
+    saveShopAds({ ...shopAds, banners }, 'admin.toastAdOrderUpdated');
   }, [saveShopAds, shopAds]);
 
   const [hiddenSeasons, setHiddenSeasons] = useState(() => {
@@ -249,15 +343,14 @@ export function AdminProvider({ children }) {
     } catch (error) {
       console.error('Unable to save seasonal visibility settings.', error);
       setStatus('error');
-      setStatusMsg('Unable to save seasonal visibility settings. Please try again.');
+      setStatusMsg('admin.toastSeasonSaveFailed');
       return;
     }
     setHiddenSeasons(next);
     setStatus('success');
-    const label = season === 'winter' ? 'Winter' : 'Summer';
     setStatusMsg(hidden
-      ? `${label} products are hidden from the store.`
-      : `${label} products are visible in the store.`);
+      ? `admin.toast${season === 'winter' ? 'Winter' : 'Summer'}Hidden`
+      : `admin.toast${season === 'winter' ? 'Winter' : 'Summer'}Visible`);
   }, [hiddenSeasons]);
 
   const isSeasonHidden = useCallback(
@@ -274,6 +367,10 @@ export function AdminProvider({ children }) {
     isLoggedIn,
     login,
     logout,
+    categories,
+    addCategory,
+    updateCategory,
+    deleteCategory,
     products,
     shopAds,
     addProduct,

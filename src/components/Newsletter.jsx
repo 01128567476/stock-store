@@ -14,16 +14,16 @@ export default function Newsletter() {
     e.preventDefault();
     const value = email.trim().toLowerCase();
     if (!EMAIL_RE.test(value)) {
-      setMsg({ type: 'error', text: t('newsletter.invalidEmail') });
+      setMsg({ type: 'error', key: 'newsletter.invalidEmail' });
       return;
     }
     if (subs.includes(value)) {
-      setMsg({ type: 'info', text: t('newsletter.already') });
+      setMsg({ type: 'info', key: 'newsletter.already' });
       return;
     }
     setSubs([...subs, value]);
     setEmail('');
-    setMsg({ type: 'success', text: t('newsletter.welcome') });
+    setMsg({ type: 'success', key: 'newsletter.welcome' });
   };
 
   return (
@@ -49,7 +49,7 @@ export default function Newsletter() {
           </div>
           {msg && (
             <p className={`form-msg ${msg.type}`} role="status">
-              {msg.text}
+              {t(msg.key)}
             </p>
           )}
         </form>

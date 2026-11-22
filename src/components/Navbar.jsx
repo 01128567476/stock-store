@@ -5,6 +5,8 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLang } from '../context/LangContext';
+import { useAdmin } from '../context/AdminContext';
+import { getCategoryName } from '../data/products';
 import { BagIcon, HeartIcon, HomeIcon, MoonIcon, SearchIcon, ShieldIcon, SunIcon } from './Icons';
 import LanguageToggle from './LanguageToggle';
 
@@ -19,7 +21,8 @@ export default function Navbar() {
   const { count } = useCart();
   const { ids } = useWishlist();
   const { theme, toggle } = useTheme();
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const { categories } = useAdmin();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
@@ -60,11 +63,16 @@ export default function Navbar() {
         <nav className="nav-links" aria-label="Main">
           <NavLink to="/" end>{t('nav.home')}</NavLink>
           <NavLink to="/shop" end>{t('nav.shop')}</NavLink>
-          {LINKS.map((l) => (
-            <Link key={l.to} to={l.to} className={l.isSale ? 'sale-link' : ''}>
-              {t(l.labelKey)}
-            </Link>
-          ))}
+          {LINKS.filter((link) =>
+            link.isSale || categories.some((category) => link.to === `/shop?category=${category.id}`)
+          ).map((link) => {
+            const category = categories.find((item) => link.to === `/shop?category=${item.id}`);
+            return (
+              <Link key={link.to} to={link.to} className={link.isSale ? 'sale-link' : ''}>
+                {category ? getCategoryName(category, lang) : t(link.labelKey)}
+              </Link>
+            );
+          })}
           <Link to="/admin" className="admin-nav-link">
             <ShieldIcon size={16} /> {t('nav.admin')}
           </Link>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { CATEGORIES, IMAGES, discountPercent, sortByNewest, sortBySaleAndNewest } from '../data/products';
+import { IMAGES, discountPercent, getCategoryName, sortByNewest, sortBySaleAndNewest } from '../data/products';
 import { STORE } from '../config';
 import { useAdmin } from '../context/AdminContext';
 import { useLang } from '../context/LangContext';
@@ -19,8 +19,8 @@ const FEATURE_ICONS = [
 
 export default function Home() {
   useSEO(null);
-  const { t } = useLang();
-  const { products, isSeasonHidden } = useAdmin();
+  const { t, lang } = useLang();
+  const { products, categories, isSeasonHidden } = useAdmin();
   const visible = products.filter((p) => p.active !== false && !isSeasonHidden(p.season));
   const newArrivals = sortBySaleAndNewest(visible.filter((p) => p.isNew || p.salePrice != null)).slice(0, 4);
   const onSale = sortByNewest(visible.filter((p) => p.salePrice != null));
@@ -83,14 +83,14 @@ export default function Home() {
           </div>
         </div>
         <div className="cat-grid">
-          {CATEGORIES.map((c, index) => (
-            <Link key={c.id} to={`/shop?category=${c.id}`} className="cat-tile" style={{ '--img': `url(${IMAGES.categories[c.id]})` }}>
+          {categories.map((c, index) => (
+            <Link key={c.id} to={`/shop?category=${c.id}`} className="cat-tile" style={{ '--img': `url("${c.image || IMAGES.categories[c.id] || IMAGES.banner}")` }}>
               <span className="cat-tile-top">
                 <span className="cat-tile-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
                 <span className="cat-tile-tag" aria-hidden="true">{t('home.collection')}</span>
               </span>
               <span className="cat-tile-footer">
-                <span className="cat-tile-title">{t(`category.${c.id}`)}</span>
+                <span className="cat-tile-title">{getCategoryName(c, lang)}</span>
                 <small className="cat-tile-action">
                   {t('home.explore')} <ArrowIcon size={14} />
                 </small>

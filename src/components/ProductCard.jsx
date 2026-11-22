@@ -39,7 +39,7 @@ export default function ProductCard({ product }) {
           className={`wish ${wished ? 'on' : ''}`}
           onClick={() => {
             toggle(product.id);
-            toast(wished ? t('product.removedWishlist') : t('product.savedWishlist'), wished ? 'wishlist-remove' : 'wishlist');
+            toast(wished ? 'product.removedWishlist' : 'product.savedWishlist', wished ? 'wishlist-remove' : 'wishlist');
           }}
           aria-pressed={wished}
           aria-label={wished ? t('product.removeWishlist') : t('product.addWishlist')}

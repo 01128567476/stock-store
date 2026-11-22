@@ -2,7 +2,7 @@
 import { Link } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
 import { useLang } from '../context/LangContext';
-import { CATEGORIES, SEASONS, normalizeSeason } from '../data/products';
+import { SEASONS, getCategoryName, normalizeSeason } from '../data/products';
 import { money } from '../config';
 import { EditIcon, TrashIcon, EyeIcon, EyeOffIcon, PlusIcon, SearchIcon } from '../components/Icons';
 
@@ -15,8 +15,8 @@ const SORT_OPTIONS = [
 ];
 
 export default function AdminProducts() {
-  const { t } = useLang();
-  const { products, deleteProduct, toggleProductActive, toggleSeasonVisibility, isSeasonHidden, status, statusMsg, clearStatus } = useAdmin();
+  const { t, lang } = useLang();
+  const { products, categories, deleteProduct, toggleProductActive, toggleSeasonVisibility, isSeasonHidden, status, statusMsg, clearStatus } = useAdmin();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [saleOnly, setSaleOnly] = useState(false);
@@ -25,8 +25,8 @@ export default function AdminProducts() {
   const [confirmId, setConfirmId] = useState(null);
 
   const catLabel = (id) => {
-    const cat = CATEGORIES.find((c) => c.id === id);
-    return cat ? t(`category.${cat.id}`, { defaultValue: cat.label }) : id;
+    const cat = categories.find((c) => c.id === id);
+    return cat ? getCategoryName(cat, lang) : id;
   };
   const seasonLabel = (id) => {
     const normalizedSeason = normalizeSeason(id);
@@ -81,7 +81,7 @@ export default function AdminProducts() {
       {status && statusMsg && (
         <div className={`admin-toast admin-toast--${status}`} onClick={clearStatus}>
           <span className="admin-toast-icon">{status === 'error' ? '!' : '✓'}</span>
-          <span className="admin-toast-msg">{statusMsg}</span>
+          <span className="admin-toast-msg">{t(statusMsg)}</span>
         </div>
       )}
 
@@ -161,8 +161,8 @@ export default function AdminProducts() {
           <div className="admin-toolbar-filters">
             <select className="admin-select" value={category} onChange={(e) => setCategory(e.target.value)} aria-label={t('admin.filterByCategoryAria')}>
               <option value="all">{t('admin.allCategories')}</option>
-              {CATEGORIES.map((c) => (
-                <option key={c.id} value={c.id}>{t(`category.${c.id}`, { defaultValue: c.label })}</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>{getCategoryName(c, lang)}</option>
               ))}
             </select>
             <select className="admin-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)} aria-label={t('admin.sortProductsAria')}>

@@ -33,7 +33,7 @@ export default function AdminAds() {
 
     const validFiles = files.filter((file) => file.type.startsWith('image/'));
     if (validFiles.length !== files.length) {
-      setUploadError(t('admin.onlyImages'));
+      setUploadError('admin.onlyImages');
     }
     if (!validFiles.length) return;
 
@@ -58,7 +58,7 @@ export default function AdminAds() {
       addAdBanners(banners);
     } catch (error) {
       console.error('Unable to read advertisement images.', error);
-      setUploadError(t('admin.couldNotRead'));
+      setUploadError('admin.couldNotRead');
     }
   };
 
@@ -69,7 +69,7 @@ export default function AdminAds() {
       {status && statusMsg && (
         <div className={`admin-toast admin-toast--${status}`} onClick={clearStatus}>
           <span className="admin-toast-icon">{status === 'error' ? '!' : '✓'}</span>
-          <span className="admin-toast-msg">{statusMsg}</span>
+          <span className="admin-toast-msg">{t(statusMsg)}</span>
         </div>
       )}
 
@@ -99,7 +99,7 @@ export default function AdminAds() {
         </button>
       </section>
 
-      {uploadError && <p className="admin-field-error" role="alert">{uploadError}</p>}
+      {uploadError && <p className="admin-field-error" role="alert">{t(uploadError)}</p>}
 
       <section className="admin-card">
         <div className="admin-section-head admin-ad-list-head">

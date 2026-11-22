@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { CATEGORIES, discountPercent, getProductDetails } from '../data/products';
+import { discountPercent, getCategoryName, getProductDetails } from '../data/products';
 import { useAdmin } from '../context/AdminContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -17,14 +17,15 @@ import NotFound from './NotFound';
 
 export default function ProductDetails() {
   const { id } = useParams();
-  const { products, isSeasonHidden } = useAdmin();
+  const { products, categories, isSeasonHidden } = useAdmin();
   const product = products.find((p) => p.id === id);
   if (!product || product.active === false || isSeasonHidden(product.season)) return <NotFound />;
-  return <Details key={product.id} product={product} />;
+  return <Details key={product.id} product={product} categories={categories} />;
 }
 
-function Details({ product }) {
-  const { t } = useLang();
+function Details({ product, categories }) {
+  const { t, lang } = useLang();
+  const { products, isSeasonHidden } = useAdmin();
   const navigate = useNavigate();
   const { addItem } = useCart();
   const { has, toggle } = useWishlist();
@@ -47,9 +48,8 @@ function Details({ product }) {
   const pct = discountPercent(product);
   const details = getProductDetails(product);
   const wished = has(product.id);
-  const catId = CATEGORIES.find((c) => c.id === product.category)?.id;
-  const catLabel = catId ? t(`category.${catId}`) : '';
-  const { products, isSeasonHidden } = useAdmin();
+  const category = categories.find((item) => item.id === product.category);
+  const catLabel = category ? getCategoryName(category, lang) : '';
   const related = products.filter((p) =>
     p.active !== false &&
     !isSeasonHidden(p.season) &&
@@ -86,7 +86,7 @@ function Details({ product }) {
     const invalidVariants = variants.filter((variant) => !variant.color || !variant.size);
     if (invalidVariants.length) {
       setVariantErrors(invalidVariants.map((variant) => variant.id));
-      toast(t('product.chooseColorSize'), 'error');
+      toast('product.chooseColorSize', 'error');
       return false;
     }
 
@@ -96,7 +96,7 @@ function Details({ product }) {
 
   const add = () => {
     if (!addVariantsToCart()) return;
-    toast(`${product.name} ${t('product.addedToCart')}`);
+    toast('product.addedToCart', 'success', { name: product.name });
   };
 
   const buyNow = () => {
@@ -226,7 +226,7 @@ function Details({ product }) {
               className={`btn btn-outline btn-lg icon-only wish-btn ${wished ? 'on' : ''}`}
               onClick={() => {
                 toggle(product.id);
-                toast(wished ? t('product.removedWishlist') : t('product.savedWishlist'), wished ? 'wishlist-remove' : 'wishlist');
+                toast(wished ? 'product.removedWishlist' : 'product.savedWishlist', wished ? 'wishlist-remove' : 'wishlist');
               }}
               aria-pressed={wished}
               aria-label={wished ? t('product.removeWishlist') : t('product.addWishlist')}

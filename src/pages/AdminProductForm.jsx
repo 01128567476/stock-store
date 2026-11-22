@@ -2,7 +2,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
 import { useLang } from '../context/LangContext';
-import { CATEGORIES, SEASONS, normalizeSeason } from '../data/products';
+import { SEASONS, getCategoryName, normalizeSeason } from '../data/products';
 import { money } from '../config';
 import { CloseIcon, ArrowIcon } from '../components/Icons';
 
@@ -16,19 +16,20 @@ const DEFAULT_SIZES = {
 };
 
 export default function AdminProductForm() {
-  const { t } = useLang();
-  const { products, addProduct, updateProduct } = useAdmin();
+  const { t, lang } = useLang();
+  const { products, categories, addProduct, updateProduct } = useAdmin();
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
+  const defaultCategory = categories[0]?.id || 'pants';
 
   const existing = isEdit ? products.find((p) => p.id === id) : null;
   const imageInput = useRef(null);
 
   const [form, setForm] = useState({
-    name: '', description: '', category: 'pants', price: '', discount: '',
+    name: '', description: '', category: defaultCategory, price: '', discount: '',
     colors: [{ name: 'Black', hex: '#141414' }],
-    sizes: DEFAULT_SIZES.pants,
+    sizes: DEFAULT_SIZES[defaultCategory] || DEFAULT_SIZES.pants,
     images: [],
     active: true,
     season: 'both',
@@ -72,13 +73,13 @@ export default function AdminProductForm() {
 
   const validate = () => {
     const e = {};
-    if (!form.name.trim()) e.name = t('admin.errNameRequired');
-    if (!form.description.trim()) e.description = t('admin.errDescriptionRequired');
-    if (!form.price || parseFloat(form.price) <= 0) e.price = t('admin.errPriceInvalid');
-    if (form.discount !== '' && (parseFloat(form.discount) < 0 || parseFloat(form.discount) > 100)) e.discount = t('admin.errDiscountRange');
-    if (!form.colors.length) e.colors = t('admin.errColorsRequired');
-    if (!form.sizes.length) e.sizes = t('admin.errSizesRequired');
-    if (!form.images.length) e.images = t('admin.errImagesRequired');
+    if (!form.name.trim()) e.name = 'admin.errNameRequired';
+    if (!form.description.trim()) e.description = 'admin.errDescriptionRequired';
+    if (!form.price || parseFloat(form.price) <= 0) e.price = 'admin.errPriceInvalid';
+    if (form.discount !== '' && (parseFloat(form.discount) < 0 || parseFloat(form.discount) > 100)) e.discount = 'admin.errDiscountRange';
+    if (!form.colors.length) e.colors = 'admin.errColorsRequired';
+    if (!form.sizes.length) e.sizes = 'admin.errSizesRequired';
+    if (!form.images.length) e.images = 'admin.errImagesRequired';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -164,22 +165,22 @@ export default function AdminProductForm() {
           <div className="admin-field full">
             <label>{t('admin.productName')}</label>
             <input type="text" value={form.name} onChange={(e) => set('name', e.target.value)} placeholder={t('admin.productNamePlaceholder')} />
-            {errors.name && <span className="admin-field-error">{errors.name}</span>}
+            {errors.name && <span className="admin-field-error">{t(errors.name)}</span>}
           </div>
 
           <div className="admin-field full">
             <label>{t('admin.description')}</label>
             <textarea rows={4} value={form.description} onChange={(e) => set('description', e.target.value)} placeholder={t('admin.descriptionPlaceholder')} />
-            {errors.description && <span className="admin-field-error">{errors.description}</span>}
+            {errors.description && <span className="admin-field-error">{t(errors.description)}</span>}
           </div>
 
           <div className="admin-field">
             <label>{t('admin.categoryLabel')}</label>
             <select value={form.category} onChange={(e) => {
               const cat = e.target.value;
-              setForm((p) => ({ ...p, category: cat, sizes: DEFAULT_SIZES[cat] }));
+              setForm((p) => ({ ...p, category: cat, sizes: DEFAULT_SIZES[cat] || DEFAULT_SIZES.pants }));
             }}>
-              {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{t(`category.${c.id}`, { defaultValue: c.label })}</option>)}
+              {categories.map((c) => <option key={c.id} value={c.id}>{getCategoryName(c, lang)}</option>)}
             </select>
           </div>
 
@@ -202,13 +203,13 @@ export default function AdminProductForm() {
           <div className="admin-field">
             <label>{t('admin.originalPrice')}</label>
             <input type="number" min="1" step="0.01" value={form.price} onChange={(e) => set('price', e.target.value)} placeholder="690" />
-            {errors.price && <span className="admin-field-error">{errors.price}</span>}
+            {errors.price && <span className="admin-field-error">{t(errors.price)}</span>}
           </div>
 
           <div className="admin-field">
             <label>{t('admin.discountPercent')}</label>
             <input type="number" min="0" max="100" step="1" value={form.discount} onChange={(e) => set('discount', e.target.value)} placeholder="0" />
-            {errors.discount && <span className="admin-field-error">{errors.discount}</span>}
+            {errors.discount && <span className="admin-field-error">{t(errors.discount)}</span>}
           </div>
 
           <div className="admin-field full">
@@ -228,7 +229,7 @@ export default function AdminProductForm() {
 
           <div className="admin-field full">
             <label>{t('admin.colors')}</label>
-            {errors.colors && <span className="admin-field-error">{errors.colors}</span>}
+            {errors.colors && <span className="admin-field-error">{t(errors.colors)}</span>}
             <div className="admin-color-list">
               {form.colors.map((c, i) => (
                 <div key={i} className="admin-color-row">
@@ -244,7 +245,7 @@ export default function AdminProductForm() {
 
           <div className="admin-field full">
             <label>{t('admin.sizes')}</label>
-            {errors.sizes && <span className="admin-field-error">{errors.sizes}</span>}
+            {errors.sizes && <span className="admin-field-error">{t(errors.sizes)}</span>}
             <div className="admin-size-list">
               {Array.from(new Set([...DEFAULT_SIZES[form.category], ...form.sizes])).map((s) => (
                 <button key={s} type="button" className={`size-chip ${form.sizes.includes(s) ? 'active' : ''}`} onClick={() => toggleSize(s)}>{s}</button>
@@ -265,7 +266,7 @@ export default function AdminProductForm() {
 
           <div className="admin-field full">
             <label>{t('admin.images')}</label>
-            {errors.images && <span className="admin-field-error">{errors.images}</span>}
+            {errors.images && <span className="admin-field-error">{t(errors.images)}</span>}
             <div className="admin-image-grid">
               {form.images.map((src, i) => (
                 <div key={i} className="admin-image-item">
