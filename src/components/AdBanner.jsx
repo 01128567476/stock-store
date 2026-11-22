@@ -30,11 +30,11 @@ export default function AdBanner() {
 
   useEffect(() => {
     if (activeBanners.length < 2) return undefined;
-    const timer = setInterval(() => {
+    const timer = setTimeout(() => {
       setActiveIndex((index) => (index + 1) % activeBanners.length);
     }, 5000);
-    return () => clearInterval(timer);
-  }, [activeBanners.length]);
+    return () => clearTimeout(timer);
+  }, [activeBanners.length, activeIndex]);
 
   if (!shopAds.enabled) return null;
 
