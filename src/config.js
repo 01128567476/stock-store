@@ -6,7 +6,11 @@ export const STORE = {
   whatsapp: '201000000000',
   email: 'hello@maisonvera.com',
   phone: '+20 100 000 0000',
-  address: '12 Zamalek Street, Cairo, Egypt',
+  address: 'المنشية، شارع متولي سردينة',
+  stores: [
+    { key: 'clothing', address: 'المنشية، شارع متولي سردينة' },
+    { key: 'shoes', address: 'المنشية، شارع برج الشروق' },
+  ],
   freeShippingThreshold: 3000,
   shippingFee: 80,
   social: {

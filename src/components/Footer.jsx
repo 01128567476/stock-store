@@ -29,7 +29,11 @@ export default function Footer() {
           </div>
           <div>
             <h4>{t('footer.contact')}</h4>
-            <span>{STORE.address}</span>
+            {STORE.stores.map((store) => (
+              <span key={store.key} className="footer-address">
+                {t(`footer.stores.${store.key}`)}: {store.address}
+              </span>
+            ))}
             <a href={`tel:${STORE.phone.replace(/\s/g, '')}`}>{STORE.phone}</a>
             <a href={`mailto:${STORE.email}`}>{STORE.email}</a>
             <span>{t('footer.hours')}</span>
