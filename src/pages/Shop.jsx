@@ -159,28 +159,6 @@ export default function Shop() {
         </button>
       </div>
       <div className="filter-page-content">
-        <div className="filter-group filter-category-group">
-          <div className="filter-section-heading">
-            <div>
-              <h3>{t('shop.category')}</h3>
-              <span>{t('shop.categoryHint')}</span>
-            </div>
-            <span className="filter-selection-count">{category === 'all' ? t('shop.all') : '1'}</span>
-          </div>
-          <div className="chips filter-category-chips">
-            <button className={`chip filter-chip ${category === 'all' ? 'active' : ''}`} onClick={() => update({ category: 'all' })}>
-              {t('shop.all')}
-              {category === 'all' && <span className="filter-chip-check">✓</span>}
-            </button>
-            {categories.map((c) => (
-              <button key={c.id} className={`chip filter-chip ${category === c.id ? 'active' : ''}`} onClick={() => update({ category: c.id })}>
-                {getCategoryName(c, lang)}
-                {category === c.id && <span className="filter-chip-check">✓</span>}
-              </button>
-            ))}
-          </div>
-        </div>
-
         <div className="filter-group filter-price-group">
           <div className="filter-section-heading">
             <div>
@@ -265,6 +243,25 @@ export default function Shop() {
               aria-label={t('shop.searchPlaceholder')}
             />
           </label>
+          <div className="quick-category-filter" aria-label={t('shop.category')}>
+            <button
+              type="button"
+              className={`quick-category-chip ${category === 'all' ? 'active' : ''}`}
+              onClick={() => update({ category: 'all' })}
+            >
+              {t('shop.all')}
+            </button>
+            {categories.map((item) => (
+              <button
+                type="button"
+                key={item.id}
+                className={`quick-category-chip ${category === item.id ? 'active' : ''}`}
+                onClick={() => update({ category: item.id })}
+              >
+                {getCategoryName(item, lang)}
+              </button>
+            ))}
+          </div>
           <button type="button" className="btn btn-outline filter-toggle" onClick={() => setShowFilters((s) => !s)} aria-expanded={showFilters} aria-controls="shop-filters">
             <span className="filter-toggle-icon"><FilterIcon size={17} /></span>
             <span>{t('shop.filters')}</span>
