@@ -971,6 +971,11 @@ p { margin: 0 0 1rem; }
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
+@media (min-width: 601px) {
+  .hero-free-shipping {
+    display: none;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .hero-free-shipping-track {
     animation: none;
