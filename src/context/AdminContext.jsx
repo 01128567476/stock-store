@@ -6,6 +6,40 @@ const PRODUCTS_KEY = 'mv_products_admin';
 const SWEATER_MIGRATION_KEY = 'mv_sweater_seeded_v4';
 const TEST_PRODUCTS_MIGRATION_KEY = 'mv_test_products_seed_v1';
 const SEASON_VISIBILITY_KEY = 'mv_hidden_seasons';
+const SHOP_ADS_KEY = 'mv_shop_ads';
+const SHOP_AD_SEED_KEY = 'mv_shop_ads_seeded_v1';
+const SHOP_AD_PHOTO_MIGRATION_KEY = 'mv_shop_ads_photo_v1';
+const SHOP_AD_PROMO_MIGRATION_KEY = 'mv_shop_ads_promo_v1';
+
+const DEFAULT_AD_BANNERS = [
+  {
+    id: 'default-new-season',
+    name: "Men's Style — Up to 50% Off",
+    src: `${import.meta.env.BASE_URL}ads/new-season.jpg`,
+    active: true,
+    eyebrow: 'THE MENSWEAR SALE',
+    headline: 'UP TO 50% OFF',
+    subtext: 'Fresh looks. Better prices.',
+  },
+  {
+    id: 'default-selected-styles',
+    name: "Men's Store — Extra 20% Off",
+    src: `${import.meta.env.BASE_URL}ads/selected-styles.jpg`,
+    active: true,
+    eyebrow: 'SELECTED MENSWEAR',
+    headline: 'EXTRA 20% OFF',
+    subtext: 'Find your next everyday favorite.',
+  },
+  {
+    id: 'default-knitwear-edit',
+    name: "Men's Essentials — Sale",
+    src: `${import.meta.env.BASE_URL}ads/knitwear-edit.jpg`,
+    active: true,
+    eyebrow: 'THE NEW MENSWEAR EDIT',
+    headline: 'GOOD STYLE. BETTER PRICES.',
+    subtext: 'Shop the latest men’s essentials.',
+  },
+];
 
 const ADMIN_CREDENTIALS = {
   username: 'admin',
@@ -13,6 +47,50 @@ const ADMIN_CREDENTIALS = {
 };
 
 const initialProducts = JSON.parse(JSON.stringify(PRODUCTS));
+
+const loadShopAds = () => {
+  try {
+    const saved = localStorage.getItem(SHOP_ADS_KEY);
+    if (!saved) {
+      localStorage.setItem(SHOP_AD_SEED_KEY, '1');
+      return { enabled: true, banners: DEFAULT_AD_BANNERS };
+    }
+    const parsed = JSON.parse(saved);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed) || !Array.isArray(parsed.banners)) {
+      throw new Error('Stored shop advertisements must contain a banner list.');
+    }
+    const ads = {
+      enabled: parsed.enabled !== false,
+      banners: parsed.banners.filter((banner) =>
+        banner && typeof banner.id === 'string' && typeof banner.src === 'string'
+      ),
+    };
+    if (
+      localStorage.getItem(SHOP_AD_PHOTO_MIGRATION_KEY) !== '1' ||
+      localStorage.getItem(SHOP_AD_PROMO_MIGRATION_KEY) !== '1'
+    ) {
+      const defaultBanners = new Map(DEFAULT_AD_BANNERS.map((banner) => [banner.id, banner]));
+      ads.banners = ads.banners.map((banner) => {
+        const replacement = defaultBanners.get(banner.id);
+        return replacement
+          ? { ...banner, ...replacement, active: banner.active }
+          : banner;
+      });
+      localStorage.setItem(SHOP_ADS_KEY, JSON.stringify(ads));
+      localStorage.setItem(SHOP_AD_PHOTO_MIGRATION_KEY, '1');
+      localStorage.setItem(SHOP_AD_PROMO_MIGRATION_KEY, '1');
+    }
+    if (!ads.banners.length && localStorage.getItem(SHOP_AD_SEED_KEY) !== '1') {
+      ads.banners = DEFAULT_AD_BANNERS;
+      localStorage.setItem(SHOP_ADS_KEY, JSON.stringify(ads));
+    }
+    localStorage.setItem(SHOP_AD_SEED_KEY, '1');
+    return ads;
+  } catch (error) {
+    console.error('Unable to load shop advertisements.', error);
+    return { enabled: true, banners: [] };
+  }
+};
 
 const AdminContext = createContext(null);
 
@@ -52,6 +130,7 @@ export function AdminProvider({ children }) {
     } catch { return initialProducts; }
   });
 
+  const [shopAds, setShopAds] = useState(loadShopAds);
   const [status, setStatus] = useState(null); // 'loading' | 'success' | 'error'
   const [statusMsg, setStatusMsg] = useState('');
 
@@ -74,7 +153,7 @@ export function AdminProvider({ children }) {
   }, []);
 
   const addProduct = useCallback((product) => {
-    setProducts((prev) => [...prev, product]);
+    setProducts((prev) => [product, ...prev]);
     setStatus('success');
     setStatusMsg('Product created successfully.');
   }, []);
@@ -98,6 +177,51 @@ export function AdminProvider({ children }) {
     setStatus('success');
     setStatusMsg('Product status updated.');
   }, []);
+
+  const saveShopAds = useCallback((nextAds, message) => {
+    try {
+      localStorage.setItem(SHOP_ADS_KEY, JSON.stringify(nextAds));
+    } catch (error) {
+      console.error('Unable to save shop advertisements.', error);
+      setStatus('error');
+      setStatusMsg('Unable to save advertisements. Browser storage may be full.');
+      return false;
+    }
+    setShopAds(nextAds);
+    setStatus('success');
+    setStatusMsg(message);
+    return true;
+  }, []);
+
+  const addAdBanners = useCallback((banners) => {
+    saveShopAds({ ...shopAds, banners: [...shopAds.banners, ...banners] }, 'Advertisement images added.');
+  }, [saveShopAds, shopAds]);
+
+  const toggleShopAds = useCallback(() => {
+    const enabled = !shopAds.enabled;
+    saveShopAds({ ...shopAds, enabled }, `Advertisement area ${enabled ? 'shown' : 'hidden'} on the store.`);
+  }, [saveShopAds, shopAds]);
+
+  const toggleAdBanner = useCallback((id) => {
+    const banners = shopAds.banners.map((banner) =>
+      banner.id === id ? { ...banner, active: banner.active === false } : banner
+    );
+    saveShopAds({ ...shopAds, banners }, 'Advertisement visibility updated.');
+  }, [saveShopAds, shopAds]);
+
+  const deleteAdBanner = useCallback((id) => {
+    const banners = shopAds.banners.filter((banner) => banner.id !== id);
+    saveShopAds({ ...shopAds, banners }, 'Advertisement image deleted.');
+  }, [saveShopAds, shopAds]);
+
+  const moveAdBanner = useCallback((id, direction) => {
+    const index = shopAds.banners.findIndex((banner) => banner.id === id);
+    const target = index + direction;
+    if (index < 0 || target < 0 || target >= shopAds.banners.length) return;
+    const banners = [...shopAds.banners];
+    [banners[index], banners[target]] = [banners[target], banners[index]];
+    saveShopAds({ ...shopAds, banners }, 'Advertisement order updated.');
+  }, [saveShopAds, shopAds]);
 
   const [hiddenSeasons, setHiddenSeasons] = useState(() => {
     try {
@@ -151,10 +275,16 @@ export function AdminProvider({ children }) {
     login,
     logout,
     products,
+    shopAds,
     addProduct,
     updateProduct,
     deleteProduct,
     toggleProductActive,
+    addAdBanners,
+    toggleShopAds,
+    toggleAdBanner,
+    deleteAdBanner,
+    moveAdBanner,
     toggleSeasonVisibility,
     isSeasonHidden,
     hiddenSeasons,

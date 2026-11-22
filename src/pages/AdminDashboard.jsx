@@ -1,7 +1,7 @@
 import { useAdmin } from '../context/AdminContext';
 import { Link } from 'react-router-dom';
 import { money } from '../config';
-import { CATEGORIES } from '../data/products';
+import { CATEGORIES, sortByNewest } from '../data/products';
 import { EditIcon, PackageIcon, TagIcon, UsersIcon, ClockIcon } from '../components/Icons';
 
 const STAT_CARDS = [
@@ -52,9 +52,7 @@ export default function AdminDashboard() {
     count: products.filter((p) => p.category === c.id).length,
   }));
 
-  const recent = [...products]
-    .sort((a, b) => b.id.localeCompare(a.id))
-    .slice(0, 6);
+  const recent = sortByNewest(products).slice(0, 6);
 
   const categoryLabel = (id) =>
     CATEGORIES.find((c) => c.id === id)?.label || id;

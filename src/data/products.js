@@ -193,6 +193,13 @@ export const PRODUCTS = [
 ];
 
 export const getProduct = (id) => PRODUCTS.find((p) => p.id === id);
+export const sortByNewest = (products) =>
+  products
+    .map((product, index) => ({ product, index }))
+    .sort((a, b) => (Number(b.product.createdAt) || 0) - (Number(a.product.createdAt) || 0) || a.index - b.index)
+    .map(({ product }) => product);
+export const sortBySaleAndNewest = (products) =>
+  sortByNewest(products).sort((a, b) => Number(b.salePrice != null) - Number(a.salePrice != null));
 export const effectivePrice = (p) => (p.salePrice != null ? p.salePrice : p.price);
 export const discountPercent = (p) =>
   p.salePrice != null ? Math.round((1 - p.salePrice / p.price) * 100) : 0;

@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { CATEGORIES, effectivePrice } from '../data/products';
+import { CATEGORIES, effectivePrice, sortByNewest, sortBySaleAndNewest } from '../data/products';
 import { useSEO } from '../hooks/useSEO';
 import { useAdmin } from '../context/AdminContext';
 import ProductCard from '../components/ProductCard';
 import { FilterIcon, SearchIcon } from '../components/Icons';
+import AdBanner from '../components/AdBanner';
 
 const SORTS = [
   { id: 'featured', label: 'Featured' },
@@ -120,121 +121,126 @@ export default function Shop() {
       'price-asc': (a, b) => effectivePrice(a) - effectivePrice(b),
       'price-desc': (a, b) => effectivePrice(b) - effectivePrice(a),
       name: (a, b) => a.name.localeCompare(b.name),
-      newest: (a, b) => Number(b.isNew) - Number(a.isNew),
+      newest: (a, b) => (Number(b.createdAt) || 0) - (Number(a.createdAt) || 0),
     }[sort];
-    if (by) r = [...r].sort(by);
+    if (sort === 'newest') r = sortByNewest(r);
+    else if (by) r = [...r].sort(by);
+    else r = sortBySaleAndNewest(r);
     return r;
   }, [category, q, sort, min, max, sale, isSeasonHidden]);
 
   const hasFilters = category !== 'all' || q || min || max || sale || sort !== 'featured';
 
   return (
-    <div className="container shop">
-      <div className="page-head">
-        <p className="eyebrow">{sale ? 'Special offers' : 'The collection'}</p>
-        <h1>{catLabel || (sale ? 'Sale' : 'All products')}</h1>
-      </div>
+    <>
+      <AdBanner />
+      <div className="container shop">
+        <div className="page-head">
+          <p className="eyebrow">{sale ? 'Special offers' : 'The collection'}</p>
+          <h1>{catLabel || (sale ? 'Sale' : 'All products')}</h1>
+        </div>
 
-      <div className="shop-bar">
-        <label className="search-field">
-          <SearchIcon size={18} />
-          <input
-            type="search"
-            value={q}
-            onChange={(e) => update({ q: e.target.value })}
-            placeholder="Search products…"
-            aria-label="Search products"
-          />
-        </label>
-        <button className="btn btn-outline filter-toggle" onClick={() => setShowFilters((s) => !s)} aria-expanded={showFilters}>
-          <FilterIcon size={16} /> Filters
-        </button>
-        <label className="sort">
-          <span className="sr-only">Sort by</span>
-          <select value={sort} onChange={(e) => update({ sort: e.target.value })} aria-label="Sort products">
-            {SORTS.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.label}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      <div className="shop-layout">
-        {showFilters && (
-          <button
-            type="button"
-            className="filter-backdrop"
-            onClick={() => setShowFilters(false)}
-            aria-label="Close filters"
-          />
-        )}
-        <aside className={`filters ${showFilters ? 'open' : ''}`} aria-label="Filters">
-          <div className="filter-drawer-head">
-            <h2>Filters</h2>
-            <button type="button" className="icon-btn" onClick={() => setShowFilters(false)} aria-label="Close filters">
-              ×
-            </button>
-          </div>
-          <div className="filter-group">
-            <h3>Category</h3>
-            <div className="chips">
-              {[{ id: 'all', label: 'All' }, ...CATEGORIES].map((c) => (
-                <button key={c.id} className={`chip ${category === c.id ? 'active' : ''}`} onClick={() => update({ category: c.id })}>
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="filter-group">
-            <h3>Price (EGP)</h3>
-            <div className="range">
-              <input type="number" min="0" inputMode="numeric" placeholder="Min" value={min} onChange={(e) => update({ min: e.target.value })} aria-label="Minimum price" />
-              <span>–</span>
-              <input type="number" min="0" inputMode="numeric" placeholder="Max" value={max} onChange={(e) => update({ max: e.target.value })} aria-label="Maximum price" />
-            </div>
-          </div>
-
-          <div className="filter-group">
-            <label className="check">
-              <input type="checkbox" checked={sale} onChange={(e) => update({ sale: e.target.checked })} />
-              <span>On sale only</span>
-            </label>
-          </div>
-
-          {hasFilters && (
-            <button className="btn btn-outline btn-full" onClick={() => setParams({}, { replace: true })}>
-              Clear all filters
-            </button>
-          )}
-          <button className="btn btn-full filter-apply" type="button" onClick={() => setShowFilters(false)}>
-            Show {list.length} {list.length === 1 ? 'product' : 'products'}
+        <div className="shop-bar">
+          <label className="search-field">
+            <SearchIcon size={18} />
+            <input
+              type="search"
+              value={q}
+              onChange={(e) => update({ q: e.target.value })}
+              placeholder="Search products…"
+              aria-label="Search products"
+            />
+          </label>
+          <button className="btn btn-outline filter-toggle" onClick={() => setShowFilters((s) => !s)} aria-expanded={showFilters}>
+            <FilterIcon size={16} /> Filters
           </button>
-        </aside>
-
-        <section aria-live="polite">
-          <p className="muted results-count">
-            {list.length} {list.length === 1 ? 'product' : 'products'}
-          </p>
-          {list.length > 0 ? (
-            <div className="grid grid-shop">
-              {list.map((p) => (
-                <ProductCard key={p.id} product={p} />
+          <label className="sort">
+            <span className="sr-only">Sort by</span>
+            <select value={sort} onChange={(e) => update({ sort: e.target.value })} aria-label="Sort products">
+              {SORTS.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.label}
+                </option>
               ))}
-            </div>
-          ) : (
-            <div className="empty">
-              <h2>No products found</h2>
-              <p className="muted">Try adjusting your search or filters.</p>
-              <button className="btn" onClick={() => setParams({}, { replace: true })}>
-                Clear filters
+            </select>
+          </label>
+        </div>
+
+        <div className="shop-layout">
+          {showFilters && (
+            <button
+              type="button"
+              className="filter-backdrop"
+              onClick={() => setShowFilters(false)}
+              aria-label="Close filters"
+            />
+          )}
+          <aside className={`filters ${showFilters ? 'open' : ''}`} aria-label="Filters">
+            <div className="filter-drawer-head">
+              <h2>Filters</h2>
+              <button type="button" className="icon-btn" onClick={() => setShowFilters(false)} aria-label="Close filters">
+                ×
               </button>
             </div>
-          )}
-        </section>
+            <div className="filter-group">
+              <h3>Category</h3>
+              <div className="chips">
+                {[{ id: 'all', label: 'All' }, ...CATEGORIES].map((c) => (
+                  <button key={c.id} className={`chip ${category === c.id ? 'active' : ''}`} onClick={() => update({ category: c.id })}>
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="filter-group">
+              <h3>Price (EGP)</h3>
+              <div className="range">
+                <input type="number" min="0" inputMode="numeric" placeholder="Min" value={min} onChange={(e) => update({ min: e.target.value })} aria-label="Minimum price" />
+                <span>–</span>
+                <input type="number" min="0" inputMode="numeric" placeholder="Max" value={max} onChange={(e) => update({ max: e.target.value })} aria-label="Maximum price" />
+              </div>
+            </div>
+
+            <div className="filter-group">
+              <label className="check">
+                <input type="checkbox" checked={sale} onChange={(e) => update({ sale: e.target.checked })} />
+                <span>On sale only</span>
+              </label>
+            </div>
+
+            {hasFilters && (
+              <button className="btn btn-outline btn-full" onClick={() => setParams({}, { replace: true })}>
+                Clear all filters
+              </button>
+            )}
+            <button className="btn btn-full filter-apply" type="button" onClick={() => setShowFilters(false)}>
+              Show {list.length} {list.length === 1 ? 'product' : 'products'}
+            </button>
+          </aside>
+
+          <section aria-live="polite">
+            <p className="muted results-count">
+              {list.length} {list.length === 1 ? 'product' : 'products'}
+            </p>
+            {list.length > 0 ? (
+              <div className="grid grid-shop">
+                {list.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            ) : (
+              <div className="empty">
+                <h2>No products found</h2>
+                <p className="muted">Try adjusting your search or filters.</p>
+                <button className="btn" onClick={() => setParams({}, { replace: true })}>
+                  Clear filters
+                </button>
+              </div>
+            )}
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

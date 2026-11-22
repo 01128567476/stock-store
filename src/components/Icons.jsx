@@ -145,6 +145,13 @@ export const PackageIcon = (p) => (
     <polyline points="21 16 14 14 7 16" />
   </Svg>
 );
+export const ImageIcon = (p) => (
+  <Svg {...p}>
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <circle cx="8.5" cy="8.5" r="1.5" />
+    <path d="M21 15l-5-5L5 21" />
+  </Svg>
+);
 export const LogoutIcon = (p) => (
   <Svg {...p}>
     <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />

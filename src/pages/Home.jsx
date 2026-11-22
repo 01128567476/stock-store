@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { CATEGORIES, IMAGES, discountPercent } from '../data/products';
+import { CATEGORIES, IMAGES, discountPercent, sortByNewest, sortBySaleAndNewest } from '../data/products';
 import { STORE } from '../config';
 import { useAdmin } from '../context/AdminContext';
 import { useSEO } from '../hooks/useSEO';
@@ -26,8 +26,8 @@ export default function Home() {
   useSEO(null);
   const { products, isSeasonHidden } = useAdmin();
   const visible = products.filter((p) => p.active !== false && !isSeasonHidden(p.season));
-  const newArrivals = visible.filter((p) => p.isNew).slice(0, 4);
-  const onSale = visible.filter((p) => p.salePrice != null);
+  const newArrivals = sortBySaleAndNewest(visible.filter((p) => p.isNew || p.salePrice != null)).slice(0, 4);
+  const onSale = sortByNewest(visible.filter((p) => p.salePrice != null));
   const maxOff = onSale.length ? Math.max(...onSale.map(discountPercent)) : 0;
 
   return (

@@ -98,6 +98,8 @@ export default function AdminProductForm() {
       images: form.images,
       active: form.active,
       season: form.season,
+      isNew: isEdit ? existing.isNew : true,
+      createdAt: isEdit ? existing.createdAt : Date.now(),
     };
     if (isEdit) updateProduct(existing.id, payload);
     else addProduct(payload);

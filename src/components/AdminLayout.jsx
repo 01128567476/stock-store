@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
-import { ArrowIcon, CloseIcon, LayoutIcon, LogoutIcon, MenuIcon, PackageIcon, PlusIcon } from './Icons';
+import { ArrowIcon, CloseIcon, ImageIcon, LayoutIcon, LogoutIcon, MenuIcon, PackageIcon, PlusIcon } from './Icons';
 
 export default function AdminLayout({ children }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -13,6 +13,7 @@ export default function AdminLayout({ children }) {
     { to: '/admin', label: 'Dashboard', icon: <LayoutIcon size={18} /> },
     { to: '/admin/products', label: 'Products', icon: <PackageIcon size={18} /> },
     { to: '/admin/products/add', label: 'Add Product', icon: <PlusIcon size={18} /> },
+    { to: '/admin/ads', label: 'Advertisements', icon: <ImageIcon size={18} /> },
   ];
 
   const isActiveLink = (to) =>
