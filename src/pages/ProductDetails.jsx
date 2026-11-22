@@ -34,10 +34,15 @@ function Details({ product, categories }) {
   const colors = Array.isArray(product.colors) ? product.colors : [];
   const sizes = Array.isArray(product.sizes) ? product.sizes : [];
   const images = Array.isArray(product.images) ? product.images.filter(Boolean) : [];
+  const soldOutWhole = product.soldOut === true;
+  const soldOutColors = new Set(product.soldOutColors || []);
+  const soldOutSizes = new Set(product.soldOutSizes || []);
+  const availableColors = colors.filter((color) => !soldOutWhole && !soldOutColors.has(color.name));
+  const availableSizes = sizes.filter((size) => !soldOutWhole && !soldOutSizes.has(size));
   const [variants, setVariants] = useState([{
     id: 0,
-    color: colors[0]?.name || '',
-    size: sizes.length === 1 ? sizes[0] : null,
+    color: availableColors[0]?.name || '',
+    size: availableSizes.length === 1 ? availableSizes[0] : null,
     qty: 1,
   }]);
   const [variantErrors, setVariantErrors] = useState([]);
@@ -71,8 +76,8 @@ function Details({ product, categories }) {
   const addVariant = () => {
     setVariants((current) => [...current, {
       id: nextVariantId.current++,
-      color: colors[0]?.name || '',
-      size: sizes.length === 1 ? sizes[0] : null,
+      color: availableColors[0]?.name || '',
+      size: availableSizes.length === 1 ? availableSizes[0] : null,
       qty: 1,
     }]);
   };
@@ -83,7 +88,13 @@ function Details({ product, categories }) {
   };
 
   const addVariantsToCart = () => {
-    const invalidVariants = variants.filter((variant) => !variant.color || !variant.size);
+    const invalidVariants = variants.filter((variant) =>
+      !variant.color ||
+      !variant.size ||
+      soldOutWhole ||
+      soldOutColors.has(variant.color) ||
+      soldOutSizes.has(variant.size)
+    );
     if (invalidVariants.length) {
       setVariantErrors(invalidVariants.map((variant) => variant.id));
       toast('product.chooseColorSize', 'error');
@@ -129,6 +140,7 @@ function Details({ product, categories }) {
             <div className="badges">
               {pct > 0 && <span className="badge badge-sale">-{pct}%</span>}
               {product.isNew && <span className="badge">{t('product.new')}</span>}
+              {soldOutWhole && <span className="badge badge-sold-out">{t('admin.soldOut')}</span>}
             </div>
           </div>
         </div>
@@ -173,8 +185,9 @@ function Details({ product, categories }) {
                           aria-checked={variant.color === c.name}
                           aria-label={c.name}
                           title={c.name}
-                          className={`swatch ${variant.color === c.name ? 'active' : ''}`}
+                          className={`swatch ${variant.color === c.name ? 'active' : ''} ${soldOutWhole || soldOutColors.has(c.name) ? 'sold-out' : ''}`}
                           style={{ '--c': c.hex }}
+                          disabled={soldOutWhole || soldOutColors.has(c.name)}
                           onClick={() => updateVariant(variant.id, 'color', c.name)}
                         />
                       ))}
@@ -191,7 +204,8 @@ function Details({ product, categories }) {
                           type="button"
                           role="radio"
                           aria-checked={variant.size === sizeOption}
-                          className={`size ${variant.size === sizeOption ? 'active' : ''}`}
+                          className={`size ${variant.size === sizeOption ? 'active' : ''} ${soldOutWhole || soldOutSizes.has(sizeOption) ? 'sold-out' : ''}`}
+                          disabled={soldOutWhole || soldOutSizes.has(sizeOption)}
                           onClick={() => updateVariant(variant.id, 'size', sizeOption)}
                         >
                           {sizeOption}
@@ -216,10 +230,10 @@ function Details({ product, categories }) {
           </button>
 
           <div className="pdp-actions">
-            <button className="btn btn-lg btn-discover" onClick={add}>
+            <button className="btn btn-lg btn-discover" onClick={add} disabled={soldOutWhole}>
               <BagIcon size={18} /> {t('product.addToCart')}
             </button>
-            <button className="btn btn-outline btn-lg btn-buy" onClick={buyNow}>
+            <button className="btn btn-outline btn-lg btn-buy" onClick={buyNow} disabled={soldOutWhole}>
               {t('product.buyNow')}
             </button>
             <button

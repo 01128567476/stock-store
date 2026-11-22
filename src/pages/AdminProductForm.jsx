@@ -31,6 +31,9 @@ export default function AdminProductForm() {
     sizes: DEFAULT_SIZES[defaultCategory] || DEFAULT_SIZES.pants,
     images: [],
     active: true,
+    soldOut: false,
+    soldOutColors: [],
+    soldOutSizes: [],
     season: 'both',
   });
 
@@ -54,6 +57,9 @@ export default function AdminProductForm() {
       sizes: existing.sizes || [],
       images: existing.images || [],
       active: existing.active !== false,
+      soldOut: existing.soldOut === true,
+      soldOutColors: existing.soldOutColors || [],
+      soldOutSizes: existing.soldOutSizes || [],
       season: normalizeSeason(existing.season),
     });
     setReady(true);
@@ -99,6 +105,9 @@ export default function AdminProductForm() {
       sizes: form.sizes,
       images: form.images,
       active: form.active,
+      soldOut: form.soldOut,
+      soldOutColors: form.soldOutColors,
+      soldOutSizes: form.soldOutSizes,
       season: form.season,
       isNew: isEdit ? existing.isNew : true,
       createdAt: isEdit ? existing.createdAt : Date.now(),
@@ -111,9 +120,35 @@ export default function AdminProductForm() {
   };
 
   const addColor = () => setForm((p) => ({ ...p, colors: [...p.colors, { name: 'New Color', hex: '#d9c9ae' }] }));
-  const removeColor = (i) => setForm((p) => ({ ...p, colors: p.colors.filter((_, idx) => idx !== i) }));
+  const removeColor = (i) => setForm((p) => {
+    const removedName = p.colors[i]?.name;
+    return {
+      ...p,
+      colors: p.colors.filter((_, idx) => idx !== i),
+      soldOutColors: p.soldOutColors.filter((name) => name !== removedName),
+    };
+  });
   const updateColor = (i, field, value) => setForm((p) => ({ ...p, colors: p.colors.map((c, idx) => idx === i ? { ...c, [field]: value } : c) }));
-  const toggleSize = (s) => setForm((p) => ({ ...p, sizes: p.sizes.includes(s) ? p.sizes.filter((x) => x !== s) : [...p.sizes, s] }));
+  const toggleSize = (s) => setForm((p) => {
+    const removing = p.sizes.includes(s);
+    return {
+      ...p,
+      sizes: removing ? p.sizes.filter((x) => x !== s) : [...p.sizes, s],
+      soldOutSizes: removing ? p.soldOutSizes.filter((x) => x !== s) : p.soldOutSizes,
+    };
+  });
+  const toggleSoldOutColor = (name) => setForm((p) => ({
+    ...p,
+    soldOutColors: p.soldOutColors.includes(name)
+      ? p.soldOutColors.filter((value) => value !== name)
+      : [...p.soldOutColors, name],
+  }));
+  const toggleSoldOutSize = (size) => setForm((p) => ({
+    ...p,
+    soldOutSizes: p.soldOutSizes.includes(size)
+      ? p.soldOutSizes.filter((value) => value !== size)
+      : [...p.soldOutSizes, size],
+  }));
 
   const handleImages = (ev) => {
     const files = Array.from(ev.target.files || []);
@@ -199,6 +234,14 @@ export default function AdminProductForm() {
             </label>
           </div>
 
+          <div className="admin-field full">
+            <label>{t('admin.soldOut')}</label>
+            <label className="admin-check admin-sold-out-check">
+              <input type="checkbox" checked={form.soldOut} onChange={(e) => set('soldOut', e.target.checked)} />
+              {t('admin.soldOutEntireProduct')}
+            </label>
+          </div>
+
           <div className="admin-field">
             <label>{t('admin.originalPrice')}</label>
             <input type="number" min="1" step="0.01" value={form.price} onChange={(e) => set('price', e.target.value)} placeholder="690" />
@@ -235,6 +278,10 @@ export default function AdminProductForm() {
                   <span className="admin-color-dot" style={{ background: c.hex }} />
                   <input type="text" value={c.name} onChange={(e) => updateColor(i, 'name', e.target.value)} placeholder={t('admin.colorName')} />
                   <input type="color" value={c.hex} onChange={(e) => updateColor(i, 'hex', e.target.value)} />
+                  <label className="admin-sold-out-option" title={t('admin.soldOutColor')}>
+                    <input type="checkbox" checked={form.soldOutColors.includes(c.name)} onChange={() => toggleSoldOutColor(c.name)} />
+                    <span>{t('admin.soldOutShort')}</span>
+                  </label>
                   <button type="button" className="admin-icon-btn" onClick={() => removeColor(i)} aria-label={t('admin.removeColor')}><CloseIcon size={14} /></button>
                 </div>
               ))}
@@ -245,10 +292,25 @@ export default function AdminProductForm() {
           <div className="admin-field full">
             <label>{t('admin.sizes')}</label>
             {errors.sizes && <span className="admin-field-error">{t(errors.sizes)}</span>}
-            <div className="admin-size-list">
-              {Array.from(new Set([...DEFAULT_SIZES[form.category], ...form.sizes])).map((s) => (
-                <button key={s} type="button" className={`size-chip ${form.sizes.includes(s) ? 'active' : ''}`} onClick={() => toggleSize(s)}>{s}</button>
-              ))}
+            <div className="admin-sizes-box">
+              <div className="admin-sizes-box-head">
+                <strong>{t('admin.availableSizes')}</strong>
+                <span className="muted small">{t('admin.soldOutSizesHint')}</span>
+              </div>
+              <div className="admin-stock-size-list">
+                {form.sizes.map((size) => (
+                  <label key={size} className={`admin-stock-size-row ${form.soldOutSizes.includes(size) ? 'is-sold-out' : ''}`}>
+                    <strong>{size}</strong>
+                    <span>{t('admin.soldOutShort')}</span>
+                    <input
+                      type="checkbox"
+                      checked={form.soldOutSizes.includes(size)}
+                      onChange={() => toggleSoldOutSize(size)}
+                    />
+                    <button type="button" className="admin-stock-size-remove" onClick={(event) => { event.preventDefault(); toggleSize(size); }} aria-label={`${t('admin.remove')} ${size}`}>×</button>
+                  </label>
+                ))}
+              </div>
             </div>
             <div className="admin-custom-size">
               <input type="text" id="customSize" placeholder={t('admin.customSize')} onKeyDown={(e) => {

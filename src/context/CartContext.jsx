@@ -12,6 +12,11 @@ export function CartProvider({ children }) {
 
   const addItem = useCallback(
     (product, { size, color, qty = 1 }) => {
+      if (
+        product.soldOut === true ||
+        (product.soldOutColors || []).includes(color) ||
+        (product.soldOutSizes || []).includes(size)
+      ) return false;
       const key = `${product.id}|${size}|${color}`;
       setItems((prev) => {
         const found = prev.find((i) => i.key === key);
@@ -20,6 +25,7 @@ export function CartProvider({ children }) {
         }
         return [...prev, { key, id: product.id, size, color, qty: Math.min(MAX_QTY, qty) }];
       });
+      return true;
     },
     [setItems]
   );
@@ -40,6 +46,11 @@ export function CartProvider({ children }) {
     const lines = items
       .map((i) => ({ ...i, product: getProduct(i.id) }))
       .filter((l) => l.product)
+      .filter((l) =>
+        l.product.soldOut !== true &&
+        !(l.product.soldOutColors || []).includes(l.color) &&
+        !(l.product.soldOutSizes || []).includes(l.size)
+      )
       .map((l) => ({ ...l, unit: effectivePrice(l.product), total: effectivePrice(l.product) * l.qty }));
     const count = lines.reduce((s, l) => s + l.qty, 0);
     const subtotal = lines.reduce((s, l) => s + l.total, 0);

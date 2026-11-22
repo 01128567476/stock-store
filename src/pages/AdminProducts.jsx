@@ -203,6 +203,7 @@ export default function AdminProducts() {
               {filtered.map((p) => {
                 const pct = pctOf(p);
                 const isActive = p.active !== false;
+                const isSoldOut = p.soldOut === true;
                 return (
                   <tr key={p.id} className="admin-table-row">
                     <td>
@@ -236,9 +237,9 @@ export default function AdminProducts() {
                         : <span className="admin-muted-dash">—</span>}
                     </td>
                     <td>
-                      <span className={`admin-status ${isActive ? 'active' : 'hidden'}`}>
+                      <span className={`admin-status ${isSoldOut ? 'hidden' : isActive ? 'active' : 'hidden'}`}>
                         <span className="admin-status-dot" />
-                        {isActive ? t('admin.statActive') : t('admin.statHidden')}
+                        {isSoldOut ? t('admin.soldOut') : isActive ? t('admin.statActive') : t('admin.statHidden')}
                       </span>
                     </td>
                     <td>
@@ -277,6 +278,7 @@ export default function AdminProducts() {
           {filtered.map((p) => {
             const pct = pctOf(p);
             const isActive = p.active !== false;
+            const isSoldOut = p.soldOut === true;
             return (
               <div key={p.id} className="admin-product-card">
                 {firstImage(p)
@@ -285,9 +287,9 @@ export default function AdminProducts() {
                 <div className="admin-product-card-body">
                   <div className="admin-product-card-top">
                     <span className="admin-product-card-name">{p.name}</span>
-                    <span className={`admin-status ${isActive ? 'active' : 'hidden'}`}>
+                    <span className={`admin-status ${isSoldOut ? 'hidden' : isActive ? 'active' : 'hidden'}`}>
                       <span className="admin-status-dot" />
-                      {isActive ? t('admin.statActive') : t('admin.statHidden')}
+                      {isSoldOut ? t('admin.soldOut') : isActive ? t('admin.statActive') : t('admin.statHidden')}
                     </span>
                   </div>
                   <div className="admin-product-card-tags">

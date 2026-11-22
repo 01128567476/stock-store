@@ -14,9 +14,16 @@ export default function ProductCard({ product }) {
   const pct = discountPercent(product);
   const wished = has(product.id);
   const link = `/product/${product.id}`;
+  const soldOut = product.soldOut === true;
+  const soldOutSizes = product.soldOutSizes || [];
+  const soldOutColors = product.soldOutColors || [];
+  const noAvailableVariant =
+    soldOut ||
+    ((product.colors || []).every((color) => soldOutColors.includes(color.name))) ||
+    ((product.sizes || []).every((size) => soldOutSizes.includes(size)));
 
   return (
-    <article className="card">
+    <article className={`card ${noAvailableVariant ? 'is-sold-out' : ''}`}>
       <div className="card-media">
         <Link to={link} aria-label={product.name}>
           <ProductImage src={product.images[0]} alt={product.name} />
@@ -34,6 +41,7 @@ export default function ProductCard({ product }) {
         <div className="badges">
           {pct > 0 && <span className="badge badge-sale">-{pct}%</span>}
           {product.isNew && <span className="badge">{t('product.new')}</span>}
+          {noAvailableVariant && <span className="badge badge-sold-out">{t('admin.soldOut')}</span>}
         </div>
         <button
           className={`wish ${wished ? 'on' : ''}`}
@@ -53,7 +61,7 @@ export default function ProductCard({ product }) {
         <Price product={product} />
 
         <Link className="btn btn-full" to={link}>
-          <BagIcon size={16} /> {t('product.addToCart')}
+          <BagIcon size={16} /> {noAvailableVariant ? t('admin.soldOut') : t('product.addToCart')}
         </Link>
       </div>
     </article>
