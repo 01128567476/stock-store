@@ -27,11 +27,6 @@ const POOLS = {
     'photo-1594938298603-c8148c4dae35',
     'photo-1507679799987-c73779587ccf',
   ],
-  sweaters: [
-    'photo-1618354691373-d851c5c3a990',
-    'photo-1576566588028-4147f3842f27',
-    'photo-1556821840-3a63f95609a7',
-  ],
   pullover: [
     'photo-1556821840-3a63f95609a7',
     'photo-1618354691373-d851c5c3a990',
@@ -57,8 +52,7 @@ export const IMAGES = {
     pants: U(POOLS.apparel[4], 700, 900),
     hoodies: U(POOLS.apparel[6], 700, 900),
     jackets: U(POOLS.apparel[3], 700, 900),
-    sweaters: U(POOLS.sweaters[0], 700, 900),
-    pullover: U(POOLS.sweaters[1], 700, 900),
+    pullover: U(POOLS.pullover[1], 700, 900),
   },
 };
 
@@ -66,7 +60,6 @@ export const CATEGORIES = [
   { id: 'pants', label: 'Pants', labelAr: 'بناطيل', image: IMAGES.categories.pants },
   { id: 'hoodies', label: 'Hoodies', labelAr: 'هودي', image: IMAGES.categories.hoodies },
   { id: 'jackets', label: 'Jackets', labelAr: 'جواكت', image: IMAGES.categories.jackets },
-  { id: 'sweaters', label: 'Sweaters', labelAr: 'سويتر', image: IMAGES.categories.sweaters },
   { id: 'pullover', label: 'Pullover', labelAr: 'بلوفرات', image: IMAGES.categories.pullover },
   { id: 'shoes', label: 'Shoes', labelAr: 'أحذية', image: IMAGES.categories.shoes },
 ];
@@ -122,7 +115,6 @@ const DETAILS = {
   pants: ['Versatile everyday style', 'Available in selected sizes and colors', 'Easy to pair with casual and smart-casual outfits'],
   hoodies: ['Comfortable everyday layer', 'Available in selected sizes and colors', 'Designed for casual styling'],
   jackets: ['Versatile outer layer for everyday wear', 'Available in selected sizes and colors', 'Easy to style across seasons'],
-  sweaters: ['Comfortable knit layer for everyday wear', 'Available in selected sizes and colors', 'Easy to layer with your everyday outfits'],
   pullover: ['Comfortable pullover for everyday wear', 'Available in selected sizes and colors', 'Easy to layer with your everyday outfits'],
   shoes: ['Genuine materials, hand finished', 'Cushioned insole for all-day comfort', 'Wipe clean with a soft cloth'],
 };
@@ -132,7 +124,7 @@ export const getProductDetails = (product) =>
     ? product.details
     : DETAILS[product.category] || [];
 
-const counters = { pants: 0, hoodies: 0, jackets: 0, sweaters: 0, pullover: 0, shoes: 0 };
+const counters = { pants: 0, hoodies: 0, jackets: 0, pullover: 0, shoes: 0 };
 let order = 0;
 
 const make = (name, category, price, salePrice, colors, flags, description, sizes, season = 'both') => {
@@ -173,10 +165,6 @@ export const TEST_PRODUCTS = [
     'Test catalog item for checking category browsing and product details.'),
   make('TEST - Classic Denim Jacket', 'jackets', 3100, 2790, cols('Indigo', 'Black'), 'n',
     'Test catalog item for checking discounted pricing and product filters.'),
-  make('TEST - Ribbed Knit Sweater', 'sweaters', 1950, null, cols('Grey', 'Camel'), 'n',
-    'Test catalog item for checking category browsing and product details.'),
-  make('TEST - Wool Blend Cardigan', 'sweaters', 2450, 2205, cols('Navy', 'Beige'), 'b',
-    'Test catalog item for checking discounted pricing and product filters.'),
   make('TEST - Cotton Pullover', 'pullover', 1700, null, cols('Black', 'White'), 'n',
     'Test catalog item for checking category browsing and product details.'),
   make('TEST - Textured Knit Pullover', 'pullover', 2100, 1890, cols('Brown', 'Grey'), 'b',
@@ -189,9 +177,6 @@ export const TEST_PRODUCTS = [
 
 export const PRODUCTS = [
   ...TEST_PRODUCTS,
-  // Sweaters
-  make('Merino Crewneck Sweater', 'sweaters', 2100, 1680, cols('Grey', 'Navy', 'Camel'), 'fb',
-    'Fine-gauge extra-soft merino wool, naturally temperature regulating and beautifully lightweight.'),
   // Shoes
   make('Minimal Leather Sneakers', 'shoes', 2900, null, cols('White', 'Black'), 'fb',
     'Hand-finished Italian leather sneakers with a clean low profile and a cushioned insole.'),

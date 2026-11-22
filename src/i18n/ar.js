@@ -3,7 +3,6 @@ export default {
   nav: {
     home: 'الرئيسية',
     shop: 'المتجر',
-    sweaters: 'سويتر',
     pullover: 'بلوفرات',
     shoes: 'أحذية',
     sale: 'تخفيضات',
@@ -45,7 +44,7 @@ export default {
     newArrivals: 'وصل حديثاً',
     specialOffer: 'عرض خاص',
     offerTitle: 'خصم حتى {percent}% على تشكيلة مختارة',
-    offerText: 'أسعار لفترة محدودة على السويتر والأحذية الرياضية حتى نفاد الكمية.',
+    offerText: 'أسعار لفترة محدودة على البلوفرات والأحذية الرياضية حتى نفاد الكمية.',
     shopSale: 'تسوق التخفيضات',
     reduced: 'مخفّض',
     onSaleNow: 'عروض حالية',
@@ -251,7 +250,7 @@ export default {
     already: 'أنت مشترك بالفعل. شكراً لك!',
     welcome: 'أهلاً بك في القائمة! ترقّب إصدارنا القادم.',
   },
-  category: { pants: 'بناطيل', hoodies: 'هودي', jackets: 'جواكت', sweaters: 'سويتر', pullover: 'بلوفرات', shoes: 'أحذية' },
+  category: { pants: 'بناطيل', hoodies: 'هودي', jackets: 'جواكت', pullover: 'بلوفرات', shoes: 'أحذية' },
   season: { winter: 'شتوي', summer: 'صيفي', both: 'كل المواسم' },
   admin: {
     dashboard: 'لوحة التحكم',

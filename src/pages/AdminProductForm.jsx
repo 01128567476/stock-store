@@ -11,7 +11,6 @@ const DEFAULT_SIZES = {
   pants: ['S', 'M', 'L', 'XL', 'XXL'],
   hoodies: ['S', 'M', 'L', 'XL', 'XXL'],
   jackets: ['S', 'M', 'L', 'XL', 'XXL'],
-  sweaters: ['S', 'M', 'L', 'XL', 'XXL'],
   pullover: ['S', 'M', 'L', 'XL', 'XXL'],
 };
 

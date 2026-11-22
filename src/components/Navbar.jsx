@@ -11,7 +11,6 @@ import { BagIcon, HeartIcon, HomeIcon, MoonIcon, SearchIcon, ShieldIcon, SunIcon
 import LanguageToggle from './LanguageToggle';
 
 const LINKS = [
-  { to: '/shop?category=sweaters', labelKey: 'nav.sweaters' },
   { to: '/shop?category=pullover', labelKey: 'nav.pullover' },
   { to: '/shop?category=shoes', labelKey: 'nav.shoes' },
   { to: '/shop?sale=1', labelKey: 'nav.sale', isSale: true },

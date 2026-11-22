@@ -3,7 +3,6 @@ export default {
   nav: {
     home: 'Home',
     shop: 'Shop',
-    sweaters: 'Sweaters',
     pullover: 'Pullover',
     shoes: 'Shoes',
     sale: 'Sale',
@@ -45,7 +44,7 @@ export default {
     newArrivals: 'New arrivals',
     specialOffer: 'Special offer',
     offerTitle: 'Up to {percent}% off selected styles',
-    offerText: 'Limited-time prices on sweaters and sneakers while stock lasts.',
+    offerText: 'Limited-time prices on pullovers and sneakers while stock lasts.',
     shopSale: 'Shop the sale',
     reduced: 'Reduced',
     onSaleNow: 'On sale now',
@@ -251,7 +250,7 @@ export default {
     already: 'You are already subscribed. Thank you!',
     welcome: 'Welcome to the list! Look out for our next drop.',
   },
-  category: { pants: 'Pants', hoodies: 'Hoodies', jackets: 'Jackets', sweaters: 'Sweaters', pullover: 'Pullover', shoes: 'Shoes' },
+  category: { pants: 'Pants', hoodies: 'Hoodies', jackets: 'Jackets', pullover: 'Pullover', shoes: 'Shoes' },
   season: { winter: 'Winter', summer: 'Summer', both: 'All Seasons' },
   admin: {
     dashboard: 'Dashboard',

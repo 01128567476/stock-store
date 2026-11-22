@@ -4,7 +4,6 @@ import { CATEGORIES, IMAGES, PRODUCTS, TEST_PRODUCTS, normalizeSeason } from '..
 const ADMIN_KEY = 'mv_admin';
 const PRODUCTS_KEY = 'mv_products_admin';
 const CATEGORIES_KEY = 'mv_categories_admin';
-const SWEATER_MIGRATION_KEY = 'mv_sweater_seeded_v4';
 const TEST_PRODUCTS_MIGRATION_KEY = 'mv_test_products_seed_v1';
 const SEASON_VISIBILITY_KEY = 'mv_hidden_seasons';
 const SHOP_ADS_KEY = 'mv_shop_ads';
@@ -59,6 +58,7 @@ const loadCategories = () => {
     }
     const categories = parsed.filter((category) =>
       category &&
+      category.id !== 'sweaters' &&
       typeof category.id === 'string' &&
       typeof category.label === 'string' &&
       typeof category.labelAr === 'string'
@@ -141,17 +141,9 @@ export function AdminProvider({ children }) {
       const parsed = JSON.parse(saved);
       if (!Array.isArray(parsed)) return initialProducts;
       const currentProducts = parsed.filter((product) =>
+        product.category !== 'sweaters' &&
         categories.some((category) => category.id === product.category)
       );
-      if (localStorage.getItem(SWEATER_MIGRATION_KEY) !== '1') {
-        const starterSweater = initialProducts.find((product) => product.category === 'sweaters');
-        if (starterSweater) {
-          if (!currentProducts.some((product) => product.id === starterSweater.id)) {
-            currentProducts.push(starterSweater);
-          }
-          localStorage.setItem(SWEATER_MIGRATION_KEY, '1');
-        }
-      }
       if (localStorage.getItem(TEST_PRODUCTS_MIGRATION_KEY) !== '1') {
         const existingIds = new Set(currentProducts.map((product) => product.id));
         currentProducts.push(...TEST_PRODUCTS.filter((product) => !existingIds.has(product.id)));
@@ -231,6 +223,10 @@ export function AdminProvider({ children }) {
   useEffect(() => {
     try { localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products)); } catch {}
   }, [products]);
+
+  useEffect(() => {
+    try { localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories)); } catch {}
+  }, [categories]);
 
   const login = useCallback((username, password) => {
     if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {

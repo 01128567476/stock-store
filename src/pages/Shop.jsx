@@ -91,7 +91,7 @@ export default function Shop() {
 
   const selectedCategory = categories.find((item) => item.id === category);
   const catLabel = selectedCategory ? getCategoryName(selectedCategory, lang) : undefined;
-  useSEO(catLabel || (sale ? t('shop.sale') : t('nav.shop')), `Shop ${catLabel || 'all fashion'} at STOCK STORE — premium apparel, sweaters, and shoes.`);
+  useSEO(catLabel || (sale ? t('shop.sale') : t('nav.shop')), `Shop ${catLabel || 'all fashion'} at STOCK STORE — premium apparel, pullovers, and shoes.`);
 
   const update = (patch) => {
     const next = new URLSearchParams(params);
