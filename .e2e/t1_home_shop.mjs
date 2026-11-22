@@ -1,0 +1,127 @@
+﻿import { go, sleep, txt, txtAll, count, exists, smartClick, clickByText, clickNth, type, setInput, attr, hash, lsGet, BASE } from './lib.mjs';
+
+export default async function t1({ page, results, ok }) {
+  const err0 = page._errors.length;
+
+  // ---- First load: Arabic / RTL by default ----
+  await page.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => !document.querySelector('.splash'), { timeout: 8000 }).catch(() => {});
+  await sleep(600);
+  ok('home: default lang = ar', (await page.evaluate(() => document.documentElement.lang)) === 'ar');
+  ok('home: default dir = rtl', (await page.evaluate(() => document.documentElement.dir)) === 'rtl');
+  ok('home: hero image rendered', await exists(page, '.hero-media-main'));
+  ok('home: 6 category tiles (default)', (await count(page, '.cat-tile')) === 6);
+  ok('home: AR tile name أحذية', (await txtAll(page, '.cat-tile-title')).includes('أحذية'));
+  ok('home: footer logo exists', await exists(page, '.footer-logo'));
+  const wa = await attr(page, '.whatsapp', 'href');
+  ok('home: whatsapp float link', !!wa && wa.startsWith('https://wa.me/'));
+  ok('home: topbar shows free-shipping', (await txt(page, '.topbar')).includes('3,000'));
+
+  // ---- Language switch to EN ----
+  await page.evaluate(() => localStorage.setItem('mv-lang', 'en'));
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await sleep(800);
+  ok('lang: switched to en/ltr', (await page.evaluate(() => document.documentElement.lang)) === 'en'
+    && (await page.evaluate(() => document.documentElement.dir)) === 'ltr');
+  ok('lang: hero h1 EN', ((await txt(page, '.hero h1')) || '').includes('EVERYDAY'));
+
+  // ---- Theme toggle ----
+  await smartClick(page, '.nav-actions button[aria-label="Switch to dark mode"]');
+  await sleep(250);
+  ok('theme: dark applied', (await page.evaluate(() => document.documentElement.dataset.theme)) === 'dark');
+  await smartClick(page, '.nav-actions button[aria-label="Switch to light mode"]');
+  await sleep(250);
+  ok('theme: back to light', (await page.evaluate(() => document.documentElement.dataset.theme)) === 'light');
+
+  // ---- Hero CTAs ----
+  await clickByText(page, '.hero-actions a', 'Shop Now');
+  await sleep(600);
+  ok('hero: Shop Now -> /shop', (await hash(page)) === '#/shop');
+  await go(page, '/');
+  await clickByText(page, '.hero-actions a', 'New Arrivals');
+  await sleep(600);
+  ok('hero: New Arrivals -> sort=newest', (await hash(page)).includes('/shop?sort=newest'));
+
+  // ---- Navbar search ----
+  await go(page, '/');
+  await smartClick(page, '.nav-actions button[aria-label="Search"]');
+  await sleep(300);
+  ok('nav: search panel opens', await exists(page, '.search-panel input'));
+  await type(page, '.search-panel input', 'Chelsea');
+  await smartClick(page, '.search-panel button[type="submit"]');
+  await sleep(800);
+  ok('nav: search navigates to q=Chelsea', (await hash(page)).includes('/shop?q=Chelsea'));
+  ok('nav: search finds 1 product', (await count(page, '.card')) === 1);
+  ok('nav: result is Chelsea Boots', ((await txtAll(page, '.card-title')) || []).includes('Chelsea Boots'));
+
+  // ---- Category tile -> shop filter ----
+  await go(page, '/');
+  await clickByText(page, '.cat-tile', 'Shoes');
+  await sleep(800);
+  ok('tile: Shoes -> category=shoes', (await hash(page)).includes('/shop?category=shoes'));
+  ok('tile: 7 shoes products', (await count(page, '.card')) === 7);
+  ok('tile: results count text', ((await txt(page, '.results-count')) || '').includes('7'));
+
+  // ---- Filters drawer ----
+  await smartClick(page, '.filter-toggle'); // open the drawer (inputs are hidden otherwise)
+  await sleep(500);
+  await clickByText(page, '.chips .chip', 'Sweaters');
+  await sleep(600);
+  ok('filters: sweaters = 3', (await count(page, '.card')) === 3);
+  await setInput(page, '.range input[aria-label="Min"]', '2000');
+  await sleep(700);
+  ok('filters: min 2000 leaves 1 (eff. price)', (await count(page, '.card')) === 1, await txt(page, '.results-count'));
+  await clickByText(page, '.filters button', 'Clear all filters');
+  await sleep(700);
+  ok('filters: clear all -> 18 products', (await count(page, '.card')) === 18);
+  await setInput(page, '.range input[aria-label="Min"]', '99999');
+  await sleep(700);
+  ok('filters: impossible range -> empty state', await exists(page, '.empty'));
+  await clickByText(page, '.empty button', 'Clear filters');
+  await sleep(400);
+  // First click may only close the open filters drawer (ghost-click guard) — click again.
+  await clickByText(page, '.empty button', 'Clear filters');
+  await sleep(700);
+  ok('filters: empty-state clear -> 18', (await count(page, '.card')) === 18);
+  await smartClick(page, '.filters .check input');
+  await sleep(700);
+  ok('filters: sale-only = 9', (await count(page, '.card')) === 9, await txt(page, '.results-count'));
+  await clickByText(page, '.filters button', 'Clear all filters');
+  await sleep(600);
+
+  // ---- Wishlist heart + toast ----
+  await smartClick(page, '.card .wish');
+  await sleep(500);
+  ok('wish: toast shown', await exists(page, '.toast.wishlist'));
+  ok('wish: navbar badge = 1', (await txt(page, 'a[href="#/wishlist"] .count')) === '1');
+  await go(page, '/wishlist');
+  ok('wish: page shows 1 item', (await count(page, '.card')) === 1);
+  await smartClick(page, '.card .wish');
+  await sleep(500);
+  ok('wish: removed -> empty state', await exists(page, '.empty'));
+
+  // ---- Newsletter ----
+  await type(page, '.newsletter-row input', 'not-an-email');
+  await smartClick(page, '.newsletter-row button');
+  await sleep(300);
+  ok('newsletter: invalid email error', ((await txt(page, '.form-msg.error')) || '').length > 3);
+  await type(page, '.newsletter-row input', 'test@stock.com');
+  await smartClick(page, '.newsletter-row button');
+  await sleep(300);
+  ok('newsletter: welcome on subscribe', ((await txt(page, '.form-msg.success')) || '').includes('Welcome'));
+  await type(page, '.newsletter-row input', 'test@stock.com');
+  await smartClick(page, '.newsletter-row button');
+  await sleep(300);
+  ok('newsletter: duplicate detected', ((await txt(page, '.form-msg.info')) || '').includes('already'));
+  ok('newsletter: persisted', ((await lsGet(page, 'mv-newsletter')) || '').includes('test@stock.com'));
+
+  // ---- 404 ----
+  await go(page, '/no-such-page');
+  ok('404: page renders', ((await txt(page, '.empty h1')) || '').includes("doesn't exist"));
+  await clickByText(page, '.empty a', 'Back to the shop');
+  await sleep(600);
+  ok('404: back-to-shop works', (await hash(page)) === '#/shop');
+
+  const errs = page._errors.slice(err0);
+  ok('t1: zero console/page errors', errs.length === 0, errs.join(' || ').slice(0, 300));
+}

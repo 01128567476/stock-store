@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import { PageLoader, SplashLoader } from './components/Loaders';
-import { AdminProvider, useAdmin } from './context/AdminContext';
+import { useAdmin } from './context/AdminContext';
 import AdminLayout from './components/AdminLayout';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
@@ -97,5 +97,7 @@ function AppShell() {
 }
 
 export default function App() {
-  return <AdminProvider><AppShell /></AdminProvider>;
+  // AdminProvider now lives in main.jsx so contexts like WishlistProvider
+  // can consume the live catalog (admin-created products included).
+  return <AppShell />;
 }

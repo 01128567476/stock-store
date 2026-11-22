@@ -1,12 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
-import { PRODUCTS } from '../data/products';
+import { useAdmin } from '../context/AdminContext';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const WishlistContext = createContext(null);
 
 export function WishlistProvider({ children }) {
   const [storedIds, setStoredIds] = useLocalStorage('mv-wishlist', []);
-  const validIds = useMemo(() => new Set(PRODUCTS.map((p) => p.id)), []);
+  // Validate against the live catalog so admin-created products can be saved too.
+  const { products } = useAdmin();
+  const validIds = useMemo(() => new Set(products.map((p) => p.id)), [products]);
 
   // Ignore (and clean up) ids of products that no longer exist in the catalog.
   const ids = useMemo(

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { IMAGES, discountPercent, getCategoryName, sortByNewest, sortBySaleAndNewest } from '../data/products';
+import { IMAGES, discountPercent, getCategoryName, sortByNewest } from '../data/products';
 import { STORE } from '../config';
 import { useAdmin } from '../context/AdminContext';
 import { useLang } from '../context/LangContext';
@@ -22,7 +22,9 @@ export default function Home() {
   const { t, lang } = useLang();
   const { products, categories, isSeasonHidden } = useAdmin();
   const visible = products.filter((p) => p.active !== false && !isSeasonHidden(p.season));
-  const newArrivals = sortBySaleAndNewest(visible.filter((p) => p.isNew || p.salePrice != null)).slice(0, 4);
+  // "New Arrivals" must surface the genuinely newest items — sale-first sorting
+  // (sortBySaleAndNewest) could crowd the newest product out of the 4 shown.
+  const newArrivals = sortByNewest(visible.filter((p) => p.isNew || p.salePrice != null)).slice(0, 4);
   const onSale = sortByNewest(visible.filter((p) => p.salePrice != null));
   const maxOff = onSale.length ? Math.max(...onSale.map(discountPercent)) : 0;
   const reviews = t('reviews');

@@ -1,0 +1,139 @@
+﻿import { go, sleep, txt, txtAll, count, exists, smartClick, clickByText, clickNth, type, attr, hash, lsGet } from './lib.mjs';
+
+const addChelseaToCart = async (page) => {
+  await go(page, '/shop?q=Chelsea');
+  await smartClick(page, '.card-title');
+  await sleep(800);
+  await clickByText(page, '.sizes .size', '42');
+  await sleep(200);
+  await smartClick(page, '.pdp-actions .btn-discover');
+  await sleep(600);
+};
+
+export default async function t2({ page, results, ok }) {
+  const err0 = page._errors.length;
+
+  // ---- PDP gallery ----
+  await go(page, '/shop?q=Chelsea');
+  await smartClick(page, '.card-title');
+  await sleep(900);
+  ok('pdp: breadcrumb renders', await exists(page, '.breadcrumbs'));
+  ok('pdp: 3 thumbnails', (await count(page, '.thumb')) === 3);
+  const src1 = await page.$eval('.gallery-main img', (i) => i.src);
+  await clickNth(page, '.thumb', 1);
+  await sleep(400);
+  const src2 = await page.$eval('.gallery-main img', (i) => i.src);
+  ok('pdp: thumb click switches main image', src1 !== src2);
+  ok('pdp: sale badge -20%', ((await txt(page, '.gallery-main .badge-sale')) || '') === '-20%');
+  await clickNth(page, '.variant-swatches .swatch', 1);
+  await sleep(250);
+  ok('pdp: swatch selects Brown', (await page.$eval('.variant-swatches .swatch:nth-child(2)', (e) => e.getAttribute('aria-checked'))) === 'true');
+  await clickByText(page, '.sizes .size', '42');
+  await sleep(250);
+  const activeSize = await page.evaluate(() =>
+    [...document.querySelectorAll('.sizes .size')].find((b) => b.textContent.trim() === '42')?.className || 'missing');
+  ok('pdp: size 42 active', activeSize.includes('active'), activeSize);
+  await smartClick(page, 'button[aria-label="Increase quantity"]');
+  await sleep(250);
+  ok('pdp: qty + -> 2', (await txt(page, '.qty span')) === '2');
+  await smartClick(page, 'button[aria-label="Decrease quantity"]');
+  await smartClick(page, 'button[aria-label="Decrease quantity"]');
+  await sleep(250);
+  ok('pdp: qty floor at 1 & disabled', (await txt(page, '.qty span')) === '1'
+    && (await page.$eval('button[aria-label="Decrease quantity"]', (b) => b.disabled)));
+  await smartClick(page, '.variant-add');
+  await sleep(300);
+  ok('pdp: add another variant -> 2 rows', (await count(page, '.variant-row')) === 2);
+  await smartClick(page, '.variant-remove');
+  await sleep(300);
+  ok('pdp: remove variant -> 1 row', (await count(page, '.variant-row')) === 1);
+
+  // ---- Validation: add to cart without size ----
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await sleep(1000);
+  await smartClick(page, '.pdp-actions .btn-discover');
+  await sleep(500);
+  ok('pdp: missing size shows inline error', await exists(page, '.form-msg.error'));
+  ok('pdp: missing size shows error toast', await exists(page, '.toast.error'));
+  ok('pdp: nothing added to cart', !(await exists(page, 'a[href="#/cart"] .count')));
+
+  // ---- Add to cart + Buy Now ----
+  await clickByText(page, '.sizes .size', '43');
+  await sleep(200);
+  await smartClick(page, '.pdp-actions .btn-discover');
+  await sleep(600);
+  ok('pdp: added toast', await exists(page, '.toast.success'));
+  ok('pdp: cart badge = 1', (await txt(page, 'a[href="#/cart"] .count')) === '1');
+  await smartClick(page, '.pdp-actions .btn-buy');
+  await sleep(800);
+  ok('pdp: Buy Now -> /checkout', (await hash(page)).includes('/checkout'));
+
+  // ---- Checkout validation ----
+  await smartClick(page, '.summary button[type="submit"]');
+  await sleep(500);
+  ok('checkout: 4 field errors on empty submit', (await count(page, '.field-error')) === 4);
+  ok('checkout: fix-fields toast', await exists(page, '.toast.error'));
+
+  // ---- Fill & pay ----
+  await type(page, '#fullName', 'Ahmed Hassan');
+  await type(page, '#phone', '+201234567890');
+  await type(page, '#address', '12 Test Street, Maadi');
+  await type(page, '#city', 'Cairo');
+  await page.click('input[name="payment"][value="instapay"]');
+  await sleep(300);
+  ok('checkout: instapay selected note', ((await txt(page, '.summary .center')) || '').includes('InstaPay'));
+  await smartClick(page, '.summary button[type="submit"]');
+  await page.waitForFunction(() => location.hash.includes('/order/'), { timeout: 6000 });
+  await sleep(700);
+  const orderHash = await hash(page);
+  ok('order: success page', ((await txt(page, '.success h1')) || '').includes('confirmed'));
+  const orders = JSON.parse((await lsGet(page, 'mv-orders')) || '[]');
+  ok('order: saved to localStorage', orders.length === 1 && orderHash.includes(orders[0].id));
+  ok('order: cart cleared after purchase', !(await exists(page, 'a[href="#/cart"] .count')));
+  const waHref = await attr(page, 'a[href*="wa.me"]', 'href');
+  ok('order: whatsapp link present', !!waHref && waHref.startsWith('https://wa.me/'));
+  await clickByText(page, '.success a', 'Continue shopping');
+  await sleep(600);
+  ok('order: continue shopping -> /shop', (await hash(page)) === '#/shop');
+
+  // ---- Cart page: qty/remove + guard ----
+  await addChelseaToCart(page);
+  await go(page, '/cart');
+  ok('cart: 1 line rendered', (await count(page, '.cart-line')) === 1);
+  const totalBefore = parseInt(((await txt(page, '.cart-line .cart-total')) || '0').replace(/[^\d]/g, ''), 10);
+  await smartClick(page, '.cart-line button[aria-label="Increase quantity"]');
+  await sleep(400);
+  const totalAfter = parseInt(((await txt(page, '.cart-line .cart-total')) || '0').replace(/[^\d]/g, ''), 10);
+  ok('cart: qty+ doubles line total', totalAfter === totalBefore * 2, `${totalBefore} -> ${totalAfter}`);
+  await clickByText(page, '.cart-line .link-btn', 'Remove');
+  await sleep(500);
+  ok('cart: remove -> empty state', await exists(page, '.empty'));
+  await go(page, '/checkout');
+  await sleep(600);
+  ok('cart: guard redirects empty checkout -> /cart', (await hash(page)) === '#/cart');
+
+  // ---- Clear cart flow ----
+  await addChelseaToCart(page);
+  await go(page, '/cart');
+  await clickByText(page, '.cart-lines .link-btn', 'Clear cart');
+  await sleep(500);
+  ok('cart: clear -> empty state + toast', await exists(page, '.empty') && await exists(page, '.toast'));
+
+  // ---- Order not found ----
+  await go(page, '/order/MV-NOPE');
+  ok('order: unknown id -> not found', ((await txt(page, '.empty h1')) || '').includes('not found'));
+
+  // ---- Back to Arabic storefront ----
+  await page.evaluate(() => localStorage.setItem('mv-lang', 'ar'));
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await sleep(1200);
+  ok('ar: back to rtl', (await page.evaluate(() => document.documentElement.dir)) === 'rtl');
+  ok('ar: nav shows المتجر', ((await txtAll(page, '.nav-links a')) || []).includes('المتجر'));
+  await go(page, '/shop?q=Chelsea');
+  await sleep(900);
+  const badge = await txt(page, '.card .badge-sale');
+  ok('ar: sale badge text intact', !!badge && badge.startsWith('-') && badge.endsWith('%'), badge);
+
+  const errs = page._errors.slice(err0);
+  ok('t2: zero console/page errors', errs.length === 0, errs.join(' || ').slice(0, 300));
+}
