@@ -1,10 +1,28 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAdmin } from '../context/AdminContext';
 
 export default function AdBanner() {
   const { shopAds } = useAdmin();
   const activeBanners = shopAds.banners.filter((banner) => banner.active !== false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const touchStart = useRef(null);
+
+  const handleTouchStart = (event) => {
+    const touch = event.touches[0];
+    touchStart.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const handleTouchEnd = (event) => {
+    if (!touchStart.current || activeBanners.length < 2) return;
+
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStart.current.x;
+    const deltaY = touch.clientY - touchStart.current.y;
+    touchStart.current = null;
+
+    if (Math.abs(deltaX) < 40 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+    setActiveIndex((index) => (index + (deltaX < 0 ? 1 : -1) + activeBanners.length) % activeBanners.length);
+  };
 
   useEffect(() => {
     setActiveIndex(0);
@@ -23,7 +41,14 @@ export default function AdBanner() {
   const banner = activeBanners[activeIndex % Math.max(activeBanners.length, 1)];
 
   return (
-    <section className="shop-ad-slot" aria-label="Store advertisements" aria-roledescription="carousel">
+    <section
+      className="shop-ad-slot"
+      aria-label="Store advertisements"
+      aria-roledescription="carousel"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={() => { touchStart.current = null; }}
+    >
       {banner && (
         <>
           <img
