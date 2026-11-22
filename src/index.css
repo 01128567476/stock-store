@@ -815,6 +815,18 @@ p { margin: 0 0 1rem; }
   overflow: hidden;
   background-color: #26231f;
 }
+.hero-media-lqip {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  filter: blur(14px);
+  transform: scale(1.08);
+}
 .hero-media-main {
   display: block;
   position: absolute;
@@ -825,6 +837,11 @@ p { margin: 0 0 1rem; }
   max-width: none;
   object-fit: cover;
   object-position: center 30%;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease);
+}
+.hero-media-main.is-loaded {
+  opacity: 1;
 }
 .lang-toggle {
   display: inline-flex;

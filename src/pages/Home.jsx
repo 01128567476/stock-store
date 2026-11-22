@@ -10,6 +10,9 @@ import Stars from '../components/Stars';
 import LanguageToggle from '../components/LanguageToggle';
 import { ArrowIcon, CashIcon, ReturnIcon, ShieldIcon, TruckIcon } from '../components/Icons';
 
+// 24x36 JPEG of the hero, ~850 bytes, inlined so the hero never shows a blank/dark box
+const HERO_LQIP = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDABQODxIPDRQSERIXFhQYHzMhHxwcHz8tLyUzSkFOTUlBSEZSXHZkUldvWEZIZoxob3p9hIWET2ORm4+AmnaBhH//2wBDARYXFx8bHzwhITx/VEhUf39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f3//wAARCAAkABgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAwAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDmYUVNj7h94jIOOMe/8qlNl5674F2tnp0/T/CpCkUiWyqV8tVUvjjnA/WrTJYuXKebbEDhk+dP15FZuWpoo6GQVkQKHBAPQjpRVgyOpMUseGxw2TxjpRWiZDRJabY7dg5T5yvBPQc81PCofyMlVzId3bAwOTS6dbR3bb5ZljKnBDE7mAGev+elWDpMAKtJfRuCSeMkkY6VDiUmZl4pMMbLIrbSckN16etFXL6witLUyLcxyur4ICkZHbFFXFWRLZm2spRjgDhT1HtTYvnnUHoWFFFIB07bIwoVeuc0UUU1sJn/2Q==';
+
 const FEATURE_ICONS = [
   { icon: TruckIcon, titleKey: 'features.fastDelivery', textKey: 'features.fastDeliveryText' },
   { icon: CashIcon, titleKey: 'features.cod', textKey: 'features.codText' },
@@ -61,7 +64,18 @@ export default function Home() {
           </div>
         </div>
         <div className="hero-media">
-          <img className="hero-media-main" src={IMAGES.hero} alt={t('hero.alt')} width="768" height="1152" fetchpriority="high" decoding="async" />
+          {/* LQIP: tiny blurred placeholder painted instantly; the full image fades in once loaded */}
+          <img className="hero-media-lqip" src={HERO_LQIP} alt="" aria-hidden="true" width="24" height="36" />
+          <img
+            className="hero-media-main"
+            src={IMAGES.hero}
+            alt={t('hero.alt')}
+            width="768"
+            height="1152"
+            fetchpriority="high"
+            decoding="async"
+            onLoad={(e) => e.currentTarget.classList.add('is-loaded')}
+          />
         </div>
       </section>
 
