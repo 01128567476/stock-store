@@ -110,6 +110,7 @@ export default {
     addWishlist: 'أضف إلى المفضلة',
     removeWishlist: 'أزل من المفضلة',
     details: 'التفاصيل',
+    saveAmount: 'وفر +{amount} جنيه',
     youMayAlsoLike: 'قد يعجبك أيضاً',
     home: 'الرئيسية',
     shop: 'المتجر',
@@ -227,7 +228,7 @@ export default {
     backToShop: 'العودة إلى المتجر',
   },
   footer: {
-    tagline: 'قطع أساسية فاخرة صُممت للحياة العصرية.',
+    tagline: 'Always In STOCK Never In Line',
     shop: 'المتجر',
     account: 'الحساب',
     contact: 'تواصل معنا',

@@ -110,6 +110,7 @@ export default {
     addWishlist: 'Add to wishlist',
     removeWishlist: 'Remove from wishlist',
     details: 'Details',
+    saveAmount: 'Save +{amount} EGP',
     youMayAlsoLike: 'You may also like',
     home: 'Home',
     shop: 'Shop',
@@ -227,7 +228,7 @@ export default {
     backToShop: 'Back to the shop',
   },
   footer: {
-    tagline: 'Premium essentials designed for modern living.',
+    tagline: 'Always In STOCK Never In Line',
     shop: 'Shop',
     account: 'Account',
     contact: 'Contact',

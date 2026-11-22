@@ -186,8 +186,23 @@ p { margin: 0 0 1rem; }
 .card-title:hover { text-decoration: underline; text-underline-offset: 3px; }
 .card-body .btn { margin-top: auto; padding-block: 0.7rem; }
 .price { display: flex; flex-direction: column; align-items: flex-start; gap: 0.2rem; font-size: 0.95rem; }
+.price-main { display: flex; align-items: center; flex-wrap: wrap; gap: .45rem; }
 .price .now { font-weight: 600; }
 .price .now.sale { color: var(--danger); }
+.price-saving {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: .22rem .48rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  color: var(--accent-dark);
+  font-size: .68em;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
 .price .was { color: var(--muted); font-size: 0.7em; margin-top: 0.1rem; }
 .price.large { font-size: 1.5rem; margin-block: 0.6rem 1rem; }
 .swatches { display: flex; gap: 0.45rem; }

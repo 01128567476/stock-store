@@ -17,9 +17,9 @@ export default function Footer() {
         <div className="container footer-grid">
           <div className="footer-contact">
             <Link to="/" className="logo footer-logo brand-ltr" dir="ltr">
-              <span className="logo-stoc">STOC</span><span className="logo-k">K</span><span className="logo-store">STORE</span>
+              <span className="logo-stoc">STOC</span><span className="logo-k" style={{ color: 'var(--accent)' }}>K</span><span className="logo-store">STORE</span>
             </Link>
-            <p className="footer-about" style={{ color: '#000000', WebkitTextFillColor: '#000000', opacity: 1 }}>{t('footer.tagline')}</p>
+            <p className="footer-about" dir="ltr" lang="en" style={{ color: '#000000', WebkitTextFillColor: '#000000', opacity: 1 }}>Always In STOCK Never In Line</p>
             <div className="socials">
               <a href={STORE.social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><InstagramIcon /></a>
               <a href={STORE.social.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook"><FacebookIcon /></a>
