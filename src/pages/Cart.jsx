@@ -28,6 +28,7 @@ export default function Cart() {
   }
 
   const remaining = subtotal > STORE.freeShippingThreshold ? 0 : STORE.freeShippingThreshold - subtotal + 1;
+  const freeShippingProgress = Math.min(100, Math.max(0, (subtotal / STORE.freeShippingThreshold) * 100));
 
   return (
     <div className="container page-pad">
@@ -72,14 +73,25 @@ export default function Cart() {
 
         <aside className="summary">
           <h2>{t('cart.summary')}</h2>
+          <div className={`summary-shipping-progress ${remaining === 0 ? 'complete' : ''}`}>
+            <div className="summary-shipping-copy">
+              <span>{remaining === 0 ? t('cart.free') : t('cart.shipping')}</span>
+              <strong>{remaining === 0 ? t('cart.free') : money(STORE.shippingFee)}</strong>
+            </div>
+            <div className="summary-progress-track" aria-label={t('cart.summary')}>
+              <span style={{ width: `${freeShippingProgress}%` }} />
+            </div>
+            {remaining > 0 && (
+              <p className="summary-shipping-note">
+                {t('cart.addMoreFreeShipping', { amount: money(remaining) })}
+              </p>
+            )}
+          </div>
           <dl>
             <div><dt>{t('cart.subtotal')}</dt><dd>{money(subtotal)}</dd></div>
             <div><dt>{t('cart.shipping')}</dt><dd>{shipping === 0 ? t('cart.free') : money(shipping)}</dd></div>
             <div className="grand"><dt>{t('cart.total')}</dt><dd>{money(total)}</dd></div>
           </dl>
-          {remaining > 0 && (
-            <p className="muted small">{t('cart.addMoreFreeShipping', { amount: money(remaining) })}</p>
-          )}
           <button className="btn btn-lg btn-full" onClick={() => navigate('/checkout')}>
             {t('cart.proceed')}
           </button>

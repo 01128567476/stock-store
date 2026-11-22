@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { money } from '../config';
+import { STORE, money } from '../config';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useLang } from '../context/LangContext';
@@ -26,6 +26,8 @@ export default function Checkout() {
   const toast = useToast();
   const placed = useRef(false);
   const [form, setForm] = useState({ fullName: '', phone: '', address: '', city: '', notes: '', payment: 'cod' });
+  const remaining = subtotal > STORE.freeShippingThreshold ? 0 : STORE.freeShippingThreshold - subtotal + 1;
+  const freeShippingProgress = Math.min(100, Math.max(0, (subtotal / STORE.freeShippingThreshold) * 100));
   const [errors, setErrors] = useState({});
 
   if (lines.length === 0 && !placed.current) return <Navigate to="/cart" replace />;
@@ -160,6 +162,20 @@ export default function Checkout() {
 
         <aside className="summary">
           <h2>{t('checkout.orderSummary')}</h2>
+          <div className={`summary-shipping-progress ${remaining === 0 ? 'complete' : ''}`}>
+            <div className="summary-shipping-copy">
+              <span>{remaining === 0 ? t('cart.free') : t('cart.shipping')}</span>
+              <strong>{remaining === 0 ? t('cart.free') : money(STORE.shippingFee)}</strong>
+            </div>
+            <div className="summary-progress-track" aria-label={t('cart.summary')}>
+              <span style={{ width: `${freeShippingProgress}%` }} />
+            </div>
+            {remaining > 0 && (
+              <p className="summary-shipping-note">
+                {t('cart.addMoreFreeShipping', { amount: money(remaining) })}
+              </p>
+            )}
+          </div>
           <ul className="summary-items">
             {lines.map((l) => (
               <li key={l.key}>
