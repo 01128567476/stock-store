@@ -4,7 +4,7 @@ import { CATEGORIES, IMAGES, PRODUCTS, TEST_PRODUCTS, normalizeSeason } from '..
 const ADMIN_KEY = 'mv_admin';
 const PRODUCTS_KEY = 'mv_products_admin';
 const CATEGORIES_KEY = 'mv_categories_admin';
-const TEST_PRODUCTS_MIGRATION_KEY = 'mv_test_products_seed_v1';
+const TEST_PRODUCTS_MIGRATION_KEY = 'mv_test_products_seed_v3';
 const SEASON_VISIBILITY_KEY = 'mv_hidden_seasons';
 const SHOP_ADS_KEY = 'mv_shop_ads';
 const SHOP_AD_SEED_KEY = 'mv_shop_ads_seeded_v1';

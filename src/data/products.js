@@ -173,6 +173,11 @@ export const TEST_PRODUCTS = [
     'Test catalog item for checking category browsing and product details.'),
   make('TEST - Leather Ankle Boots', 'shoes', 2700, 2430, cols('Brown', 'Black'), 'b',
     'Test catalog item for checking discounted pricing and product filters.'),
+  Object.assign(
+    make('TEST - Sold Out Product', 'pants', 2500, 2250, cols('Black', 'Grey'), 'f',
+      'Test catalog item for checking the complete sold-out product state.'),
+    { soldOut: true, soldOutColors: [], soldOutSizes: [] }
+  ),
 ];
 
 export const PRODUCTS = [

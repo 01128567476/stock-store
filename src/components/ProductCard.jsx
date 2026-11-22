@@ -40,7 +40,6 @@ export default function ProductCard({ product }) {
         </Link>
         <div className="badges">
           {pct > 0 && <span className="badge badge-sale">-{pct}%</span>}
-          {product.isNew && <span className="badge">{t('product.new')}</span>}
           {noAvailableVariant && <span className="badge badge-sold-out">{t('admin.soldOut')}</span>}
         </div>
         <button

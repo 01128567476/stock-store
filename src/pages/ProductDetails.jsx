@@ -139,7 +139,6 @@ function Details({ product, categories }) {
             <ProductImage src={images[img % images.length]} alt={product.name} loading="eager" />
             <div className="badges">
               {pct > 0 && <span className="badge badge-sale">-{pct}%</span>}
-              {product.isNew && <span className="badge">{t('product.new')}</span>}
               {soldOutWhole && <span className="badge badge-sold-out">{t('admin.soldOut')}</span>}
             </div>
           </div>
