@@ -41,6 +41,7 @@ export default function AdminProductForm() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [customSize, setCustomSize] = useState('');
 
   useEffect(() => {
     if (!isEdit) return;
@@ -149,6 +150,16 @@ export default function AdminProductForm() {
       ? p.soldOutSizes.filter((value) => value !== size)
       : [...p.soldOutSizes, size],
   }));
+  const addCustomSize = () => {
+    const value = customSize.trim();
+    if (!value) return;
+    setForm((current) => {
+      const exists = current.sizes.some((size) => size.toLowerCase() === value.toLowerCase());
+      if (exists) return current;
+      return { ...current, sizes: [...current.sizes, value] };
+    });
+    setCustomSize('');
+  };
 
   const handleImages = (ev) => {
     const files = Array.from(ev.target.files || []);
@@ -275,9 +286,8 @@ export default function AdminProductForm() {
             <div className="admin-color-list">
               {form.colors.map((c, i) => (
                 <div key={i} className="admin-color-row">
-                  <span className="admin-color-dot" style={{ background: c.hex }} />
-                  <input type="text" value={c.name} onChange={(e) => updateColor(i, 'name', e.target.value)} placeholder={t('admin.colorName')} />
                   <input type="color" value={c.hex} onChange={(e) => updateColor(i, 'hex', e.target.value)} />
+                  <input type="text" value={c.name} onChange={(e) => updateColor(i, 'name', e.target.value)} placeholder={t('admin.colorName')} />
                   <label className="admin-sold-out-option" title={t('admin.soldOutColor')}>
                     <input type="checkbox" checked={form.soldOutColors.includes(c.name)} onChange={() => toggleSoldOutColor(c.name)} />
                     <span>{t('admin.soldOutShort')}</span>
@@ -313,15 +323,23 @@ export default function AdminProductForm() {
               </div>
             </div>
             <div className="admin-custom-size">
-              <input type="text" id="customSize" placeholder={t('admin.customSize')} onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  const v = e.target.value.trim();
-                  if (v && !form.sizes.includes(v)) set('sizes', [...form.sizes, v]);
-                  e.target.value = '';
-                }
-              }} />
-              <span className="muted small">{t('admin.pressEnter')}</span>
+              <input
+                type="text"
+                id="customSize"
+                value={customSize}
+                onChange={(e) => setCustomSize(e.target.value)}
+                placeholder={t('admin.customSize')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addCustomSize();
+                  }
+                }}
+              />
+              <button type="button" className="admin-add-size-btn" onClick={addCustomSize}>
+                <span className="admin-add-size-plus" aria-hidden="true" />
+                {t('admin.addSize')}
+              </button>
             </div>
           </div>
 

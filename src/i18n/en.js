@@ -375,7 +375,7 @@ export default {
     addColor: '+ Add Color',
     sizes: 'Sizes',
     customSize: 'Custom size',
-    pressEnter: 'Press Enter to add',
+    addSize: 'Add size',
     images: 'Images',
     imageAlt: 'Image {index}',
     moveLeft: 'Move left',

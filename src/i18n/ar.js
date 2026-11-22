@@ -375,7 +375,7 @@ export default {
     addColor: '+ إضافة لون',
     sizes: 'المقاسات',
     customSize: 'مقاس مخصص',
-    pressEnter: 'اضغط Enter للإضافة',
+    addSize: 'إضافة مقاس',
     images: 'الصور',
     imageAlt: 'صورة {index}',
     moveLeft: 'تحريك لليسار',
