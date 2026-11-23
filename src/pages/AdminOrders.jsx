@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useLang } from '../context/LangContext';
 import { useOrders } from '../context/OrdersContext';
 import { STORE, money } from '../config';
@@ -27,6 +27,24 @@ export default function AdminOrders() {
   const { orders, removeOrder, updateOrderStatus } = useOrders();
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  // Full-size image preview (lightbox) — opened by clicking an item thumbnail.
+  const [preview, setPreview] = useState(null);
+
+  // Close the lightbox on Escape / body scroll lock while it is open.
+  useEffect(() => {
+    if (!preview) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') setPreview(null); };
+    document.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [preview]);
+
+  // Color name of an order line, translated when it is a known color name.
+  const colorLabel = (i) => i.color || '';
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -145,9 +163,20 @@ export default function AdminOrders() {
                         <div className="admin-order-items">
                           {o.items.map((i, idx) => (
                             <span key={idx} className="admin-order-item">
-                              {i.image ? <img className="admin-order-item-img" src={i.image} alt={i.name} loading="lazy" decoding="async" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : null}
+                              {i.image ? (
+                                <button
+                                  type="button"
+                                  className="admin-order-item-img-btn"
+                                  onClick={() => setPreview({ src: i.image, alt: i.name })}
+                                  aria-label={t('admin.viewImage')}
+                                  title={t('admin.viewImage')}
+                                >
+                                  <img className="admin-order-item-img" src={i.image} alt={i.name} loading="lazy" decoding="async" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                                </button>
+                              ) : null}
                               {i.qty}× {i.name}
                               {i.size && i.size !== 'One Size' ? ` (${i.size})` : ''}
+                              {colorLabel(i) ? ` — ${colorLabel(i)}` : ''}
                             </span>
                           ))}
                         </div>
@@ -214,9 +243,20 @@ export default function AdminOrders() {
                     <div className="admin-order-items">
                       {o.items.map((i, idx) => (
                         <span key={idx} className="admin-order-item">
-                          {i.image ? <img className="admin-order-item-img" src={i.image} alt={i.name} loading="lazy" decoding="async" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : null}
+                          {i.image ? (
+                            <button
+                              type="button"
+                              className="admin-order-item-img-btn"
+                              onClick={() => setPreview({ src: i.image, alt: i.name })}
+                              aria-label={t('admin.viewImage')}
+                              title={t('admin.viewImage')}
+                            >
+                              <img className="admin-order-item-img" src={i.image} alt={i.name} loading="lazy" decoding="async" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                            </button>
+                          ) : null}
                           {i.qty}× {i.name}
                           {i.size && i.size !== 'One Size' ? ` (${i.size})` : ''}
+                          {colorLabel(i) ? ` — ${colorLabel(i)}` : ''}
                         </span>
                       ))}
                     </div>
@@ -262,6 +302,13 @@ export default function AdminOrders() {
           </>
         )}
       </div>
+
+      {preview && (
+        <div className="admin-lightbox" role="dialog" aria-modal="true" aria-label={t('admin.viewImage')} onClick={() => setPreview(null)}>
+          <button type="button" className="admin-lightbox-close" aria-label={t('admin.closeImage')} onClick={(e) => { e.stopPropagation(); setPreview(null); }}>×</button>
+          <img src={preview.src} alt={preview.alt} onClick={(e) => e.stopPropagation()} />
+        </div>
+      )}
     </div>
   );
 }
