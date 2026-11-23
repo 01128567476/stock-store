@@ -141,8 +141,8 @@ p { margin: 0 0 1rem; }
 .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
 .reveal.in { opacity: 1; transform: none; }
 
-.shop-ad-slot { position: relative; width: 100%; margin: 0 auto; overflow: hidden; background: var(--surface-2); touch-action: pan-y; }
-.shop-ad-image { display: block; width: 100%; height: auto; max-height: 80vh; object-fit: contain; animation: ad-banner-in .45s ease both; }
+.shop-ad-slot { position: relative; width: 100%; height: 160px; margin: 0 auto; overflow: hidden; background: var(--surface-2); touch-action: pan-y; }
+.shop-ad-image { display: block; width: 100%; height: 100%; object-fit: contain; animation: ad-banner-in .45s ease both; }
 .shop-ad-copy { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 0.25rem; padding: 1rem clamp(1.25rem, 5vw, 4rem); color: #fff; background: linear-gradient(to right, rgba(0, 0, 0, 0.76), rgba(0, 0, 0, 0.28) 68%, transparent); pointer-events: none; }
 [dir='rtl'] .shop-ad-copy { background: linear-gradient(to left, rgba(0, 0, 0, 0.76), rgba(0, 0, 0, 0.28) 68%, transparent); }
 .shop-ad-eyebrow { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.2em; }
