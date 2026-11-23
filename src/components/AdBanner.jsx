@@ -68,6 +68,21 @@ export default function AdBanner() {
           )}
         </>
       )}
+      {activeBanners.length > 1 && (
+        <div className="shop-ad-dots" role="tablist" aria-label={t('admin.advertisements')}>
+          {activeBanners.map((b, i) => (
+            <button
+              key={b.id}
+              type="button"
+              role="tab"
+              aria-selected={i === activeIndex}
+              className={`shop-ad-dot${i === activeIndex ? ' is-active' : ''}`}
+              onClick={() => setActiveIndex(i)}
+              aria-label={t('admin.advertisementN', { index: i + 1 })}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
