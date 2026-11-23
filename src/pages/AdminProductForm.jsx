@@ -27,7 +27,7 @@ export default function AdminProductForm() {
 
   const [form, setForm] = useState({
     name: '', description: '', category: defaultCategory, price: '', discount: '',
-    colors: [{ name: 'Black', hex: '#141414' }],
+    colors: [{ name: 'Black', hex: '#141414', images: [] }],
     sizes: DEFAULT_SIZES[defaultCategory] || DEFAULT_SIZES.pants,
     images: [],
     active: true,
@@ -54,7 +54,7 @@ export default function AdminProductForm() {
       discount: existing.salePrice != null
         ? String(Math.round(((existing.price - existing.salePrice) / existing.price) * 100))
         : '',
-      colors: (existing.colors || []).map((c) => ({ name: c.name, hex: c.hex })),
+      colors: (existing.colors || []).map((c) => ({ name: c.name, hex: c.hex, images: c.images || [] })),
       sizes: existing.sizes || [],
       images: existing.images || [],
       active: existing.active !== false,
@@ -120,7 +120,7 @@ export default function AdminProductForm() {
     setTimeout(() => navigate('/admin/products'), 900);
   };
 
-  const addColor = () => setForm((p) => ({ ...p, colors: [...p.colors, { name: 'New Color', hex: '#d9c9ae' }] }));
+  const addColor = () => setForm((p) => ({ ...p, colors: [...p.colors, { name: 'New Color', hex: '#d9c9ae', images: [] }] }));
   const removeColor = (i) => setForm((p) => {
     const removedName = p.colors[i]?.name;
     return {
@@ -130,6 +130,27 @@ export default function AdminProductForm() {
     };
   });
   const updateColor = (i, field, value) => setForm((p) => ({ ...p, colors: p.colors.map((c, idx) => idx === i ? { ...c, [field]: value } : c) }));
+  const addColorImages = (i, files) => {
+    Array.from(files || []).forEach((file) => {
+      if (!file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = () => setForm((current) => ({
+        ...current,
+        colors: current.colors.map((color, idx) =>
+          idx === i ? { ...color, images: [...(color.images || []), String(reader.result)] } : color
+        ),
+      }));
+      reader.readAsDataURL(file);
+    });
+  };
+  const removeColorImage = (i, imageIndex) => setForm((p) => ({
+    ...p,
+    colors: p.colors.map((color, idx) =>
+      idx === i
+        ? { ...color, images: (color.images || []).filter((_, currentIndex) => currentIndex !== imageIndex) }
+        : color
+    ),
+  }));
   const toggleSize = (s) => setForm((p) => {
     const removing = p.sizes.includes(s);
     return {
@@ -285,14 +306,31 @@ export default function AdminProductForm() {
             {errors.colors && <span className="admin-field-error">{t(errors.colors)}</span>}
             <div className="admin-color-list">
               {form.colors.map((c, i) => (
-                <div key={i} className="admin-color-row">
-                  <input type="color" value={c.hex} onChange={(e) => updateColor(i, 'hex', e.target.value)} />
-                  <input type="text" value={c.name} onChange={(e) => updateColor(i, 'name', e.target.value)} placeholder={t('admin.colorName')} />
-                  <label className="admin-sold-out-option" title={t('admin.soldOutColor')}>
-                    <input type="checkbox" checked={form.soldOutColors.includes(c.name)} onChange={() => toggleSoldOutColor(c.name)} />
-                    <span>{t('admin.soldOutShort')}</span>
-                  </label>
-                  <button type="button" className="admin-icon-btn" onClick={() => removeColor(i)} aria-label={t('admin.removeColor')}><CloseIcon size={14} /></button>
+                <div key={i} className="admin-color-block">
+                  <div className="admin-color-row">
+                    <input type="color" value={c.hex} onChange={(e) => updateColor(i, 'hex', e.target.value)} />
+                    <input type="text" value={c.name} onChange={(e) => updateColor(i, 'name', e.target.value)} placeholder={t('admin.colorName')} />
+                    <label className="admin-sold-out-option" title={t('admin.soldOutColor')}>
+                      <input type="checkbox" checked={form.soldOutColors.includes(c.name)} onChange={() => toggleSoldOutColor(c.name)} />
+                      <span>{t('admin.soldOutShort')}</span>
+                    </label>
+                    <button type="button" className="admin-icon-btn" onClick={() => removeColor(i)} aria-label={t('admin.removeColor')}><CloseIcon size={14} /></button>
+                  </div>
+                  <div className="admin-color-images">
+                    {(c.images || []).map((src, imageIndex) => (
+                      <div key={`${src.slice(0, 30)}-${imageIndex}`} className="admin-color-image">
+                        <img src={src} alt={`${c.name} ${imageIndex + 1}`} />
+                        <button type="button" onClick={() => removeColorImage(i, imageIndex)} aria-label={t('admin.removeImage')}>
+                          <CloseIcon size={12} />
+                        </button>
+                      </div>
+                    ))}
+                    <label className="admin-color-image-add">
+                      <input type="file" accept="image/*" multiple onChange={(e) => addColorImages(i, e.target.files)} />
+                      <span>+</span>
+                      <small>{t('admin.addColorImages')}</small>
+                    </label>
+                  </div>
                 </div>
               ))}
             </div>

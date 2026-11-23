@@ -10,7 +10,6 @@ import { useSEO } from '../hooks/useSEO';
 import ProductImage from '../components/ProductImage';
 import ProductCard from '../components/ProductCard';
 import Price from '../components/Price';
-import Stars from '../components/Stars';
 import QtySelect from '../components/QtySelect';
 import { BagIcon, CashIcon, HeartIcon, ReturnIcon, TrashIcon, TruckIcon } from '../components/Icons';
 import NotFound from './NotFound';
@@ -45,8 +44,16 @@ function Details({ product, categories }) {
     size: availableSizes.length === 1 ? availableSizes[0] : null,
     qty: 1,
   }]);
+  const [activeVariantId, setActiveVariantId] = useState(0);
   const [variantErrors, setVariantErrors] = useState([]);
   const nextVariantId = useRef(1);
+  const selectedVariant = variants.find((variant) => variant.id === activeVariantId) || variants[0];
+  const selectedColor = colors.find((color) => color.name === selectedVariant?.color);
+  const colorImages = Array.isArray(selectedColor?.images) ? selectedColor.images.filter(Boolean) : [];
+  const allColorImages = colors.flatMap((color) =>
+    Array.isArray(color.images) ? color.images.filter(Boolean) : []
+  );
+  const activeImages = [...new Set([...images, ...allColorImages])];
 
   useSEO(product.name, product.description);
 
@@ -63,9 +70,11 @@ function Details({ product, categories }) {
   ).slice(0, 4);
 
   const updateVariant = (id, field, value) => {
+    setActiveVariantId(id);
     setVariants((current) => current.map((variant) =>
       variant.id === id ? { ...variant, [field]: value } : variant
     ));
+    if (field === 'color') setImg(0);
     const variant = variants.find((item) => item.id === id);
     const otherChoice = field === 'color' ? variant?.size : variant?.color;
     if ((field === 'color' || field === 'size') && value && otherChoice) {
@@ -74,16 +83,22 @@ function Details({ product, categories }) {
   };
 
   const addVariant = () => {
+    const id = nextVariantId.current++;
     setVariants((current) => [...current, {
-      id: nextVariantId.current++,
+      id,
       color: availableColors[0]?.name || '',
       size: availableSizes.length === 1 ? availableSizes[0] : null,
       qty: 1,
     }]);
+    setActiveVariantId(id);
   };
 
   const removeVariant = (id) => {
-    setVariants((current) => current.filter((variant) => variant.id !== id));
+    setVariants((current) => {
+      const remaining = current.filter((variant) => variant.id !== id);
+      if (activeVariantId === id) setActiveVariantId(remaining[0]?.id ?? 0);
+      return remaining;
+    });
     setVariantErrors((current) => current.filter((variantId) => variantId !== id));
   };
 
@@ -129,14 +144,38 @@ function Details({ product, categories }) {
       <div className="pdp-grid">
         <div className="gallery">
           <div className="thumbs">
-            {images.map((src, i) => (
-              <button key={src} className={`thumb ${i === img ? 'active' : ''}`} onClick={() => setImg(i)} aria-label={t('product.viewImage', { index: i + 1 })}>
+            {activeImages.map((src, i) => (
+              (() => {
+                const imageColor = colors.find((color) =>
+                  Array.isArray(color.images) && color.images.includes(src)
+                );
+                return (
+              <button
+                key={src}
+                className={`thumb ${i === img ? 'active' : ''} ${imageColor?.name === selectedVariant?.color ? 'matches-selected-color' : ''}`}
+                onClick={() => {
+                  setImg(i);
+                  const matchingColor = colors.find((color) =>
+                    Array.isArray(color.images) && color.images.includes(src)
+                  );
+                  if (matchingColor && selectedVariant) {
+                    setVariants((current) => current.map((variant) =>
+                      variant.id === activeVariantId
+                        ? { ...variant, color: matchingColor.name }
+                        : variant
+                    ));
+                  }
+                }}
+                aria-label={t('product.viewImage', { index: i + 1 })}
+              >
                 <ProductImage src={src} alt={`${product.name} view ${i + 1}`} />
               </button>
+                );
+              })()
             ))}
           </div>
           <div className="gallery-main">
-            <ProductImage src={images[img % images.length]} alt={product.name} loading="eager" />
+            <ProductImage src={activeImages[img % activeImages.length]} alt={`${product.name} - ${selectedVariant?.color || ''}`} loading="eager" />
             <div className="badges">
               {pct > 0 && <span className="badge badge-sale">-{pct}%</span>}
               {soldOutWhole && <span className="badge badge-sold-out">{t('admin.soldOut')}</span>}
@@ -147,15 +186,20 @@ function Details({ product, categories }) {
         <div className="pdp-info">
           <p className="eyebrow">{catLabel}</p>
           <h1>{product.name}</h1>
-          <Stars value={product.rating} count={product.reviews} />
           <Price product={product} large />
-          <p className="pdp-desc">{product.description}</p>
 
           <div className="variant-list">
             {variants.map((variant, index) => {
               const hasError = variantErrors.includes(variant.id);
               return (
-                <section key={variant.id} className="variant-row" aria-label={t('product.item', { index: index + 1 })}>
+                <section
+                  key={variant.id}
+                  className={`variant-row ${activeVariantId === variant.id ? 'active' : ''}`}
+                  aria-label={t('product.item', { index: index + 1 })}
+                  onClick={(event) => {
+                    if (!event.target.closest('button,input')) setActiveVariantId(variant.id);
+                  }}
+                >
                   <div className="variant-row-head">
                     <div className="variant-item-title">
                       <span className="variant-item-number">{String(index + 1).padStart(2, '0')}</span>

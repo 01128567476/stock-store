@@ -6,7 +6,6 @@ import { useLang } from '../context/LangContext';
 import { useSEO } from '../hooks/useSEO';
 import ProductSection from '../components/ProductSection';
 import Reveal from '../components/Reveal';
-import Stars from '../components/Stars';
 import LanguageToggle from '../components/LanguageToggle';
 import { ArrowIcon, CashIcon, ReturnIcon, ShieldIcon, TruckIcon } from '../components/Icons';
 
@@ -156,7 +155,6 @@ export default function Home() {
         <div className="reviews">
           {reviews.map((r) => (
             <figure key={r.name} className="review">
-              <Stars value={r.rating} />
               <blockquote>“{r.text}”</blockquote>
               <figcaption>
                 <strong>{r.name}</strong> · {r.city}

@@ -373,6 +373,7 @@ export default {
     colorName: 'اسم اللون',
     removeColor: 'إزالة اللون',
     addColor: '+ إضافة لون',
+    addColorImages: 'إضافة صور اللون',
     sizes: 'المقاسات',
     customSize: 'مقاس مخصص',
     addSize: 'إضافة مقاس',

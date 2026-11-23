@@ -373,6 +373,7 @@ export default {
     colorName: 'Color name',
     removeColor: 'Remove color',
     addColor: '+ Add Color',
+    addColorImages: 'Add color images',
     sizes: 'Sizes',
     customSize: 'Custom size',
     addSize: 'Add size',
