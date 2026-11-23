@@ -24,9 +24,9 @@ export default function Home() {
   const { t, lang } = useLang();
   const { products, categories, isSeasonHidden } = useAdmin();
   const visible = products.filter((p) => p.active !== false && !isSeasonHidden(p.season));
-  // "New Arrivals" must surface the genuinely newest items — sale-first sorting
-  // (sortBySaleAndNewest) could crowd the newest product out of the 4 shown.
-  const newArrivals = sortByNewest(visible.filter((p) => p.isNew || p.salePrice != null)).slice(0, 4);
+  // Each home section shows the 6 newest products the admin added (by
+  // createdAt, newest first); the "View all" arrow link leads to the rest.
+  const newArrivals = sortByNewest(visible).slice(0, 6);
   const onSale = sortByNewest(visible.filter((p) => p.salePrice != null));
   const maxOff = onSale.length ? Math.max(...onSale.map(discountPercent)) : 0;
   const reviews = t('reviews');
@@ -143,7 +143,7 @@ export default function Home() {
         </div>
       </Reveal>
 
-      <ProductSection eyebrow={t('home.reduced')} title={t('home.onSaleNow')} products={onSale.slice(0, 4)} to="/shop?sale=1" linkLabel={t('home.seeAllOffers')} />
+      <ProductSection eyebrow={t('home.reduced')} title={t('home.onSaleNow')} products={onSale.slice(0, 6)} to="/shop?sale=1" linkLabel={t('home.seeAllOffers')} />
 
       <Reveal as="section" className="section container">
         <div className="section-head">
