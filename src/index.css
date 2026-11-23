@@ -138,6 +138,7 @@ p { margin: 0 0 1rem; }
 /* Sections */
 .section { padding-block: 4.5rem 0; }
 .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+.section-more { display: flex; justify-content: center; margin-top: 2.5rem; }
 .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
 .reveal.in { opacity: 1; transform: none; }
 

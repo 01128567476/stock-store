@@ -128,7 +128,7 @@ export default function Home() {
         </div>
       </Reveal>
 
-      <ProductSection eyebrow={t('home.justLanded')} title={t('home.newArrivals')} products={newArrivals} to="/shop?sort=newest" />
+      <ProductSection eyebrow={t('home.justLanded')} title={t('home.newArrivals')} products={newArrivals} moreTo="/shop" moreLabel={t('wishlist.discover')} />
 
       <Reveal as="section" className="offer" >
         <div className="offer-bg" style={{ '--img': `url(${IMAGES.banner})` }}>
@@ -143,7 +143,7 @@ export default function Home() {
         </div>
       </Reveal>
 
-      <ProductSection eyebrow={t('home.reduced')} title={t('home.onSaleNow')} products={onSale.slice(0, 6)} to="/shop?sale=1" linkLabel={t('home.seeAllOffers')} />
+      <ProductSection eyebrow={t('home.reduced')} title={t('home.onSaleNow')} products={onSale.slice(0, 6)} moreTo="/shop" moreLabel={t('wishlist.discover')} />
 
       <Reveal as="section" className="section container">
         <div className="section-head">
