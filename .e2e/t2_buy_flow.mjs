@@ -75,6 +75,17 @@ export default async function t2({ page, results, ok }) {
   ok('checkout: fix-fields toast', await exists(page, '.toast.error'));
 
   // ---- Fill & pay ----
+  // Spy on window.open: the checkout must auto-open WhatsApp *inside* the click
+  // handler (otherwise popup blockers would silently kill it).
+  await page.evaluate(() => {
+    window.__opened = [];
+    const orig = window.open;
+    window.open = function (...args) {
+      const w = orig.apply(this, args);
+      window.__opened.push({ url: args[0], target: args[1], got: !!w });
+      return w;
+    };
+  });
   await type(page, '#fullName', 'Ahmed Hassan');
   await type(page, '#phone', '+201234567890');
   await type(page, '#address', '12 Test Street, Maadi');
@@ -92,6 +103,26 @@ export default async function t2({ page, results, ok }) {
   ok('order: cart cleared after purchase', !(await exists(page, 'a[href="#/cart"] .count')));
   const waHref = await attr(page, 'a[href*="wa.me"]', 'href');
   ok('order: whatsapp link present', !!waHref && waHref.startsWith('https://wa.me/'));
+  // The checkout must have auto-opened WhatsApp right at confirm-click time:
+  // first a blank tab synchronously inside the click, then the wa.me URL on
+  // the same tick once the order number exists.
+  const opened = await page.evaluate(() => window.__opened || []);
+  const firstCall = opened[0] || {};
+  ok('order: whatsapp auto-opened on confirm',
+    opened.length >= 1 && firstCall.url === '' && firstCall.target === '_blank',
+    JSON.stringify(opened).slice(0, 200));
+  // The blank tab is then redirected via location.replace() — verify the real
+  // tab ended up on the store's WhatsApp number.
+  const otherUrls = [];
+  for (let i = 0; i < 10; i++) {
+    otherUrls.length = 0;
+    for (const p of await page.browser().pages()) if (p !== page) otherUrls.push(p.url());
+    if (otherUrls.some((u) => u.includes('wa.me') || u.includes('whatsapp'))) break;
+    await sleep(300);
+  }
+  ok('order: whatsapp tab redirected to wa.me',
+    otherUrls.some((u) => u.includes('201289661122') && (u.includes('wa.me') || u.includes('whatsapp'))),
+    otherUrls.join(' | ').slice(0, 200));
   await clickByText(page, '.success a', 'Continue shopping');
   await sleep(600);
   ok('order: continue shopping -> /shop', (await hash(page)) === '#/shop');

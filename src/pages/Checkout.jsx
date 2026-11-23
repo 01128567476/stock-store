@@ -8,6 +8,7 @@ import { useToast } from '../context/ToastContext';
 import { useLang } from '../context/LangContext';
 import { useOrders } from '../context/OrdersContext';
 import { useSEO } from '../hooks/useSEO';
+import { buildCustomerWhatsAppLink } from '../lib/whatsapp';
 import ProductImage from '../components/ProductImage';
 import { CashIcon, InstapayIcon, WalletIcon } from '../components/Icons';
 
@@ -67,6 +68,11 @@ export default function Checkout() {
       return;
     }
 
+    // Open the WhatsApp tab synchronously inside the user's click (before any
+    // async work) — browsers only allow popups directly tied to a user gesture.
+    // The URL is filled in once the order has its sequential number below.
+    const waWindow = window.open('', '_blank');
+
     // normalize the city back to its canonical English key so orders/WhatsApp
     // messages stay consistent regardless of the UI language
     const cityLabel = form.city.trim();
@@ -98,6 +104,17 @@ export default function Checkout() {
     // OrdersProvider assigns the sequential order number (#1, #2, …) and
     // persists it so the order shows up in the admin dashboard immediately.
     const saved = addOrder(order);
+
+    // Send the order details to the store's WhatsApp automatically — the
+    // customer just presses Send in the opened chat.
+    const waLink = buildCustomerWhatsAppLink(saved, t);
+    if (waWindow && !waWindow.closed) {
+      try {
+        waWindow.location.replace(waLink);
+      } catch {
+        window.open(waLink, '_blank', 'noopener');
+      }
+    }
 
     placed.current = true;
     navigate(`/order/${saved.id}`, { replace: true, state: { order: saved } });
