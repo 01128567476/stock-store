@@ -84,6 +84,12 @@ export default function AdminProductForm() {
     if (!form.price || parseFloat(form.price) <= 0) e.price = 'admin.errPriceInvalid';
     if (form.discount !== '' && (parseFloat(form.discount) < 0 || parseFloat(form.discount) > 100)) e.discount = 'admin.errDiscountRange';
     if (!form.colors.length) e.colors = 'admin.errColorsRequired';
+    else {
+      // Same shade may appear twice, but each row needs its own distinct name.
+      const names = form.colors.map((c) => c.name.trim().toLowerCase());
+      if (names.some((n) => !n)) e.colors = 'admin.errColorNameRequired';
+      else if (new Set(names).size !== names.length) e.colors = 'admin.errDuplicateColorName';
+    }
     if (!form.sizes.length) e.sizes = 'admin.errSizesRequired';
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -101,12 +107,13 @@ export default function AdminProductForm() {
       category: form.category,
       price: parseFloat(form.price),
       salePrice: onSale ? finalPrice : null,
-      colors: form.colors,
+      colors: form.colors.map((c) => ({ ...c, name: c.name.trim() })),
       sizes: form.sizes,
       images: form.images,
       active: form.active,
       soldOut: form.soldOut,
-      soldOutColors: form.soldOutColors,
+      soldOutColors: form.soldOutColors.map((n) => n.trim())
+        .filter((n) => form.colors.some((c) => c.name.trim() === n)),
       soldOutSizes: form.soldOutSizes,
       season: form.season,
       isNew: isEdit ? existing.isNew : true,
@@ -119,7 +126,13 @@ export default function AdminProductForm() {
     setTimeout(() => navigate('/admin/products'), 900);
   };
 
-  const addColor = () => setForm((p) => ({ ...p, colors: [...p.colors, { name: 'New Color', hex: '#d9c9ae', images: [] }] }));
+  // Default name is unique ("New Color", "New Color 2", ...) so a fresh row
+  // never clashes with an existing one — duplicate names are rejected on submit.
+  const addColor = () => setForm((p) => {
+    let name = 'New Color';
+    for (let n = 2; p.colors.some((c) => c.name.trim().toLowerCase() === name.toLowerCase()); n++) name = `New Color ${n}`;
+    return { ...p, colors: [...p.colors, { name, hex: '#d9c9ae', images: [] }] };
+  });
   const removeColor = (i) => setForm((p) => {
     const removedName = p.colors[i]?.name;
     return {

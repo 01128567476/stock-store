@@ -21,7 +21,7 @@ export default function AdminAds() {
 
   useEffect(() => {
     if (!status) return undefined;
-    const timer = setTimeout(clearStatus, 4000);
+    const timer = setTimeout(clearStatus, 1500);
     return () => clearTimeout(timer);
   }, [status, clearStatus]);
 

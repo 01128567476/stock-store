@@ -394,6 +394,8 @@ export default {
     errPriceInvalid: 'Enter a valid original price',
     errDiscountRange: 'Discount must be between 0 and 100',
     errColorsRequired: 'Add at least one color',
+    errColorNameRequired: 'Enter a name for every color',
+    errDuplicateColorName: 'Color names must be different — the same shade twice needs a new name',
     errSizesRequired: 'Select at least one size',
     errImagesRequired: 'Add at least one image',
     // Ads

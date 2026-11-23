@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { discountPercent } from '../data/products';
+import { discountPercent, productImages } from '../data/products';
 import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';
 import { useLang } from '../context/LangContext';
@@ -12,6 +12,7 @@ export default function ProductCard({ product }) {
   const toast = useToast();
   const { t } = useLang();
   const pct = discountPercent(product);
+  const gallery = productImages(product);
   const wished = has(product.id);
   const link = `/product/${product.id}`;
   const soldOut = product.soldOut === true;
@@ -26,11 +27,11 @@ export default function ProductCard({ product }) {
     <article className={`card ${noAvailableVariant ? 'is-sold-out' : ''}`}>
       <div className="card-media">
         <Link to={link} aria-label={product.name}>
-          <ProductImage src={(product.images || [])[0] || ''} alt={product.name} />
-          {(product.images || [])[1] && (
+          <ProductImage src={gallery[0] || ''} alt={product.name} />
+          {gallery[1] && (
             <img
               className="card-alt"
-              src={product.images[1]}
+              src={gallery[1]}
               alt=""
               aria-hidden="true"
               loading="lazy"
@@ -61,7 +62,7 @@ export default function ProductCard({ product }) {
         <Link to={link} className="card-title">{product.name}</Link>
         <Price product={product} />
 
-        <Link className="btn btn-full" to={link}>
+        <Link className="btn btn-full" to={`${link}#pick`}>
           <BagIcon size={16} /> {noAvailableVariant ? t('admin.soldOut') : t('product.addToCart')}
         </Link>
       </div>

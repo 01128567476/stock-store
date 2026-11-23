@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { discountPercent, getCategoryName, getProductDetails } from '../data/products';
 import { useAdmin } from '../context/AdminContext';
@@ -30,6 +30,20 @@ function Details({ product, categories }) {
   const { has, toggle } = useWishlist();
   const toast = useToast();
   const [img, setImg] = useState(0);
+  // Arriving from a card's "Add to cart" button (#pick): scroll straight to
+  // the color/size chooser and flash it so the shopper knows to pick variants.
+  useEffect(() => {
+    if (!window.location.hash.includes('pick')) return undefined;
+    const timer = setTimeout(() => {
+      document.getElementById('pick')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const el = document.getElementById('pick');
+      if (el) {
+        el.classList.add('pick-flash');
+        setTimeout(() => el.classList.remove('pick-flash'), 1600);
+      }
+    }, 350);
+    return () => clearTimeout(timer);
+  }, []);
   const colors = Array.isArray(product.colors) ? product.colors : [];
   const sizes = Array.isArray(product.sizes) ? product.sizes : [];
   const images = Array.isArray(product.images) ? product.images.filter(Boolean) : [];
@@ -123,6 +137,7 @@ function Details({ product, categories }) {
   const add = () => {
     if (!addVariantsToCart()) return;
     toast('product.addedToCart', 'success', { name: product.name });
+    navigate('/cart');
   };
 
   const buyNow = () => {
@@ -192,7 +207,7 @@ function Details({ product, categories }) {
           <h1>{product.name}</h1>
           <Price product={product} large />
 
-          <div className="variant-list">
+          <div className="variant-list" id="pick">
             {variants.map((variant, index) => {
               const hasError = variantErrors.includes(variant.id);
               return (

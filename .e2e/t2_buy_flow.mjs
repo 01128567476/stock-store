@@ -1,5 +1,8 @@
 ﻿import { go, sleep, txt, txtAll, count, exists, smartClick, clickByText, clickNth, type, attr, hash, lsGet } from './lib.mjs';
 
+// Add-to-cart on a card links to the product page with #pick (variants are
+// required), scrolling to the chooser and flashing it — the add happens there.
+// From the PDP itself, "Add to cart" adds and then navigates straight to /cart.
 const addChelseaToCart = async (page) => {
   await go(page, '/shop?q=Chelsea');
   await smartClick(page, '.card-title');
@@ -12,6 +15,16 @@ const addChelseaToCart = async (page) => {
 
 export default async function t2({ page, results, ok }) {
   const err0 = page._errors.length;
+
+  // ---- Card "Add to cart" -> PDP #pick (variants must be chosen on the PDP) ----
+  await go(page, '/shop?q=Chelsea');
+  await sleep(600);
+  await smartClick(page, '.card .btn-full');
+  await sleep(500);
+  ok('card: add-to-cart -> PDP #pick', (await hash(page)).includes('/product/') && (await hash(page)).endsWith('#pick'));
+  let flashed = false;
+  for (let i = 0; i < 12 && !flashed; i++) { flashed = await exists(page, '.pick-flash'); if (!flashed) await sleep(150); }
+  ok('card: chooser flashes on arrival', flashed);
 
   // ---- PDP gallery ----
   await go(page, '/shop?q=Chelsea');
@@ -57,13 +70,22 @@ export default async function t2({ page, results, ok }) {
   ok('pdp: missing size shows error toast', await exists(page, '.toast.error'));
   ok('pdp: nothing added to cart', !(await exists(page, 'a[href="#/cart"] .count')));
 
-  // ---- Add to cart + Buy Now ----
+  // ---- Add to cart (navigates to /cart) + Buy Now (straight to checkout) ----
   await clickByText(page, '.sizes .size', '43');
   await sleep(200);
   await smartClick(page, '.pdp-actions .btn-discover');
-  await sleep(600);
+  await sleep(800);
+  ok('pdp: add to cart -> /cart', (await hash(page)).includes('/cart'));
   ok('pdp: added toast', await exists(page, '.toast.success'));
   ok('pdp: cart badge = 1', (await txt(page, 'a[href="#/cart"] .count')) === '1');
+  // /cart is a lazy route — wait for the line instead of a fixed sleep.
+  await page.waitForFunction(() => document.querySelector('.cart-line'), { timeout: 6000 }).catch(() => {});
+  ok('pdp: cart page shows the added line', (await count(page, '.cart-line')) === 1);
+  await go(page, '/shop?q=Chelsea');
+  await smartClick(page, '.card-title');
+  await sleep(800);
+  await clickByText(page, '.sizes .size', '43');
+  await sleep(200);
   await smartClick(page, '.pdp-actions .btn-buy');
   await sleep(800);
   ok('pdp: Buy Now -> /checkout', (await hash(page)).includes('/checkout'));

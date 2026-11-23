@@ -204,14 +204,26 @@ export const sortByNewest = (products) =>
 export const sortBySaleAndNewest = (products) =>
   sortByNewest(products).sort((a, b) => Number(b.salePrice != null) - Number(a.salePrice != null));
 export const effectivePrice = (p) => (p.salePrice != null ? p.salePrice : p.price);
+// Every image the product carries: main images first, then any images uploaded
+// inside the colors — deduped, truthy-only. Powers out-of-page rendering.
+export const productImages = (product) => {
+  const main = Array.isArray(product?.images) ? product.images.filter(Boolean) : [];
+  const colorImages = (Array.isArray(product?.colors) ? product.colors : [])
+    .flatMap((c) => (Array.isArray(c?.images) ? c.images.filter(Boolean) : []));
+  return [...new Set([...main, ...colorImages])];
+};
+// Cover image shown outside the product page (cards, shop, home, admin lists):
+// the product's main image, or — when the admin only uploaded images inside
+// the colors — the first color image, so the card never falls back to a letter.
+export const coverImage = (product) => productImages(product)[0] || '';
 // Image that represents a specific color: the first image uploaded for that
-// color in the admin panel, falling back to the product's main image.
+// color in the admin panel, falling back to any other image of the product.
 export const colorImage = (product, colorName) => {
   const color = Array.isArray(product?.colors)
     ? product.colors.find((c) => c?.name === colorName)
     : null;
   const first = Array.isArray(color?.images) ? color.images.find(Boolean) : null;
-  return first || product?.images?.find(Boolean) || '';
+  return first || coverImage(product);
 };
 export const discountPercent = (p) =>
   p.salePrice != null ? Math.round((1 - p.salePrice / p.price) * 100) : 0;

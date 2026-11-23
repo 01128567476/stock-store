@@ -2,7 +2,7 @@
 import { Link } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
 import { useLang } from '../context/LangContext';
-import { SEASONS, getCategoryName, normalizeSeason } from '../data/products';
+import { SEASONS, coverImage, getCategoryName, normalizeSeason } from '../data/products';
 import { money } from '../config';
 import { EditIcon, TrashIcon, EyeIcon, EyeOffIcon, PlusIcon, SearchIcon } from '../components/Icons';
 
@@ -33,7 +33,7 @@ export default function AdminProducts() {
     const season = SEASONS.find((s) => s.id === normalizedSeason);
     return season ? t(`season.${season.id}`, { defaultValue: season.label }) : normalizedSeason;
   };
-  const firstImage = (p) => Array.isArray(p.images) && p.images.length ? p.images[0] : '';
+  const firstImage = coverImage;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -57,7 +57,7 @@ export default function AdminProducts() {
 
   useEffect(() => {
     if (!status) return undefined;
-    const t = setTimeout(clearStatus, 4000);
+    const t = setTimeout(clearStatus, 1500);
     return () => clearTimeout(t);
   }, [status, clearStatus]);
 

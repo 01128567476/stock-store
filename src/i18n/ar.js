@@ -394,6 +394,8 @@ export default {
     errPriceInvalid: 'أدخل سعراً أصلياً صحيحاً',
     errDiscountRange: 'يجب أن يكون الخصم بين 0 و 100',
     errColorsRequired: 'أضف لوناً واحداً على الأقل',
+    errColorNameRequired: 'اكتب اسماً لكل لون',
+    errDuplicateColorName: 'أسماء الألوان يجب أن تكون مختلفة — نفس اللون مرتين يحتاج اسماً مختلفاً',
     errSizesRequired: 'اختر مقاساً واحداً على الأقل',
     errImagesRequired: 'أضف صورة واحدة على الأقل',
     // Ads

@@ -1,8 +1,9 @@
+import { useEffect } from 'react';
 import { useAdmin } from '../context/AdminContext';
 import { useLang } from '../context/LangContext';
 import { Link } from 'react-router-dom';
 import { money } from '../config';
-import { getCategoryName, sortByNewest } from '../data/products';
+import { coverImage, getCategoryName, sortByNewest } from '../data/products';
 import { EditIcon, PackageIcon, TagIcon, UsersIcon, ClockIcon } from '../components/Icons';
 
 const STAT_CARDS = [
@@ -15,6 +16,13 @@ const STAT_CARDS = [
 export default function AdminDashboard() {
   const { t, lang } = useLang();
   const { products, categories, status, statusMsg, clearStatus } = useAdmin();
+
+  // Same snappy auto-dismiss as the other admin pages (1.5s).
+  useEffect(() => {
+    if (!status) return undefined;
+    const timer = setTimeout(clearStatus, 1500);
+    return () => clearTimeout(timer);
+  }, [status, clearStatus]);
 
   const total = products.length;
   const active = products.filter((p) => p.active !== false).length;
@@ -40,7 +48,7 @@ export default function AdminDashboard() {
     const cat = categories.find((c) => c.id === id);
     return cat ? getCategoryName(cat, lang) : id;
   };
-  const firstImage = (p) => Array.isArray(p.images) && p.images.length ? p.images[0] : '';
+  const firstImage = coverImage;
 
   return (
     <div className="admin-page">
