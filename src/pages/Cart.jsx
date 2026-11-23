@@ -1,5 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { STORE, money } from '../config';
+import { colorImage } from '../data/products';
+import { useAdmin } from '../context/AdminContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useLang } from '../context/LangContext';
@@ -14,6 +16,12 @@ export default function Cart() {
   const { lines, count, subtotal, shipping, total, removeItem, setQty, clear, MAX_QTY } = useCart();
   const navigate = useNavigate();
   const toast = useToast();
+  // Live admin catalog (has the per-color images uploaded from the admin panel).
+  const { products: liveProducts } = useAdmin();
+  const lineImage = (line) => {
+    const live = liveProducts.find((p) => p.id === line.product.id) || line.product;
+    return colorImage(live, line.color) || line.product.images[0];
+  };
 
   if (lines.length === 0) {
     return (
@@ -42,7 +50,7 @@ export default function Cart() {
           {lines.map((l) => (
             <div key={l.key} className="cart-line">
               <Link to={`/product/${l.product.id}`} className="cart-img">
-                <ProductImage src={l.product.images[0]} alt={l.product.name} />
+                <ProductImage src={lineImage(l)} alt={l.product.name} />
               </Link>
               <div className="cart-info">
                 <Link to={`/product/${l.product.id}`} className="card-title">{l.product.name}</Link>

@@ -24,33 +24,33 @@ export default async function t3({ page, results, ok }) {
   await sleep(800);
   ok('login: success -> dashboard', (await hash(page)) === '#/admin');
   ok('dashboard: 4 stat cards', (await count(page, '.admin-stat')) === 4);
-  ok('dashboard: stats show 18 products', ((await txtAll(page, '.admin-stat-value')) || [])[0] === '18');
-  ok('dashboard: sidebar 5 links + view store', (await count(page, '.admin-sidebar .admin-link')) === 7
+  ok('dashboard: stats show 16 products', ((await txtAll(page, '.admin-stat-value')) || [])[0] === '16');
+  ok('dashboard: sidebar 6 links + view store', (await count(page, '.admin-sidebar .admin-link')) === 8
     && (await count(page, '.admin-sidebar .admin-link-danger')) === 1);
 
   // ---- Categories page ----
   await go(page, '/admin/categories');
   await sleep(800);
-  ok('cat: 6 default cards', (await count(page, '.admin-category-card')) === 6);
-  ok('cat: count badge text', ((await txt(page, '.admin-category-count')) || '').includes('6'));
+  ok('cat: 5 default cards', (await count(page, '.admin-category-card')) === 5);
+  ok('cat: count badge text', ((await txt(page, '.admin-category-count')) || '').includes('5'));
 
   // add new category
   await type(page, 'form.admin-category-create label.admin-field:nth-of-type(1) input', 'E2E Cat');
   await type(page, 'form.admin-category-create label.admin-field:nth-of-type(2) input', 'فئة اختبار');
   await smartClick(page, 'form.admin-category-create button[type="submit"]');
   await sleep(800);
-  ok('cat: added -> 7 cards', (await count(page, '.admin-category-card')) === 7);
+  ok('cat: added -> 6 cards', (await count(page, '.admin-category-card')) === 6);
   ok('cat: success toast', await exists(page, '.admin-toast--success'));
   ok('cat: persisted in localStorage', ((await lsGet(page, 'mv_categories_admin')) || '').includes('e2e-cat'));
 
   // storefront reflects new category
   await go(page, '/');
   await sleep(900);
-  ok('cat: storefront shows 7 tiles', (await count(page, '.cat-tile')) === 7);
+  ok('cat: storefront shows 6 tiles', (await count(page, '.cat-tile')) === 6);
   ok('cat: storefront tile name', (await txtAll(page, '.cat-tile-title')).includes('E2E Cat'));
   await go(page, '/shop');
   await sleep(700);
-  ok('cat: shop filter chip added', (await txtAll(page, '.chips .chip')).includes('E2E Cat'));
+  ok('cat: shop filter chip added', (await txtAll(page, '.quick-category-chip')).includes('E2E Cat'));
 
   // rename category (React controlled input needs native setter)
   await go(page, '/admin/categories');
@@ -113,10 +113,10 @@ export default async function t3({ page, results, ok }) {
     card?.querySelector('.admin-category-delete')?.click();
   });
   await sleep(800);
-  ok('cat: deleted -> back to 6', before7 === 7 && (await count(page, '.admin-category-card')) === 6);
+  ok('cat: deleted -> back to 5', before7 === 6 && (await count(page, '.admin-category-card')) === 5);
   await go(page, '/');
   await sleep(900);
-  ok('cat: storefront back to 6 tiles', (await count(page, '.cat-tile')) === 6);
+  ok('cat: storefront back to 5 tiles', (await count(page, '.cat-tile')) === 5);
 
   // delete disabled when category has products
   await go(page, '/admin/categories');

@@ -27,7 +27,7 @@ export default async function t4({ page, results, ok }) {
   await sleep(800);
   await go(page, '/admin/products');
   await sleep(900);
-  ok('adm-products: 18 rows', (await count(page, '.admin-table tbody tr')) === 18);
+  ok('adm-products: 16 rows', (await count(page, '.admin-table tbody tr')) === 16);
   await type(page, '.admin-search input', 'Chelsea');
   await sleep(500);
   ok('adm-products: search -> 1 row', (await count(page, '.admin-table tbody tr')) === 1);
@@ -45,7 +45,7 @@ export default async function t4({ page, results, ok }) {
   ok('adm-products: sale-only shoes = 3', (await count(page, '.admin-table tbody tr')) === 3);
   await clickByText(page, '.admin-clear-filters', 'Clear');
   await sleep(500);
-  ok('adm-products: cleared -> 18', (await count(page, '.admin-table tbody tr')) === 18);
+  ok('adm-products: cleared -> 16', (await count(page, '.admin-table tbody tr')) === 16);
 
   // ---- Create product (empty submit first) ----
   await go(page, '/admin/products/add');
@@ -66,8 +66,10 @@ export default async function t4({ page, results, ok }) {
   await page.evaluate(() => [...document.querySelectorAll('.admin-color-row .admin-icon-btn')].pop().click());
   await sleep(300);
   ok('adm-form: color removed -> 1 row', (await count(page, '.admin-color-row')) === 1);
-  const fileInput = await page.$('.admin-form input[type="file"]');
-  await fileInput.uploadFile(FIXTURE);
+  // The form holds several file inputs (one per color + the main images one,
+  // rendered last). Grab the LAST one so the upload lands in form.images.
+  const fileInputs = await page.$$('.admin-form input[type="file"]');
+  await fileInputs[fileInputs.length - 1].uploadFile(FIXTURE);
   await sleep(700);
   ok('adm-form: image uploaded', (await count(page, '.admin-image-item')) === 1);
   await smartClick(page, '.admin-form-actions button[type="submit"]');

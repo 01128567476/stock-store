@@ -8,6 +8,7 @@ import { LangProvider } from './context/LangContext';
 import { ToastProvider } from './context/ToastContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { OrdersProvider } from './context/OrdersContext';
 import './index.css';
 
 createRoot(document.getElementById('root')).render(
@@ -19,7 +20,9 @@ createRoot(document.getElementById('root')).render(
           <ToastProvider>
             <WishlistProvider>
               <CartProvider>
-                <App />
+                <OrdersProvider>
+                  <App />
+                </OrdersProvider>
               </CartProvider>
             </WishlistProvider>
           </ToastProvider>

@@ -12,6 +12,7 @@ import AdminProducts from './pages/AdminProducts';
 import AdminProductForm from './pages/AdminProductForm';
 import AdminAds from './pages/AdminAds';
 import AdminCategories from './pages/AdminCategories';
+import AdminOrders from './pages/AdminOrders';
 
 const Home = lazy(() => import('./pages/Home'));
 const Shop = lazy(() => import('./pages/Shop'));
@@ -79,6 +80,7 @@ function AppShell() {
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route element={<AdminRoute />}>
                 <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/orders" element={<AdminOrders />} />
                 <Route path="/admin/products" element={<AdminProducts />} />
                 <Route path="/admin/products/add" element={<AdminProductForm />} />
                 <Route path="/admin/products/edit/:id" element={<AdminProductForm />} />

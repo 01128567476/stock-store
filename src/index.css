@@ -2311,6 +2311,24 @@ p { margin: 0 0 1rem; }
 .admin-icon-btn:hover { background: var(--inv-bg); color: var(--inv-text); border-color: var(--inv-bg); }
 .admin-icon-btn.danger:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
 
+/* Orders */
+.admin-order-no { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.admin-order-items { display: flex; flex-direction: column; gap: .35rem; }
+.admin-order-item { display: flex; align-items: center; gap: .45rem; font-size: .8rem; white-space: nowrap; }
+.admin-order-item-img { flex-shrink: 0; width: 34px; height: 40px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); background: var(--surface-2); }
+.admin-order-total { font-weight: 650; white-space: nowrap; }
+.admin-stat-egp { font-weight: 800; font-size: .78rem; letter-spacing: .02em; }
+.admin-order-status-select { min-height: 34px; padding: .3rem 1.9rem .3rem .6rem; font-size: .78rem; }
+.admin-status.new { background: var(--accent-soft); color: var(--accent-dark, var(--accent)); }
+.admin-status.shipped { background: rgba(47,107,69,.12); color: var(--success); }
+.admin-status.delivered { background: var(--surface-2); color: var(--muted); }
+.admin-order-card { flex-direction: column; }
+.admin-order-card-body { display: flex; flex-direction: column; gap: .3rem; }
+.admin-order-card-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .2rem; }
+.admin-order-card-total { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin-top: .35rem; }
+.admin-order-card-actions { display: flex; gap: .45rem; align-items: center; flex-wrap: wrap; padding-top: .6rem; border-top: 1px solid var(--line); margin-top: .4rem; }
+.admin-order-card-actions .admin-order-status-select { flex: 1; min-width: 120px; }
+
 /* Mobile cards */
 .admin-mobile-cards { display: none; flex-direction: column; gap: 1rem; }
 .admin-product-card { display: flex; gap: 1rem; padding: 1rem; border: 1px solid var(--line); border-radius: 14px; background: var(--bg); }

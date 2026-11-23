@@ -204,5 +204,14 @@ export const sortByNewest = (products) =>
 export const sortBySaleAndNewest = (products) =>
   sortByNewest(products).sort((a, b) => Number(b.salePrice != null) - Number(a.salePrice != null));
 export const effectivePrice = (p) => (p.salePrice != null ? p.salePrice : p.price);
+// Image that represents a specific color: the first image uploaded for that
+// color in the admin panel, falling back to the product's main image.
+export const colorImage = (product, colorName) => {
+  const color = Array.isArray(product?.colors)
+    ? product.colors.find((c) => c?.name === colorName)
+    : null;
+  const first = Array.isArray(color?.images) ? color.images.find(Boolean) : null;
+  return first || product?.images?.find(Boolean) || '';
+};
 export const discountPercent = (p) =>
   p.salePrice != null ? Math.round((1 - p.salePrice / p.price) * 100) : 0;

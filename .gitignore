@@ -8,3 +8,5 @@ build/
 .DS_Store
 Thumbs.db
 .vite/
+.e2e/shots/
+mobile-admin-color-images.png

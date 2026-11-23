@@ -35,7 +35,20 @@ export default function OrderSuccess() {
   const lines = order.items.map((i) => t('order.line', { qty: i.qty, name: i.name, size: i.size, color: i.color, total: money(i.total) })).join('\n');
   const paymentLabel =
     order.payment === 'cod' ? t('checkout.cod') : order.payment === 'instapay' ? t('checkout.instapay') : t('checkout.ewallet');
-  const message = `${t('order.hello', { store: STORE.name, id: order.id })}\n${lines}\nTotal: ${money(order.total)} (${paymentLabel})\nName: ${order.customer.fullName}\nPhone: ${order.customer.phone}`;
+  const orderNo = order.number || order.id;
+  // Full order details sent to the store's WhatsApp — must match what the
+  // admin sees on the dashboard, including the sequential order number.
+  const message = [
+    t('order.hello', { store: STORE.name, id: orderNo }),
+    lines,
+    `${t('order.subtotal')}: ${money(order.subtotal)}`,
+    `${t('order.shipping')}: ${order.shipping === 0 ? t('order.free') : money(order.shipping)}`,
+    `${t('order.total')}: ${money(order.total)} (${paymentLabel})`,
+    `${t('order.waName')}: ${order.customer.fullName}`,
+    `${t('order.waPhone')}: ${order.customer.phone}`,
+    `${t('order.waAddress')}: ${order.customer.address}, ${order.customer.city}`,
+    order.customer.notes ? `${t('order.waNotes')}: ${order.customer.notes}` : '',
+  ].filter(Boolean).join('\n');
   const wa = `https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(message)}`;
 
   return (
@@ -45,7 +58,7 @@ export default function OrderSuccess() {
       <h1>{t('order.confirmed')}</h1>
       <p className="muted">
         {t('order.order', {
-          id: order.id,
+          id: order.number || order.id,
           date: new Date(order.date).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-EG', { day: 'numeric', month: 'long', year: 'numeric' }),
         })}
       </p>

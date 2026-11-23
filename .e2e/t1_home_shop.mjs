@@ -10,12 +10,12 @@ export default async function t1({ page, results, ok }) {
   ok('home: default lang = ar', (await page.evaluate(() => document.documentElement.lang)) === 'ar');
   ok('home: default dir = rtl', (await page.evaluate(() => document.documentElement.dir)) === 'rtl');
   ok('home: hero image rendered', await exists(page, '.hero-media-main'));
-  ok('home: 6 category tiles (default)', (await count(page, '.cat-tile')) === 6);
+  ok('home: 5 category tiles (default)', (await count(page, '.cat-tile')) === 5);
   ok('home: AR tile name أحذية', (await txtAll(page, '.cat-tile-title')).includes('أحذية'));
   ok('home: footer logo exists', await exists(page, '.footer-logo'));
   const wa = await attr(page, '.whatsapp', 'href');
   ok('home: whatsapp float link', !!wa && wa.startsWith('https://wa.me/'));
-  ok('home: topbar shows free-shipping', (await txt(page, '.topbar')).includes('3,000'));
+  ok('home: topbar shows free-shipping', (await txt(page, '.topbar')).includes('2,500'));
 
   // ---- Language switch to EN ----
   await page.evaluate(() => localStorage.setItem('mv-lang', 'en'));
@@ -23,7 +23,7 @@ export default async function t1({ page, results, ok }) {
   await sleep(800);
   ok('lang: switched to en/ltr', (await page.evaluate(() => document.documentElement.lang)) === 'en'
     && (await page.evaluate(() => document.documentElement.dir)) === 'ltr');
-  ok('lang: hero h1 EN', ((await txt(page, '.hero h1')) || '').includes('EVERYDAY'));
+  ok('lang: hero h1 EN', ((await txt(page, '.hero h1')) || '').includes('THIS IS YOUR STYLE'));
 
   // ---- Theme toggle ----
   await smartClick(page, '.nav-actions button[aria-label="Switch to dark mode"]');
@@ -62,18 +62,18 @@ export default async function t1({ page, results, ok }) {
   ok('tile: 7 shoes products', (await count(page, '.card')) === 7);
   ok('tile: results count text', ((await txt(page, '.results-count')) || '').includes('7'));
 
-  // ---- Filters drawer ----
+  // ---- Quick category chips + filter drawer (category, price, sale) ----
+  await clickByText(page, '.quick-category-chip', 'All');
+  await sleep(700);
+  ok('chips: All -> 16 products', (await count(page, '.card')) === 16);
   await smartClick(page, '.filter-toggle'); // open the drawer (inputs are hidden otherwise)
   await sleep(500);
-  await clickByText(page, '.chips .chip', 'Sweaters');
-  await sleep(600);
-  ok('filters: sweaters = 3', (await count(page, '.card')) === 3);
   await setInput(page, '.range input[aria-label="Min"]', '2000');
   await sleep(700);
-  ok('filters: min 2000 leaves 1 (eff. price)', (await count(page, '.card')) === 1, await txt(page, '.results-count'));
+  ok('filters: min 2000 leaves 9 (eff. price)', (await count(page, '.card')) === 9, await txt(page, '.results-count'));
   await clickByText(page, '.filters button', 'Clear all filters');
   await sleep(700);
-  ok('filters: clear all -> 18 products', (await count(page, '.card')) === 18);
+  ok('filters: clear all -> 16 products', (await count(page, '.card')) === 16);
   await setInput(page, '.range input[aria-label="Min"]', '99999');
   await sleep(700);
   ok('filters: impossible range -> empty state', await exists(page, '.empty'));
@@ -82,10 +82,10 @@ export default async function t1({ page, results, ok }) {
   // First click may only close the open filters drawer (ghost-click guard) — click again.
   await clickByText(page, '.empty button', 'Clear filters');
   await sleep(700);
-  ok('filters: empty-state clear -> 18', (await count(page, '.card')) === 18);
-  await smartClick(page, '.filters .check input');
+  ok('filters: empty-state clear -> 16', (await count(page, '.card')) === 16);
+  await smartClick(page, '.filters .filter-sale-card input');
   await sleep(700);
-  ok('filters: sale-only = 9', (await count(page, '.card')) === 9, await txt(page, '.results-count'));
+  ok('filters: sale-only = 8', (await count(page, '.card')) === 8, await txt(page, '.results-count'));
   await clickByText(page, '.filters button', 'Clear all filters');
   await sleep(600);
 

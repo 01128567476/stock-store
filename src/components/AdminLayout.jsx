@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
 import { useLang } from '../context/LangContext';
-import { ArrowIcon, CloseIcon, ImageIcon, LayoutIcon, LogoutIcon, MenuIcon, PackageIcon, PlusIcon, TagIcon } from './Icons';
+import { ArrowIcon, CloseIcon, ImageIcon, LayoutIcon, LogoutIcon, MenuIcon, PackageIcon, PlusIcon, TagIcon, TruckIcon } from './Icons';
 
 export default function AdminLayout({ children }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -13,6 +13,7 @@ export default function AdminLayout({ children }) {
 
   const links = [
     { to: '/admin', labelKey: 'admin.dashboard', icon: <LayoutIcon size={18} /> },
+    { to: '/admin/orders', labelKey: 'admin.orders', icon: <TruckIcon size={18} /> },
     { to: '/admin/products', labelKey: 'admin.products', icon: <PackageIcon size={18} /> },
     { to: '/admin/products/add', labelKey: 'admin.addProduct', icon: <PlusIcon size={18} /> },
     { to: '/admin/categories', labelKey: 'admin.categories', icon: <TagIcon size={18} /> },

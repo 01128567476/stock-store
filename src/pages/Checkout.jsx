@@ -1,9 +1,12 @@
 import { useRef, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { STORE, money } from '../config';
+import { colorImage } from '../data/products';
+import { useAdmin } from '../context/AdminContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useLang } from '../context/LangContext';
+import { useOrders } from '../context/OrdersContext';
 import { useSEO } from '../hooks/useSEO';
 import ProductImage from '../components/ProductImage';
 import { CashIcon, InstapayIcon, WalletIcon } from '../components/Icons';
@@ -22,6 +25,10 @@ export default function Checkout() {
   const validators = makeValidators();
   useSEO(t('checkout.title'));
   const { lines, subtotal, shipping, total, clear } = useCart();
+  // Live admin catalog (includes color images uploaded from the admin panel);
+  // the cart's static product snapshot doesn't have them.
+  const { products: liveProducts } = useAdmin();
+  const { addOrder } = useOrders();
   const navigate = useNavigate();
   const toast = useToast();
   const placed = useRef(false);
@@ -40,6 +47,11 @@ export default function Checkout() {
 
   const blur = (field) => () => setErrors((er) => ({ ...er, [field]: validators[field](form[field]) }));
 
+  // The order stores the image of the color the customer actually picked, so
+  // the admin dashboard shows the right variant — not the product's main photo.
+  const liveProduct = (line) => liveProducts.find((p) => p.id === line.product.id) || line.product;
+  const lineImage = (line) => colorImage(liveProduct(line), line.color) || line.product.images[0];
+
   const submit = (e) => {
     e.preventDefault();
     const found = {};
@@ -55,13 +67,11 @@ export default function Checkout() {
       return;
     }
 
-    const id = `MV-${Date.now().toString(36).toUpperCase()}`;
     // normalize the city back to its canonical English key so orders/WhatsApp
     // messages stay consistent regardless of the UI language
     const cityLabel = form.city.trim();
     const canonicalCity = CITIES.find((c) => t(`checkout.cities.${c}`) === cityLabel) || cityLabel;
     const order = {
-      id,
       date: new Date().toISOString(),
       customer: {
         fullName: form.fullName.trim(),
@@ -78,22 +88,19 @@ export default function Checkout() {
         qty: l.qty,
         unit: l.unit,
         total: l.total,
-        image: l.product.images[0],
+        image: lineImage(l),
       })),
       subtotal,
       shipping,
       total,
     };
 
-    try {
-      const prev = JSON.parse(localStorage.getItem('mv-orders') || '[]');
-      localStorage.setItem('mv-orders', JSON.stringify([order, ...prev]));
-    } catch {
-      /* storage unavailable */
-    }
+    // OrdersProvider assigns the sequential order number (#1, #2, …) and
+    // persists it so the order shows up in the admin dashboard immediately.
+    const saved = addOrder(order);
 
     placed.current = true;
-    navigate(`/order/${id}`, { replace: true, state: { order } });
+    navigate(`/order/${saved.id}`, { replace: true, state: { order: saved } });
     clear();
   };
 
@@ -180,7 +187,7 @@ export default function Checkout() {
             {lines.map((l) => (
               <li key={l.key}>
                 <div className="summary-img">
-                  <ProductImage src={l.product.images[0]} alt={l.product.name} />
+                  <ProductImage src={lineImage(l)} alt={l.product.name} />
                   <span className="qty-badge">{l.qty}</span>
                 </div>
                 <div>
