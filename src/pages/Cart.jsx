@@ -20,7 +20,7 @@ export default function Cart() {
   const { products: liveProducts } = useAdmin();
   const lineImage = (line) => {
     const live = liveProducts.find((p) => p.id === line.product.id) || line.product;
-    return colorImage(live, line.color) || line.product.images[0];
+    return colorImage(live, line.color) || (line.product.images || [])[0] || '';
   };
 
   if (lines.length === 0) {

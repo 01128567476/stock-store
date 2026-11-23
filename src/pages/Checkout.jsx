@@ -51,7 +51,7 @@ export default function Checkout() {
   // The order stores the image of the color the customer actually picked, so
   // the admin dashboard shows the right variant — not the product's main photo.
   const liveProduct = (line) => liveProducts.find((p) => p.id === line.product.id) || line.product;
-  const lineImage = (line) => colorImage(liveProduct(line), line.color) || line.product.images[0];
+  const lineImage = (line) => colorImage(liveProduct(line), line.color) || (line.product.images || [])[0] || '';
 
   const submit = (e) => {
     e.preventDefault();

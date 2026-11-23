@@ -26,17 +26,19 @@ export default function ProductCard({ product }) {
     <article className={`card ${noAvailableVariant ? 'is-sold-out' : ''}`}>
       <div className="card-media">
         <Link to={link} aria-label={product.name}>
-          <ProductImage src={product.images[0]} alt={product.name} />
-          <img
-            className="card-alt"
-            src={product.images[1]}
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
+          <ProductImage src={(product.images || [])[0] || ''} alt={product.name} />
+          {(product.images || [])[1] && (
+            <img
+              className="card-alt"
+              src={product.images[1]}
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          )}
         </Link>
         <div className="badges">
           {pct > 0 && <span className="badge badge-sale">-{pct}%</span>}

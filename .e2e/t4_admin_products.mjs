@@ -52,7 +52,8 @@ export default async function t4({ page, results, ok }) {
   await sleep(800);
   await smartClick(page, '.admin-form-actions button[type="submit"]');
   await sleep(500);
-  ok('adm-form: validation errors shown', (await count(page, '.admin-field-error')) >= 4);
+  ok('adm-form: validation errors shown', (await count(page, '.admin-field-error')) >= 2);
+  ok('adm-form: description & images are optional (no error for them)', (await count(page, '.admin-field-error')) === 2);
   await type(page, 'input[placeholder="e.g. Essential Oversized Tee"]', 'E2E Product Alpha');
   await type(page, '.admin-form textarea', 'Hard-test product created by the E2E suite.');
   const nums = await page.$$('.admin-form-grid input[type="number"]');
@@ -184,6 +185,39 @@ export default async function t4({ page, results, ok }) {
   await go(page, '/shop?q=E2E Product Alpha');
   await sleep(900);
   ok('adm-delete: gone from storefront', await exists(page, '.empty'));
+
+  // ---- Product with NO description and NO images (both optional) ----
+  await go(page, '/admin/products/add');
+  await sleep(800);
+  await type(page, 'input[placeholder="e.g. Essential Oversized Tee"]', 'E2E Bare Product');
+  const bareNums = await page.$$('.admin-form-grid input[type="number"]');
+  await bareNums[0].type('300');
+  await sleep(300);
+  await smartClick(page, '.admin-form-actions button[type="submit"]');
+  await page.waitForFunction(() => /^#\/admin\/products$/.test(location.hash), { timeout: 5000 });
+  await page.waitForSelector('.admin-search input', { timeout: 5000 });
+  await sleep(400);
+  await type(page, '.admin-search input', 'E2E Bare Product');
+  await sleep(500);
+  ok('bare: product with no desc/images saved & listed', (await count(page, '.admin-table tbody tr')) === 1);
+  await go(page, '/shop?q=E2E Bare Product');
+  await sleep(900);
+  ok('bare: storefront card renders', (await count(page, '.card')) === 1);
+  ok('bare: card image falls back (no broken img)', await exists(page, '.card .pimg-fallback'));
+  await smartClick(page, '.card-title');
+  await sleep(900);
+  ok('bare: PDP opens (not "incomplete")', !(await exists(page, '.pdp > p')) && await exists(page, '.pdp-info h1'));
+  ok('bare: PDP image falls back', await exists(page, '.gallery-main .pimg-fallback'));
+  // Clean up the bare test product so persisted state stays tidy.
+  await go(page, '/admin/products');
+  await sleep(700);
+  await type(page, '.admin-search input', 'E2E Bare Product');
+  await sleep(400);
+  await rowAction(page, 'E2E Bare Product', '.admin-cell-actions button.admin-icon-btn.danger');
+  await sleep(400);
+  await clickByText(page, '.admin-modal button', 'Delete product');
+  await sleep(700);
+  ok('bare: test product deleted', (await count(page, '.admin-table tbody tr')) === 0);
 
   const errs = page._errors.slice(err0);
   ok('t4: zero console/page errors', errs.length === 0, errs.join(' || ').slice(0, 300));

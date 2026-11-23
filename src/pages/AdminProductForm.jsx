@@ -81,12 +81,10 @@ export default function AdminProductForm() {
   const validate = () => {
     const e = {};
     if (!form.name.trim()) e.name = 'admin.errNameRequired';
-    if (!form.description.trim()) e.description = 'admin.errDescriptionRequired';
     if (!form.price || parseFloat(form.price) <= 0) e.price = 'admin.errPriceInvalid';
     if (form.discount !== '' && (parseFloat(form.discount) < 0 || parseFloat(form.discount) > 100)) e.discount = 'admin.errDiscountRange';
     if (!form.colors.length) e.colors = 'admin.errColorsRequired';
     if (!form.sizes.length) e.sizes = 'admin.errSizesRequired';
-    if (!form.images.length) e.images = 'admin.errImagesRequired';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -238,7 +236,6 @@ export default function AdminProductForm() {
           <div className="admin-field full">
             <label>{t('admin.description')}</label>
             <textarea rows={4} value={form.description} onChange={(e) => set('description', e.target.value)} placeholder={t('admin.descriptionPlaceholder')} />
-            {errors.description && <span className="admin-field-error">{t(errors.description)}</span>}
           </div>
 
           <div className="admin-field">
@@ -391,7 +388,6 @@ export default function AdminProductForm() {
 
           <div className="admin-field full">
             <label>{t('admin.images')}</label>
-            {errors.images && <span className="admin-field-error">{t(errors.images)}</span>}
             <div className="admin-image-grid">
               {form.images.map((src, i) => (
                 <div key={i} className="admin-image-item">

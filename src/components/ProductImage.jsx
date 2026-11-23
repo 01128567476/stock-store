@@ -5,6 +5,9 @@ export default function ProductImage({ src, alt, className = '', ...rest }) {
   const ref = useRef(null);
 
   useEffect(() => {
+    // No src (product created without images in the admin panel) → show the
+    // letter placeholder immediately instead of waiting for an error event.
+    if (!src) { setState('error'); return; }
     setState('loading');
     const img = ref.current;
     if (img && img.complete && img.naturalWidth > 0) setState('loaded');

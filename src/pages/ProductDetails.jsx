@@ -130,7 +130,7 @@ function Details({ product, categories }) {
     navigate('/checkout');
   };
 
-  if (!colors.length || !sizes.length || !images.length) {
+  if (!colors.length || !sizes.length) {
     return <div className="container pdp"><p>{t('product.incomplete')}</p></div>;
   }
 
@@ -175,7 +175,11 @@ function Details({ product, categories }) {
             ))}
           </div>
           <div className="gallery-main">
-            <ProductImage src={activeImages[img % activeImages.length]} alt={`${product.name} - ${selectedVariant?.color || ''}`} loading="eager" />
+            {activeImages.length ? (
+              <ProductImage src={activeImages[img % activeImages.length]} alt={`${product.name} - ${selectedVariant?.color || ''}`} loading="eager" />
+            ) : (
+              <ProductImage src="" alt={product.name} loading="eager" />
+            )}
             <div className="badges">
               {pct > 0 && <span className="badge badge-sale">-{pct}%</span>}
               {soldOutWhole && <span className="badge badge-sold-out">{t('admin.soldOut')}</span>}
