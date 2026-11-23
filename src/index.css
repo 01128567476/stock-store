@@ -2435,10 +2435,7 @@ p { margin: 0 0 1rem; }
   cursor: pointer;
 }
 .admin-color-image-add input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
+  display: none;
 }
 .admin-color-image-add span {
   font-size: 1.1rem;

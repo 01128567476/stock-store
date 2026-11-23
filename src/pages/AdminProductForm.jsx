@@ -24,6 +24,7 @@ export default function AdminProductForm() {
 
   const existing = isEdit ? products.find((p) => p.id === id) : null;
   const imageInput = useRef(null);
+  const colorImageInputs = useRef({});
 
   const [form, setForm] = useState({
     name: '', description: '', category: defaultCategory, price: '', discount: '',
@@ -325,11 +326,18 @@ export default function AdminProductForm() {
                         </button>
                       </div>
                     ))}
-                    <label className="admin-color-image-add">
-                      <input type="file" accept="image/*" multiple onChange={(e) => addColorImages(i, e.target.files)} />
+                    <button type="button" className="admin-color-image-add" onClick={() => colorImageInputs.current[i]?.click()}>
                       <span>+</span>
                       <small>{t('admin.addColorImages')}</small>
-                    </label>
+                    </button>
+                    <input
+                      ref={(el) => { colorImageInputs.current[i] = el; }}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => { addColorImages(i, e.target.files); e.target.value = ''; }}
+                      hidden
+                    />
                   </div>
                 </div>
               ))}
